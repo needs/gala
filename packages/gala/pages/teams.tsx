@@ -1,65 +1,44 @@
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue } from 'firebase/database';
-import { useEffect, useState } from 'react';
-import { z } from 'zod';
+import { ref } from 'firebase/database';
+import {
+  database,
+  playersSchema,
+  teamsSchema,
+  useDatabaseValue,
+} from '../lib/database';
 
-// TODO: Replace the following with your app's Firebase project configuration
-const firebaseConfig = {
-  databaseURL:
-    'https://gala-8700f-default-rtdb.europe-west1.firebasedatabase.app/',
-};
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-
-const teamsSchema = z.record(
-  z.string(),
-  z.object({
-    members: z.array(
-      z.object({
-        firstName: z.string(),
-        lastName: z.string(),
-      })
-    ),
-  })
-);
+const teamsRef = ref(database, 'teams');
+const playersRef = ref(database, 'players');
 
 export function Teams() {
-  const [teams, setTeams] = useState<z.infer<typeof teamsSchema> | undefined>(
-    undefined
+  const teams = useDatabaseValue(
+    teamsRef,
+    teamsSchema
+  );
+  const players = useDatabaseValue(
+    playersRef,
+    playersSchema
   );
 
-  useEffect(() => {
-    const teamsRef = ref(database, 'teams');
-
-    onValue(teamsRef, (snapshot) => {
-      const val = snapshot.val();
-
-      if (val === null) {
-        setTeams({});
-      } else {
-        setTeams(teamsSchema.parse(val));
-      }
-    });
-  }, []);
+  if (teams === undefined || players === undefined) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>
       <h1>Teams</h1>
       <section>
-        {teams &&
-          Object.entries(teams).map(([teamName, team]) => (
-            <article key={teamName}>
-              <h2>{teamName}</h2>
-              <ul>
-                {team.members.map((member, index) => (
-                  <li key={index}>
-                    {member.firstName} {member.lastName}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
+        {Object.entries(teams).map(([uuid, team]) => (
+          <article key={uuid}>
+            <h2>{team.name}</h2>
+            <ul>
+              {team.members.map((playerKey) => (
+                <li key={playerKey}>
+                  {players[playerKey].firstName} {players[playerKey].lastName}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
       </section>
     </>
   );
