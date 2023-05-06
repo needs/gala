@@ -19,7 +19,7 @@ export function useDatabaseValue<T extends z.ZodTypeAny>(ref: DatabaseReference,
   useEffect(() => {
     onValue(ref, (snapshot) => {
       const val = snapshot.val();
-      console.log(val);
+
       if (val === null) {
         setValue(schema.parse(undefined));
       } else {
@@ -40,9 +40,10 @@ export const teamsSchema = z.record(
     name: z.string(),
     members: z.record(
       z.string(),
-      z.boolean(),
+      z.oboolean(),
     ),
-  })
+    category: z.string().optional(),
+  }),
 ).default({});
 
 export const playersSchema = z.record(
@@ -50,5 +51,20 @@ export const playersSchema = z.record(
   z.object({
     firstName: z.string(),
     lastName: z.string(),
+  })
+).default({});
+
+export const categoriesSchema = z.record(
+  z.string(),
+  z.object({
+    name: z.string(),
+    sex: z.enum(["male", "female", "mixed"]),
+    apparatuses: z.record(
+      z.string(),
+      z.object({
+        name: z.string(),
+        icon: z.string(),
+      }),
+    ).optional().default({}),
   })
 ).default({});
