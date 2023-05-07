@@ -1,4 +1,4 @@
-import { ref, set, push, child } from 'firebase/database';
+import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Player,
   Team,
@@ -9,6 +9,7 @@ import {
 } from '../lib/database';
 import {
   Button,
+  IconButton,
   Paper,
   Stack,
   Table,
@@ -19,7 +20,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
@@ -27,7 +28,31 @@ import EditTeamDialog from '../components/EditTeamDialog';
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
 
-function PlayerButton({
+function EditTeamButton({
+  team,
+  onChange,
+}: {
+  team: Team;
+  onChange: (team: Team) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditTeamDialog
+        open={open}
+        onCancel={() => setOpen(false)}
+        onValidate={(team) => {onChange(team); setOpen(false)}}
+        team={team}
+      />
+      <IconButton onClick={() => setOpen(true)}>
+        <Edit />
+      </IconButton>
+    </>
+  );
+}
+
+function EditPlayerButton({
   player,
   onChange,
 }: {
@@ -130,6 +155,14 @@ export function Teams() {
     set(child(membersRef, playerKey), true);
   };
 
+  const updateTeam = (teamKey: string, team: Team) => {
+    set(child(teamsRef, teamKey), team);
+  };
+
+  const deleteTeam = (teamKey: string) => {
+    remove(child(teamsRef, teamKey));
+  };
+
   if (teams === undefined || players === undefined) {
     return <p>Loading...</p>;
   }
@@ -157,7 +190,7 @@ export function Teams() {
                   </TableCell>
                   <TableCell>
                     {Object.keys(team.members).map((playerKey) => (
-                      <PlayerButton
+                      <EditPlayerButton
                         key={playerKey}
                         player={players[playerKey]}
                         onChange={(player) => updatePlayer(playerKey, player)}
@@ -168,6 +201,22 @@ export function Teams() {
                         addMember(teamKey, addPlayer(player));
                       }}
                     />
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" gap={1}>
+                    <EditTeamButton
+                      team={team}
+                      onChange={(team) =>
+                        updateTeam(teamKey, team)
+                      }
+                    />
+                    <IconButton
+                      onDoubleClick={() => deleteTeam(teamKey)}
+                      sx={{color: "lightcoral"}}
+                    >
+                      <Delete />
+                    </IconButton>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}

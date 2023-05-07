@@ -1,4 +1,4 @@
-import { ref, set, push, child } from 'firebase/database';
+import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Category,
   categoriesSchema,
@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import EditCategoryDialog from '../components/EditCategoryDialog';
-import { Add, Boy, Delete, Edit, Girl, Group, Man, Man2, Shuffle, Woman } from '@mui/icons-material';
+import { Boy, Delete, Edit, Girl, Group } from '@mui/icons-material';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
@@ -106,7 +106,7 @@ export function Teams() {
   };
 
   const deleteCategory = (categoryKey: string) => {
-    set(child(categoriesRef, categoryKey), null);
+    remove(child(categoriesRef, categoryKey));
   };
 
   if (categories === undefined || teams === undefined) {
@@ -148,6 +148,7 @@ export function Teams() {
                     />
                     <IconButton
                       onDoubleClick={() => deleteCategory(categoryKey)}
+                      sx={{color: "lightcoral"}}
                     >
                       <Delete />
                     </IconButton>
