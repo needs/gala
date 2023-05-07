@@ -6,17 +6,31 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import { Category, Group } from '@mui/icons-material';
+import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
 
+const menu = [
+  {
+    label: 'Équipes',
+    href: '/teams',
+    icon: <Group />,
+  },
+  {
+    label: 'Catégories',
+    href: '/categories',
+    icon: <Category />,
+  },
+]
+
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
@@ -38,26 +52,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
+            {menu.map(({label, href, icon}) => (
+              <ListItem key={label} disablePadding>
+                <ListItemButton selected={href === router.asPath} href={href}>
                   <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                    {icon}
                   </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
+                  <ListItemText primary={label} />
                 </ListItemButton>
               </ListItem>
             ))}
