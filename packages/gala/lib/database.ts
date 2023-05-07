@@ -54,6 +54,8 @@ export const playersSchema = z.record(
   })
 ).default({});
 
+export type Player = z.infer<typeof playersSchema>[string];
+
 export const categoriesSchema = z.record(
   z.string(),
   z.object({
