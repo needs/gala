@@ -46,6 +46,8 @@ export const teamsSchema = z.record(
   }),
 ).default({});
 
+export type Team = z.infer<typeof teamsSchema>[string];
+
 export const playersSchema = z.record(
   z.string(),
   z.object({

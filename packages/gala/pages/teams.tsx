@@ -1,6 +1,7 @@
 import { ref, set, push, child } from 'firebase/database';
 import {
   Player,
+  Team,
   database,
   playersSchema,
   teamsSchema,
@@ -21,6 +22,7 @@ import {
 import { Add } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useState } from 'react';
+import EditTeamDialog from '../components/EditTeamDialog';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -71,6 +73,28 @@ function AddPlayerButton({ onAdd }: { onAdd: (player: Player) => void }) {
   );
 }
 
+function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditTeamDialog
+        open={open}
+        onCancel={() => setOpen(false)}
+        team={{
+          name: '',
+          category: undefined,
+          members: {},
+        }}
+        onValidate={onAdd}
+      />
+      <Button variant="contained" onClick={() => setOpen(true)}>
+        Ajouter
+      </Button>
+    </>
+  );
+}
+
 export function Teams() {
   const teams = useDatabaseValue(teamsRef, teamsSchema);
   const players = useDatabaseValue(playersRef, playersSchema);
@@ -90,25 +114,19 @@ export function Teams() {
     set(child(playersRef, playerKey), player);
   };
 
-  const addRandomTeam = () => {
+  const addTeam = (team: Team) => {
     const newTeamKey = push(teamsRef).key;
 
     if (newTeamKey === null) {
       throw new Error('newTeamKey is null');
     }
 
-    const newTeam = {
-      name: 'Team ' + newTeamKey,
-      members: {},
-    };
-
-    set(child(teamsRef, newTeamKey), newTeam);
-
+    set(child(teamsRef, newTeamKey), team);
     return newTeamKey;
   };
 
   const addMember = (teamKey: string, playerKey: string) => {
-    const membersRef = ref(database, "teams/${teamKey}/members");
+    const membersRef = ref(database, `teams/${teamKey}/members`);
     set(child(membersRef, playerKey), true);
   };
 
@@ -145,18 +163,18 @@ export function Teams() {
                         onChange={(player) => updatePlayer(playerKey, player)}
                       />
                     ))}
-                    <AddPlayerButton onAdd={(player) => {
-                      addMember(teamKey, addPlayer(player))
-                    }} />
+                    <AddPlayerButton
+                      onAdd={(player) => {
+                        addMember(teamKey, addPlayer(player));
+                      }}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-        <Button variant="contained" onClick={addRandomTeam}>
-          Ajouter
-        </Button>
+        <AddTeamButton onAdd={addTeam}/>
       </Stack>
     </>
   );
