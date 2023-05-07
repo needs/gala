@@ -25,6 +25,7 @@ import { Add, Delete, Edit, Woman } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
+import Head from 'next/head';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -70,11 +71,14 @@ function EditPlayerButton({
       <EditPlayerDialog
         open={open}
         onCancel={() => setOpen(false)}
-        onValidate={onChange}
+        onValidate={(player) => {
+          onChange(player);
+          setOpen(false);
+        }}
         player={player}
       />
       <Chip
-        icon={<Woman sx={{ "&&": {color: 'pink'} }}/>}
+        icon={<Woman sx={{ '&&': { color: 'pink' } }} />}
         onClick={() => setOpen(true)}
         label={`${player.firstName} ${player.lastName.toUpperCase()}`}
         variant="outlined"
@@ -178,6 +182,9 @@ export function Teams() {
 
   return (
     <>
+      <Head>
+        <title>Équipes</title>
+      </Head>
       <Stack padding={2} gap={2}>
         <Typography variant="h1">Équipes</Typography>
         <TableContainer component={Paper}>
@@ -199,18 +206,18 @@ export function Teams() {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" gap={1}>
-                    {Object.keys(team.members).map((playerKey) => (
-                      <EditPlayerButton
-                        key={playerKey}
-                        player={players[playerKey]}
-                        onChange={(player) => updatePlayer(playerKey, player)}
+                      {Object.keys(team.members).map((playerKey) => (
+                        <EditPlayerButton
+                          key={playerKey}
+                          player={players[playerKey]}
+                          onChange={(player) => updatePlayer(playerKey, player)}
+                        />
+                      ))}
+                      <AddPlayerButton
+                        onAdd={(player) => {
+                          addMember(teamKey, addPlayer(player));
+                        }}
                       />
-                    ))}
-                    <AddPlayerButton
-                      onAdd={(player) => {
-                        addMember(teamKey, addPlayer(player));
-                      }}
-                    />
                     </Stack>
                   </TableCell>
                   <TableCell>

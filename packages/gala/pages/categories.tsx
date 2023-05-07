@@ -22,6 +22,7 @@ import {
 import { useState } from 'react';
 import EditCategoryDialog from '../components/EditCategoryDialog';
 import { Boy, Delete, Edit, Girl, Group } from '@mui/icons-material';
+import Head from 'next/head';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
@@ -40,7 +41,10 @@ function EditCategoryButton({
       <EditCategoryDialog
         open={open}
         onCancel={() => setOpen(false)}
-        onValidate={(category) => {onChange(category); setOpen(false)}}
+        onValidate={(category) => {
+          onChange(category);
+          setOpen(false);
+        }}
         category={category}
       />
       <IconButton onClick={() => setOpen(true)}>
@@ -75,14 +79,26 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
   );
 }
 
-function CategoryIcon({ category }: { category: Category}) {
+function CategoryIcon({ category }: { category: Category }) {
   switch (category.sex) {
     case 'female':
-      return <Avatar sx={{ bgcolor: "pink"}}><Girl /></Avatar>;
+      return (
+        <Avatar sx={{ bgcolor: 'pink' }}>
+          <Girl />
+        </Avatar>
+      );
     case 'male':
-      return <Avatar sx={{ bgcolor: "lightblue"}}><Boy /></Avatar>;
+      return (
+        <Avatar sx={{ bgcolor: 'lightblue' }}>
+          <Boy />
+        </Avatar>
+      );
     case 'mixed':
-      return <Avatar><Group /></Avatar>;
+      return (
+        <Avatar>
+          <Group />
+        </Avatar>
+      );
   }
 }
 
@@ -114,53 +130,58 @@ export function Teams() {
   }
 
   return (
-    <Stack padding={2} gap={2}>
-      <Typography variant="h1">Catégories</Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableBody>
-            {Object.entries(categories).map(([categoryKey, category]) => (
-              <TableRow
-                key={categoryKey}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  <CategoryIcon category={category} />
+    <>
+      <Head>
+        <title>Catégories</title>
+      </Head>
+      <Stack padding={2} gap={2}>
+        <Typography variant="h1">Catégories</Typography>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableBody>
+              {Object.entries(categories).map(([categoryKey, category]) => (
+                <TableRow
+                  key={categoryKey}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    <CategoryIcon category={category} />
                   </TableCell>
                   <TableCell component="th" scope="row">
-                  {category.name}
-                </TableCell>
-                <TableCell>
-                  {
-                    Object.values(teams).filter(
-                      (team) => team.category === categoryKey
-                    ).length
-                  }{' '}
-                  équipe(s)
-                </TableCell>
-                <TableCell>
-                  <Stack direction="row" gap={1}>
-                    <EditCategoryButton
-                      category={category}
-                      onChange={(category) =>
-                        updateCategory(categoryKey, category)
-                      }
-                    />
-                    <IconButton
-                      onDoubleClick={() => deleteCategory(categoryKey)}
-                      sx={{color: "lightcoral"}}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <AddCategoryButton onAdd={addCategory} />
-    </Stack>
+                    {category.name}
+                  </TableCell>
+                  <TableCell>
+                    {
+                      Object.values(teams).filter(
+                        (team) => team.category === categoryKey
+                      ).length
+                    }{' '}
+                    équipe(s)
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" gap={1}>
+                      <EditCategoryButton
+                        category={category}
+                        onChange={(category) =>
+                          updateCategory(categoryKey, category)
+                        }
+                      />
+                      <IconButton
+                        onDoubleClick={() => deleteCategory(categoryKey)}
+                        sx={{ color: 'lightcoral' }}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <AddCategoryButton onAdd={addCategory} />
+      </Stack>
+    </>
   );
 }
 
