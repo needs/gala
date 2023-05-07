@@ -1,8 +1,12 @@
+import { Stack } from '@mui/material';
 import Link from 'next/link';
 
 export function Index() {
   return (
-    <Link href="/teams">Teams</Link>
+    <Stack>
+      <Link href="/teams">Teams</Link>
+      <Link href="/categories">Catégories</Link>
+    </Stack>
   );
 }
 
