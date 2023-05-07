@@ -7,14 +7,12 @@ import {
   DialogActions,
   Button,
   Select,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Category } from '../lib/database';
+import { Group, Man, Woman } from '@mui/icons-material';
 
 export default function EditCategoryDialog({
   open,
@@ -52,28 +50,23 @@ export default function EditCategoryDialog({
             setEditedCategory({ ...editedCategory, name: event.target.value })
           }
         />
-        <FormControl>
-          <FormLabel id="sex-label">Genre</FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="sex-label"
-            name="row-radio-buttons-group"
-            onChange={(event) =>
-              setEditedCategory({
-                ...editedCategory,
-                sex: event.target.value as Category["sex"]})
-            }
-            value={editedCategory.sex}
-          >
-            <FormControlLabel
-              value="female"
-              control={<Radio />}
-              label="Female"
-            />
-            <FormControlLabel value="male" control={<Radio />} label="Male" />
-            <FormControlLabel value="mixed" control={<Radio />} label="Mixed" />
-          </RadioGroup>
-        </FormControl>
+        <ToggleButtonGroup
+          value={editedCategory.sex}
+          exclusive
+          onChange={(event, newSex: Category['sex']) =>
+            setEditedCategory({ ...editedCategory, sex: newSex })
+          }
+        >
+          <ToggleButton value="male">
+            <Man sx={{ color: "lightblue"}}/>
+          </ToggleButton>
+          <ToggleButton value="female">
+            <Woman sx={{ color: "pink"}}/>
+          </ToggleButton>
+          <ToggleButton value="mixed">
+            <Group />
+          </ToggleButton>
+        </ToggleButtonGroup>
         <Select>{/* TODO: Category apparatuses */}</Select>
       </DialogContent>
       <DialogActions>
