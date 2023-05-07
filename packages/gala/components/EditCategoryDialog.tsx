@@ -7,6 +7,11 @@ import {
   DialogActions,
   Button,
   Select,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Category } from '../lib/database';
@@ -26,7 +31,7 @@ export default function EditCategoryDialog({
 
   useEffect(() => {
     setEditedCategory(category);
-  }, [category])
+  }, [category]);
 
   return (
     <Dialog open={open} onClose={onCancel}>
@@ -47,12 +52,29 @@ export default function EditCategoryDialog({
             setEditedCategory({ ...editedCategory, name: event.target.value })
           }
         />
-        <Select>
-          {/* TODO: Category sex */}
-        </Select>
-        <Select>
-          {/* TODO: Category apparatuses */}
-        </Select>
+        <FormControl>
+          <FormLabel id="sex-label">Genre</FormLabel>
+          <RadioGroup
+            row
+            aria-labelledby="sex-label"
+            name="row-radio-buttons-group"
+            onChange={(event) =>
+              setEditedCategory({
+                ...editedCategory,
+                sex: event.target.value as Category["sex"]})
+            }
+            value={editedCategory.sex}
+          >
+            <FormControlLabel
+              value="female"
+              control={<Radio />}
+              label="Female"
+            />
+            <FormControlLabel value="male" control={<Radio />} label="Male" />
+            <FormControlLabel value="mixed" control={<Radio />} label="Mixed" />
+          </RadioGroup>
+        </FormControl>
+        <Select>{/* TODO: Category apparatuses */}</Select>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>Annuler</Button>

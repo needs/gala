@@ -44,7 +44,7 @@ function PlayerButton({
         onValidate={onChange}
         player={player}
       />
-      <Button variant="text">{`${player.firstName} ${player.lastName}`}</Button>
+      <Button variant="text" onClick={() => setOpen(true)}>{`${player.firstName} ${player.lastName}`}</Button>
     </>
   );
 }

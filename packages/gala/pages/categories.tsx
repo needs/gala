@@ -7,7 +7,9 @@ import {
   useDatabaseValue,
 } from '../lib/database';
 import {
+  Avatar,
   Button,
+  IconButton,
   Paper,
   Stack,
   Table,
@@ -19,12 +21,12 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import EditCategoryDialog from '../components/EditCategoryDialog';
-import { Add } from '@mui/icons-material';
+import { Add, Boy, Delete, Edit, Girl, Group, Man, Man2, Shuffle, Woman } from '@mui/icons-material';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
 
-function CategoryButton({
+function EditCategoryButton({
   category,
   onChange,
 }: {
@@ -38,10 +40,12 @@ function CategoryButton({
       <EditCategoryDialog
         open={open}
         onCancel={() => setOpen(false)}
-        onValidate={onChange}
+        onValidate={(category) => {onChange(category); setOpen(false)}}
         category={category}
       />
-      <Button variant="text">{`${category.name}`}</Button>
+      <IconButton onClick={() => setOpen(true)}>
+        <Edit />
+      </IconButton>
     </>
   );
 }
@@ -55,20 +59,31 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
         open={open}
         onCancel={() => setOpen(false)}
         onValidate={(player) => {
-          onAdd(player);
           setOpen(false);
+          onAdd(player);
         }}
         category={{
-          name: "",
-          sex: "female",
+          name: '',
+          sex: 'female',
           apparatuses: {},
         }}
       />
-      <Button onClick={() => setOpen(true)}>
-        <Add />
+      <Button variant="contained" onClick={() => setOpen(true)}>
+        Ajouter
       </Button>
     </>
   );
+}
+
+function CategoryIcon({ category }: { category: Category}) {
+  switch (category.sex) {
+    case 'female':
+      return <Avatar sx={{ bgcolor: "pink"}}><Girl /></Avatar>;
+    case 'male':
+      return <Avatar sx={{ bgcolor: "lightblue"}}><Boy /></Avatar>;
+    case 'mixed':
+      return <Avatar><Group /></Avatar>;
+  }
 }
 
 export function Teams() {
@@ -90,6 +105,10 @@ export function Teams() {
     set(child(categoriesRef, categoryKey), category);
   };
 
+  const deleteCategory = (categoryKey: string) => {
+    set(child(categoriesRef, categoryKey), null);
+  };
+
   if (categories === undefined || teams === undefined) {
     return <p>Loading...</p>;
   }
@@ -106,13 +125,33 @@ export function Teams() {
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
+                  <CategoryIcon category={category} />
+                  </TableCell>
+                  <TableCell component="th" scope="row">
                   {category.name}
                 </TableCell>
                 <TableCell>
-                  {Object.values(teams).filter((team) => team.category === categoryKey).length} équipe(s)
+                  {
+                    Object.values(teams).filter(
+                      (team) => team.category === categoryKey
+                    ).length
+                  }{' '}
+                  équipe(s)
                 </TableCell>
                 <TableCell>
-                  <CategoryButton category={category} onChange={(category) => updateCategory(categoryKey, category)}/>
+                  <Stack direction="row" gap={1}>
+                    <EditCategoryButton
+                      category={category}
+                      onChange={(category) =>
+                        updateCategory(categoryKey, category)
+                      }
+                    />
+                    <IconButton
+                      onDoubleClick={() => deleteCategory(categoryKey)}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
