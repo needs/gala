@@ -9,6 +9,7 @@ import {
 } from '../lib/database';
 import {
   Button,
+  Chip,
   IconButton,
   Paper,
   Stack,
@@ -20,7 +21,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Add, Delete, Edit } from '@mui/icons-material';
+import { Add, Delete, Edit, Woman } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
@@ -42,7 +43,10 @@ function EditTeamButton({
       <EditTeamDialog
         open={open}
         onCancel={() => setOpen(false)}
-        onValidate={(team) => {onChange(team); setOpen(false)}}
+        onValidate={(team) => {
+          onChange(team);
+          setOpen(false);
+        }}
         team={team}
       />
       <IconButton onClick={() => setOpen(true)}>
@@ -69,7 +73,12 @@ function EditPlayerButton({
         onValidate={onChange}
         player={player}
       />
-      <Button variant="text" onClick={() => setOpen(true)}>{`${player.firstName} ${player.lastName}`}</Button>
+      <Chip
+        icon={<Woman sx={{ "&&": {color: 'pink'} }}/>}
+        onClick={() => setOpen(true)}
+        label={`${player.firstName} ${player.lastName.toUpperCase()}`}
+        variant="outlined"
+      />
     </>
   );
 }
@@ -91,9 +100,9 @@ function AddPlayerButton({ onAdd }: { onAdd: (player: Player) => void }) {
           lastName: '',
         }}
       />
-      <Button onClick={() => setOpen(true)}>
+      <IconButton onClick={() => setOpen(true)} size="small">
         <Add />
-      </Button>
+      </IconButton>
     </>
   );
 }
@@ -189,6 +198,7 @@ export function Teams() {
                     {team.name}
                   </TableCell>
                   <TableCell>
+                    <Stack direction="row" gap={1}>
                     {Object.keys(team.members).map((playerKey) => (
                       <EditPlayerButton
                         key={playerKey}
@@ -201,21 +211,20 @@ export function Teams() {
                         addMember(teamKey, addPlayer(player));
                       }}
                     />
+                    </Stack>
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" gap={1}>
-                    <EditTeamButton
-                      team={team}
-                      onChange={(team) =>
-                        updateTeam(teamKey, team)
-                      }
-                    />
-                    <IconButton
-                      onDoubleClick={() => deleteTeam(teamKey)}
-                      sx={{color: "lightcoral"}}
-                    >
-                      <Delete />
-                    </IconButton>
+                      <EditTeamButton
+                        team={team}
+                        onChange={(team) => updateTeam(teamKey, team)}
+                      />
+                      <IconButton
+                        onDoubleClick={() => deleteTeam(teamKey)}
+                        sx={{ color: 'lightcoral' }}
+                      >
+                        <Delete />
+                      </IconButton>
                     </Stack>
                   </TableCell>
                 </TableRow>
@@ -223,7 +232,7 @@ export function Teams() {
             </TableBody>
           </Table>
         </TableContainer>
-        <AddTeamButton onAdd={addTeam}/>
+        <AddTeamButton onAdd={addTeam} />
       </Stack>
     </>
   );
