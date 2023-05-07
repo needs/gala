@@ -72,3 +72,6 @@ export const categoriesSchema = z.record(
     ).optional().default({}),
   })
 ).default({});
+
+export type Category = z.infer<typeof categoriesSchema>[string];
+export type Apparatus = Category["apparatuses"][string];

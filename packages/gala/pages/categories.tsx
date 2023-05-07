@@ -1,6 +1,6 @@
 import { ref, set, push, child } from 'firebase/database';
-import { z } from 'zod';
 import {
+  Category,
   categoriesSchema,
   database,
   teamsSchema,
@@ -17,31 +17,77 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
+import EditCategoryDialog from '../components/EditCategoryDialog';
+import { Add } from '@mui/icons-material';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
+
+function CategoryButton({
+  category,
+  onChange,
+}: {
+  category: Category;
+  onChange: (category: Category) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditCategoryDialog
+        open={open}
+        onCancel={() => setOpen(false)}
+        onValidate={onChange}
+        category={category}
+      />
+      <Button variant="text">{`${category.name}`}</Button>
+    </>
+  );
+}
+
+function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditCategoryDialog
+        open={open}
+        onCancel={() => setOpen(false)}
+        onValidate={(player) => {
+          onAdd(player);
+          setOpen(false);
+        }}
+        category={{
+          name: "",
+          sex: "female",
+          apparatuses: {},
+        }}
+      />
+      <Button onClick={() => setOpen(true)}>
+        <Add />
+      </Button>
+    </>
+  );
+}
 
 export function Teams() {
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
   const teams = useDatabaseValue(teamsRef, teamsSchema);
 
-  const addRandomCategory = () => {
+  const addCategory = (category: Category) => {
     const newCategoryKey = push(categoriesRef).key;
 
     if (newCategoryKey === null) {
       throw new Error('newCategoryKey is null');
     }
 
-    const newCategory: z.infer<typeof categoriesSchema>[string] = {
-      name: 'Category ' + newCategoryKey,
-      sex: "female",
-      apparatuses: {
-      },
-    };
-
-    set(child(categoriesRef, newCategoryKey), newCategory);
-
+    set(child(categoriesRef, newCategoryKey), category);
     return newCategoryKey;
+  };
+
+  const updateCategory = (categoryKey: string, category: Category) => {
+    set(child(categoriesRef, categoryKey), category);
   };
 
   if (categories === undefined || teams === undefined) {
@@ -54,25 +100,26 @@ export function Teams() {
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableBody>
-            {Object.entries(categories).map(([uuid, category]) => (
+            {Object.entries(categories).map(([categoryKey, category]) => (
               <TableRow
-                key={uuid}
+                key={categoryKey}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
                   {category.name}
                 </TableCell>
                 <TableCell>
-                  {Object.values(teams).filter((team) => team.category === uuid).length} équipe(s)
+                  {Object.values(teams).filter((team) => team.category === categoryKey).length} équipe(s)
+                </TableCell>
+                <TableCell>
+                  <CategoryButton category={category} onChange={(category) => updateCategory(categoryKey, category)}/>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Button variant="contained" onClick={addRandomCategory}>
-        Ajouter
-      </Button>
+      <AddCategoryButton onAdd={addCategory} />
     </Stack>
   );
 }

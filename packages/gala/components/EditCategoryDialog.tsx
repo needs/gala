@@ -9,33 +9,28 @@ import {
   Select,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Team, categoriesSchema, database, useDatabaseValue } from '../lib/database';
-import { ref } from 'firebase/database';
+import { Category } from '../lib/database';
 
-const categoriesRef = ref(database, 'categories');
-
-export default function EditTeamDialog({
+export default function EditCategoryDialog({
   open,
   onCancel,
   onValidate,
-  team,
+  category,
 }: {
   open: boolean;
   onCancel: () => void;
-  onValidate: (player: Team) => void;
-  team: Team;
+  onValidate: (category: Category) => void;
+  category: Category;
 }) {
-  const [editedTeam, setEditedTeam] = useState(team);
-
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
+  const [editedCategory, setEditedCategory] = useState(category);
 
   useEffect(() => {
-    setEditedTeam(team);
-  }, [team])
+    setEditedCategory(category);
+  }, [category])
 
   return (
     <Dialog open={open} onClose={onCancel}>
-      <DialogTitle>Modifier une équipe</DialogTitle>
+      <DialogTitle>Modifier une catégorie</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Les modifications seront appliquées seulement une fois validées.
@@ -47,18 +42,21 @@ export default function EditTeamDialog({
           type="text"
           fullWidth
           variant="standard"
-          value={editedTeam.name}
+          value={editedCategory.name}
           onChange={(event) =>
-            setEditedTeam({ ...editedTeam, name: event.target.value })
+            setEditedCategory({ ...editedCategory, name: event.target.value })
           }
         />
         <Select>
-          {/* TODO: Category selection */}
+          {/* TODO: Category sex */}
+        </Select>
+        <Select>
+          {/* TODO: Category apparatuses */}
         </Select>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>Annuler</Button>
-        <Button onClick={() => onValidate(editedTeam)}>Valider</Button>
+        <Button onClick={() => onValidate(editedCategory)}>Valider</Button>
       </DialogActions>
     </Dialog>
   );
