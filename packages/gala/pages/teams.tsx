@@ -13,7 +13,11 @@ import {
   Avatar,
   Button,
   Chip,
+  FormControl,
   IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
   Paper,
   Stack,
   Table,
@@ -25,7 +29,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Add, Delete, Edit } from '@mui/icons-material';
+import { Add, Clear, Delete, Edit } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useMemo, useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
@@ -238,15 +242,28 @@ export function Teams() {
       <Stack padding={2} gap={2}>
         <Stack direction="row" justifyContent="space-between">
           <Stack direction="row" gap={2} alignItems="center">
-            <TextField
-              label="Rechercher"
-              variant="outlined"
-              size="small"
-              autoFocus
-              sx={{ width: 300 }}
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
+            <FormControl variant="outlined" size="small">
+              <InputLabel htmlFor="teams-search">Rechercher</InputLabel>
+
+              <OutlinedInput
+                id="teams-search"
+                type="text"
+                label="Rechercher"
+                autoFocus
+                sx={{ width: 300 }}
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                endAdornment={
+                  searchQuery !== '' && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setSearchQuery('')} edge="end">
+                        <Clear />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }
+              />
+            </FormControl>
             <Typography variant="caption">{`${
               Object.values(filteredTeams).length
             } / ${Object.values(teams).length} équipe(s)`}</Typography>
