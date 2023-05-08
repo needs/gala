@@ -239,7 +239,7 @@ export function Teams() {
       <Head>
         <title>Équipes</title>
       </Head>
-      <Stack padding={2} gap={2}>
+      <Stack padding={4} gap={4}>
         <Stack direction="row" justifyContent="space-between">
           <Stack direction="row" gap={2} alignItems="center">
             <FormControl variant="outlined" size="small">
