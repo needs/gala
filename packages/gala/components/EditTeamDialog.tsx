@@ -25,8 +25,7 @@ import {
 } from '../lib/database';
 import { ref } from 'firebase/database';
 import GenderAvatar from './GenderAvatar';
-
-const categoriesRef = ref(database, 'categories');
+import CategorySelector from './CategorySelector';
 
 export default function EditTeamDialog({
   open,
@@ -41,15 +40,9 @@ export default function EditTeamDialog({
 }) {
   const [editedTeam, setEditedTeam] = useState(team);
 
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
-
   useEffect(() => {
     setEditedTeam(team);
   }, [team]);
-
-  if (categories === undefined) {
-    return null;
-  }
 
   return (
     <Dialog open={open} onClose={onCancel}>
@@ -71,36 +64,12 @@ export default function EditTeamDialog({
               setEditedTeam({ ...editedTeam, name: event.target.value })
             }
           />
-          <FormControl size="small" fullWidth>
-            <InputLabel id="demo-simple-select-label">Catégorie</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={editedTeam.category}
-              label="Catégorie"
-              renderValue={(categoryKey) => {
-                const category = categories[categoryKey];
-                return (
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <GenderAvatar gender={category.gender} />
-                    <ListItemText>{category.name}</ListItemText>
-                  </Stack>
-                );
-              }}
-              onChange={(event) =>
-                setEditedTeam({ ...editedTeam, category: event.target.value })
-              }
-            >
-              {Object.entries(categories).map(([categoryKey, category]) => (
-                <MenuItem key={categoryKey} value={categoryKey}>
-                  <ListItemAvatar>
-                    <GenderAvatar gender={category.gender} />
-                  </ListItemAvatar>
-                  <ListItemText>{category.name}</ListItemText>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <CategorySelector
+            categoryKey={editedTeam.category}
+            onChange={(categoryKey) =>
+              setEditedTeam({ ...editedTeam, category: categoryKey })
+            }
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
