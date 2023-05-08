@@ -14,6 +14,7 @@ export default function GenderSelector({
       value={gender}
       exclusive
       onChange={(event, gender: Gender) => onChange(gender)}
+      size="small"
     >
       {genderSchema.options.map((gender) => (
         <ToggleButton value={gender} key={gender}>
