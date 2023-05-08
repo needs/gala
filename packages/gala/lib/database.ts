@@ -46,7 +46,8 @@ export const teamsSchema = z.record(
   }),
 ).default({});
 
-export type Team = z.infer<typeof teamsSchema>[string];
+export type Teams = z.infer<typeof teamsSchema>;
+export type Team = Teams[string];
 
 export const genderSchema = z.enum(["man", "woman", "mixed"])
 export type Gender = z.infer<typeof genderSchema>;

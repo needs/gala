@@ -2,6 +2,7 @@ import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Player,
   Team,
+  Teams,
   categoriesSchema,
   database,
   playersSchema,
@@ -21,11 +22,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
-import { Add, Delete, Edit, Woman } from '@mui/icons-material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import EditPlayerDialog from '../components/EditPlayerDialog';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../components/GenderAvatar';
@@ -83,7 +85,11 @@ function EditPlayerButton({
         player={player}
       />
       <Chip
-        avatar={<Avatar sx={{ bgcolor: "transparent"}}><GenderIcon gender={player.gender} /></Avatar>}
+        avatar={
+          <Avatar sx={{ bgcolor: 'transparent' }}>
+            <GenderIcon gender={player.gender} />
+          </Avatar>
+        }
         onClick={() => setOpen(true)}
         label={`${player.firstName} ${player.lastName.toUpperCase()}`}
         variant="outlined"
@@ -144,6 +150,8 @@ export function Teams() {
   const players = useDatabaseValue(playersRef, playersSchema);
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const addPlayer = (player: Player) => {
     const newPlayerKey = push(playersRef).key;
 
@@ -183,7 +191,42 @@ export function Teams() {
     remove(child(teamsRef, teamKey));
   };
 
-  if (teams === undefined || players === undefined || categories === undefined) {
+  const filteredTeams = useMemo<Teams | undefined>(() => {
+    if (teams === undefined || players === undefined) {
+      return undefined;
+    }
+
+    return Object.fromEntries(
+      Object.entries(teams).filter(([teamKey, team]) => {
+        if (searchQuery === '') {
+          return true;
+        }
+
+        const matchMembers = Object.keys(team.members).some((playerKey) => {
+          const player = players[playerKey];
+          return (
+            player.firstName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            player.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        });
+
+        const matchName = team.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+        return matchMembers || matchName;
+      })
+    );
+  }, [teams, players, searchQuery]);
+
+  if (
+    teams === undefined ||
+    players === undefined ||
+    categories === undefined ||
+    filteredTeams === undefined
+  ) {
     return <p>Loading...</p>;
   }
 
@@ -193,7 +236,24 @@ export function Teams() {
         <title>Équipes</title>
       </Head>
       <Stack padding={2} gap={2}>
-        <Typography variant="h1">Équipes</Typography>
+        <Stack direction="row" justifyContent="space-between">
+          <Stack direction="row" gap={2} alignItems="center">
+            <TextField
+              label="Rechercher"
+              variant="outlined"
+              size="small"
+              autoFocus
+              sx={{ width: 300 }}
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+            <Typography variant="caption">{`${
+              Object.values(filteredTeams).length
+            } / ${Object.values(teams).length} équipe(s)`}</Typography>
+          </Stack>
+          <AddTeamButton onAdd={addTeam} />
+        </Stack>
+
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -205,20 +265,22 @@ export function Teams() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(teams).map(([teamKey, team]) => (
+              {Object.entries(filteredTeams).map(([teamKey, team]) => (
                 <TableRow
                   key={teamKey}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {team.category !== undefined && <Stack direction="row" spacing={2} alignItems="center">
-                      <GenderAvatar gender={categories[team.category].gender} />
-                      <span>{categories[team.category].name}</span>
-                      </Stack>}
+                    {team.category !== undefined && (
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <GenderAvatar
+                          gender={categories[team.category].gender}
+                        />
+                        <span>{categories[team.category].name}</span>
+                      </Stack>
+                    )}
                   </TableCell>
-                  <TableCell>
-                    {team.name}
-                  </TableCell>
+                  <TableCell>{team.name}</TableCell>
                   <TableCell>
                     <Stack direction="row" gap={1}>
                       {Object.keys(team.members).map((playerKey) => (
@@ -254,7 +316,6 @@ export function Teams() {
             </TableBody>
           </Table>
         </TableContainer>
-        <AddTeamButton onAdd={addTeam} />
       </Stack>
     </>
   );
