@@ -1,28 +1,20 @@
-import { Girl, Boy, Wc } from "@mui/icons-material";
-import { Avatar } from "@mui/material";
-import { Gender } from "../lib/database";
+import { Girl, Boy, Wc, Woman, Man } from '@mui/icons-material';
+import { Avatar } from '@mui/material';
+import { Gender } from '../lib/database';
+import GenderIcon, { genderColor } from './GenderIcon';
 
-export default function GenderAvatar({ gender, size }: { gender: Gender, size?: number }) {
-  const sx = { width: size, height: size };
+export default function GenderAvatar({
+  gender,
+  size,
+}: {
+  gender: Gender;
+  size?: number;
+}) {
+  const sx = { width: size, height: size, bgcolor: genderColor(gender) };
 
-  switch (gender) {
-    case 'woman':
-      return (
-        <Avatar sx={{ ...sx, bgcolor: 'pink' }}>
-          <Girl />
-        </Avatar>
-      );
-    case 'man':
-      return (
-        <Avatar sx={{ ...sx, bgcolor: 'lightblue' }}>
-          <Boy />
-        </Avatar>
-      );
-    case 'mixed':
-      return (
-        <Avatar sx={sx}>
-          <Wc />
-        </Avatar>
-      );
-  }
+  return (
+    <Avatar sx={sx}>
+      <GenderIcon gender={gender} color="white"/>
+    </Avatar>
+  );
 }

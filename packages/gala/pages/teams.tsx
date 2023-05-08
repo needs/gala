@@ -9,6 +9,7 @@ import {
   useDatabaseValue,
 } from '../lib/database';
 import {
+  Avatar,
   Button,
   Chip,
   IconButton,
@@ -82,7 +83,7 @@ function EditPlayerButton({
         player={player}
       />
       <Chip
-        icon={<GenderIcon gender={player.gender} />}
+        avatar={<Avatar sx={{ bgcolor: "transparent"}}><GenderIcon gender={player.gender} /></Avatar>}
         onClick={() => setOpen(true)}
         label={`${player.firstName} ${player.lastName.toUpperCase()}`}
         variant="outlined"

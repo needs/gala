@@ -1,19 +1,41 @@
-import { Wc, Woman, Man } from "@mui/icons-material";
-import { Gender, Player } from "../lib/database";
+import { Wc, Woman, Man } from '@mui/icons-material';
+import { Gender, Player } from '../lib/database';
+import { Avatar } from '@mui/material';
 
-export default function GenderIcon({ gender, size }: { gender: Gender, size?: number }) {
+export function genderColor(gender: Gender) {
+  switch (gender) {
+    case 'woman':
+      return 'pink';
+    case 'man':
+      return 'lightblue';
+    case 'mixed':
+      return 'grey';
+  }
+}
+
+export default function GenderIcon({
+  gender,
+  size,
+  color: iconColor,
+}: {
+  gender: Gender;
+  size?: number;
+  color?: string;
+}) {
+  const color = iconColor ?? genderColor(gender);
+
+  const sx = { '&&': { color, width: size, height: size } }
+
   switch (gender) {
     case 'woman':
       return (
-        <Woman sx={{ '&&': { color: 'pink', width: size, height: size } }} />
+        <Woman sx={sx} />
       );
     case 'man':
       return (
-        <Man sx={{ '&&': { color: 'lightblue', width: size, height: size } }} />
+        <Man sx={sx} />
       );
     case 'mixed':
-      return (
-        <Wc sx={{ width: size, height: size}} />
-      );
+      return <Wc sx={sx} />;
   }
 }
