@@ -7,7 +7,6 @@ import {
   useDatabaseValue,
 } from '../lib/database';
 import {
-  Avatar,
   Button,
   IconButton,
   Paper,
@@ -21,8 +20,9 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import EditCategoryDialog from '../components/EditCategoryDialog';
-import { Boy, Delete, Edit, Girl, Group } from '@mui/icons-material';
+import { Delete, Edit } from '@mui/icons-material';
 import Head from 'next/head';
+import GenderAvatar from '../components/GenderAvatar';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
@@ -68,7 +68,7 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
         }}
         category={{
           name: '',
-          sex: 'female',
+          gender: 'woman',
           apparatuses: {},
         }}
       />
@@ -77,29 +77,6 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
       </Button>
     </>
   );
-}
-
-function CategoryIcon({ category }: { category: Category }) {
-  switch (category.sex) {
-    case 'female':
-      return (
-        <Avatar sx={{ bgcolor: 'pink' }}>
-          <Girl />
-        </Avatar>
-      );
-    case 'male':
-      return (
-        <Avatar sx={{ bgcolor: 'lightblue' }}>
-          <Boy />
-        </Avatar>
-      );
-    case 'mixed':
-      return (
-        <Avatar>
-          <Group />
-        </Avatar>
-      );
-  }
 }
 
 export function Teams() {
@@ -145,7 +122,7 @@ export function Teams() {
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    <CategoryIcon category={category} />
+                    <GenderAvatar gender={category.gender} />
                   </TableCell>
                   <TableCell component="th" scope="row">
                     {category.name}

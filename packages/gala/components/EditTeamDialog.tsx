@@ -7,10 +7,24 @@ import {
   DialogActions,
   Button,
   Select,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Stack,
+  ListItemIcon,
+  ListItemText,
+  OutlinedInput,
+  ListItemAvatar,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Team, categoriesSchema, database, useDatabaseValue } from '../lib/database';
+import {
+  Team,
+  categoriesSchema,
+  database,
+  useDatabaseValue,
+} from '../lib/database';
 import { ref } from 'firebase/database';
+import GenderAvatar from './GenderAvatar';
 
 const categoriesRef = ref(database, 'categories');
 
@@ -31,7 +45,11 @@ export default function EditTeamDialog({
 
   useEffect(() => {
     setEditedTeam(team);
-  }, [team])
+  }, [team]);
+
+  if (categories === undefined) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onClose={onCancel}>
@@ -40,21 +58,50 @@ export default function EditTeamDialog({
         <DialogContentText>
           Les modifications seront appliquées seulement une fois validées.
         </DialogContentText>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Nom"
-          type="text"
-          fullWidth
-          variant="standard"
-          value={editedTeam.name}
-          onChange={(event) =>
-            setEditedTeam({ ...editedTeam, name: event.target.value })
-          }
-        />
-        <Select>
-          {/* TODO: Category selection */}
-        </Select>
+        <Stack direction="column" spacing={2}>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nom"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={editedTeam.name}
+            onChange={(event) =>
+              setEditedTeam({ ...editedTeam, name: event.target.value })
+            }
+          />
+          <FormControl size="small" fullWidth>
+            <InputLabel id="demo-simple-select-label">Catégorie</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={editedTeam.category}
+              label="Catégorie"
+              renderValue={(categoryKey) => {
+                const category = categories[categoryKey];
+                return (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <GenderAvatar gender={category.gender} />
+                    <ListItemText>{category.name}</ListItemText>
+                  </Stack>
+                );
+              }}
+              onChange={(event) =>
+                setEditedTeam({ ...editedTeam, category: event.target.value })
+              }
+            >
+              {Object.entries(categories).map(([categoryKey, category]) => (
+                <MenuItem key={categoryKey} value={categoryKey}>
+                  <ListItemAvatar>
+                    <GenderAvatar gender={category.gender} />
+                  </ListItemAvatar>
+                  <ListItemText>{category.name}</ListItemText>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>Annuler</Button>

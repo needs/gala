@@ -41,18 +41,22 @@ export const teamsSchema = z.record(
     members: z.record(
       z.string(),
       z.oboolean(),
-    ),
+    ).optional().default({}),
     category: z.string().optional(),
   }),
 ).default({});
 
 export type Team = z.infer<typeof teamsSchema>[string];
 
+export const genderSchema = z.enum(["man", "woman", "mixed"])
+export type Gender = z.infer<typeof genderSchema>;
+
 export const playersSchema = z.record(
   z.string(),
   z.object({
     firstName: z.string(),
     lastName: z.string(),
+    gender: genderSchema.optional().default("man"),
   })
 ).default({});
 
@@ -62,7 +66,7 @@ export const categoriesSchema = z.record(
   z.string(),
   z.object({
     name: z.string(),
-    sex: z.enum(["male", "female", "mixed"]),
+    gender: genderSchema.optional().default("man"),
     apparatuses: z.record(
       z.string(),
       z.object({

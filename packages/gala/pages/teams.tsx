@@ -2,6 +2,7 @@ import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Player,
   Team,
+  categoriesSchema,
   database,
   playersSchema,
   teamsSchema,
@@ -26,9 +27,12 @@ import EditPlayerDialog from '../components/EditPlayerDialog';
 import { useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
 import Head from 'next/head';
+import GenderAvatar from '../components/GenderAvatar';
+import GenderIcon from '../components/GenderIcon';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
+const categoriesRef = ref(database, 'categories');
 
 function EditTeamButton({
   team,
@@ -78,7 +82,7 @@ function EditPlayerButton({
         player={player}
       />
       <Chip
-        icon={<Woman sx={{ '&&': { color: 'pink' } }} />}
+        icon={<GenderIcon gender={player.gender} />}
         onClick={() => setOpen(true)}
         label={`${player.firstName} ${player.lastName.toUpperCase()}`}
         variant="outlined"
@@ -102,6 +106,7 @@ function AddPlayerButton({ onAdd }: { onAdd: (player: Player) => void }) {
         player={{
           firstName: '',
           lastName: '',
+          gender: 'man',
         }}
       />
       <IconButton onClick={() => setOpen(true)} size="small">
@@ -136,6 +141,7 @@ function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
 export function Teams() {
   const teams = useDatabaseValue(teamsRef, teamsSchema);
   const players = useDatabaseValue(playersRef, playersSchema);
+  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
 
   const addPlayer = (player: Player) => {
     const newPlayerKey = push(playersRef).key;
@@ -176,7 +182,7 @@ export function Teams() {
     remove(child(teamsRef, teamKey));
   };
 
-  if (teams === undefined || players === undefined) {
+  if (teams === undefined || players === undefined || categories === undefined) {
     return <p>Loading...</p>;
   }
 
@@ -191,8 +197,10 @@ export function Teams() {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
+                <TableCell>Catégorie</TableCell>
                 <TableCell>Nom</TableCell>
                 <TableCell>Joueurs</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -202,6 +210,12 @@ export function Teams() {
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
+                    {team.category !== undefined && <Stack direction="row" spacing={2} alignItems="center">
+                      <GenderAvatar gender={categories[team.category].gender} />
+                      <span>{categories[team.category].name}</span>
+                      </Stack>}
+                  </TableCell>
+                  <TableCell>
                     {team.name}
                   </TableCell>
                   <TableCell>

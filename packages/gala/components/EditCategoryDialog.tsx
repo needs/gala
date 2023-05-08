@@ -7,12 +7,10 @@ import {
   DialogActions,
   Button,
   Select,
-  ToggleButton,
-  ToggleButtonGroup,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Category } from '../lib/database';
-import { Group, Man, Woman } from '@mui/icons-material';
+import GenderSelector from './GenderSelector';
 
 export default function EditCategoryDialog({
   open,
@@ -50,23 +48,13 @@ export default function EditCategoryDialog({
             setEditedCategory({ ...editedCategory, name: event.target.value })
           }
         />
-        <ToggleButtonGroup
-          value={editedCategory.sex}
-          exclusive
-          onChange={(event, newSex: Category['sex']) =>
-            setEditedCategory({ ...editedCategory, sex: newSex })
+        <GenderSelector
+          gender={editedCategory.gender}
+          onChange={(gender) =>
+            setEditedCategory({ ...editedCategory, gender })
           }
-        >
-          <ToggleButton value="male">
-            <Man sx={{ color: "lightblue"}}/>
-          </ToggleButton>
-          <ToggleButton value="female">
-            <Woman sx={{ color: "pink"}}/>
-          </ToggleButton>
-          <ToggleButton value="mixed">
-            <Group />
-          </ToggleButton>
-        </ToggleButtonGroup>
+        />
+
         <Select>{/* TODO: Category apparatuses */}</Select>
       </DialogContent>
       <DialogActions>
