@@ -142,7 +142,10 @@ function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
           category: undefined,
           members: {},
         }}
-        onValidate={onAdd}
+        onValidate={(team) => {
+          onAdd(team);
+          setOpen(false);
+        }}
       />
       <Button variant="contained" onClick={() => setOpen(true)}>
         Ajouter
@@ -275,11 +278,11 @@ export function Index() {
               />
             </FormControl>
             <Box width={300}>
-            <CategorySelector
-              categoryKey={categoryFilter}
-              onChange={setCategoryFilter}
-              allowAll
-            />
+              <CategorySelector
+                categoryKey={categoryFilter}
+                onChange={setCategoryFilter}
+                allowAll
+              />
             </Box>
             <Typography variant="caption">{`${sum(
               Object.values(teamsByCategory).map((teams) => teams.length)
@@ -297,16 +300,16 @@ export function Index() {
                   {categories[categoryKey].name}
                 </Typography>
               </Stack>
-              <Stack direction="column" gap={2} padding={2} alignItems="center">
                 {teams.map(({ teamKey, team }) => (
                   <Stack
                     direction="row"
-                    spacing={2}
+                    gap={2}
+                    padding={2}
                     key={teamKey}
                     divider={<Divider orientation="vertical" flexItem />}
                     width="100%"
                   >
-                    <Box width={300} padding={1}>
+                    <Box minWidth={300} maxWidth={300} padding={1}>
                       {team.name}
                     </Box>
                     <Stack
@@ -345,7 +348,6 @@ export function Index() {
                     </Stack>
                   </Stack>
                 ))}
-              </Stack>
             </Stack>
           </Paper>
         ))}
