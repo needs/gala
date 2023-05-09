@@ -16,9 +16,11 @@ const categoriesRef = ref(database, 'categories');
 export default function CategorySelector({
   categoryKey,
   onChange,
+  allowAll,
 }: {
   categoryKey: string | undefined;
   onChange: (categoryKey: string) => void;
+  allowAll?: boolean;
 }) {
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
 
@@ -41,7 +43,7 @@ export default function CategorySelector({
             const category = categories[categoryKey];
             return (
               <Stack direction="row" spacing={2} alignItems="center">
-                <GenderAvatar gender={category.gender} />
+                <GenderAvatar gender={category.gender} size={24}/>
                 <ListItemText>{category.name}</ListItemText>
               </Stack>
             );
@@ -49,6 +51,11 @@ export default function CategorySelector({
         }}
         onChange={(event) => onChange(event.target.value)}
       >
+        {allowAll && (
+          <MenuItem value="">
+            <ListItemText>Toutes les catégories</ListItemText>
+          </MenuItem>
+        )}
         {Object.entries(categories).map(([categoryKey, category]) => (
           <MenuItem key={categoryKey} value={categoryKey}>
             <ListItemAvatar>

@@ -2,7 +2,6 @@ import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Player,
   Team,
-  Teams,
   categoriesSchema,
   database,
   playersSchema,
@@ -32,6 +31,7 @@ import Head from 'next/head';
 import GenderAvatar from '../components/GenderAvatar';
 import GenderIcon from '../components/GenderIcon';
 import { groupBy, sum } from 'lodash';
+import CategorySelector from '../components/CategorySelector';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -95,7 +95,9 @@ function EditPlayerButton({
           </Avatar>
         }
         onClick={() => setOpen(true)}
-        label={`${capitalizeFirstLetter(player.firstName)} ${player.lastName.toUpperCase()}`}
+        label={`${capitalizeFirstLetter(
+          player.firstName
+        )} ${player.lastName.toUpperCase()}`}
         variant="outlined"
       />
     </>
@@ -155,6 +157,7 @@ export function Index() {
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
 
   const addPlayer = (player: Player) => {
     const newPlayerKey = push(playersRef).key;
@@ -202,6 +205,10 @@ export function Index() {
 
     const filteredTeams = Object.entries(teams)
       .filter(([teamKey, team]) => {
+        if (categoryFilter !== '' && team.category !== categoryFilter) {
+          return false;
+        }
+
         if (searchQuery === '') {
           return true;
         }
@@ -226,7 +233,7 @@ export function Index() {
 
     const ret = groupBy(filteredTeams, ({ team }) => team.category);
     return ret;
-  }, [teams, players, searchQuery]);
+  }, [teams, players, searchQuery, categoryFilter]);
 
   if (
     teams === undefined ||
@@ -236,12 +243,6 @@ export function Index() {
   ) {
     return <p>Loading...</p>;
   }
-
-  console.log("sum", sum(
-    Object.values(teamsByCategory).map((teams) =>
-      teams.length
-    )
-  ))
 
   return (
     <>
@@ -273,10 +274,15 @@ export function Index() {
                 }
               />
             </FormControl>
+            <Box width={300}>
+            <CategorySelector
+              categoryKey={categoryFilter}
+              onChange={setCategoryFilter}
+              allowAll
+            />
+            </Box>
             <Typography variant="caption">{`${sum(
-              Object.values(teamsByCategory).map((teams) =>
-                teams.length
-              )
+              Object.values(teamsByCategory).map((teams) => teams.length)
             )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
           <AddTeamButton onAdd={addTeam} />
@@ -300,8 +306,16 @@ export function Index() {
                     divider={<Divider orientation="vertical" flexItem />}
                     width="100%"
                   >
-                    <Box width={300} padding={1}>{team.name}</Box>
-                    <Stack direction="row" gap={1} flexGrow="1" flexWrap="wrap" alignItems="center">
+                    <Box width={300} padding={1}>
+                      {team.name}
+                    </Box>
+                    <Stack
+                      direction="row"
+                      gap={1}
+                      flexGrow="1"
+                      flexWrap="wrap"
+                      alignItems="center"
+                    >
                       {Object.keys(team.members).map((playerKey) => (
                         <EditPlayerButton
                           key={playerKey}

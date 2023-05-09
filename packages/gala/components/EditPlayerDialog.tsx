@@ -6,15 +6,12 @@ import {
   TextField,
   DialogActions,
   Button,
-  FormControl,
-  FormControlLabel,
   FormLabel,
   Stack,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Player } from '../lib/database';
 import GenderSelector from './GenderSelector';
-import { Label } from '@mui/icons-material';
 
 export default function EditPlayerDialog({
   open,
