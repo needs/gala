@@ -6,25 +6,12 @@ import {
   TextField,
   DialogActions,
   Button,
-  Select,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Stack,
-  ListItemIcon,
-  ListItemText,
-  OutlinedInput,
-  ListItemAvatar,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import {
   Team,
-  categoriesSchema,
-  database,
-  useDatabaseValue,
 } from '../lib/database';
-import { ref } from 'firebase/database';
-import GenderAvatar from './GenderAvatar';
 import CategorySelector from './CategorySelector';
 
 export default function EditTeamDialog({
