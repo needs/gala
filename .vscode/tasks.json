@@ -1,0 +1,64 @@
+{
+  "version": "2.0.0",
+  "presentation": {
+    "echo": false,
+    "reveal": "silent",
+    "focus": false,
+    "panel": "dedicated",
+  },
+  "inputs": [
+    {
+      "id": "terminateGala",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "Gala"
+    },
+  ],
+  "tasks": [
+    {
+      "label": "Launch local dev",
+      "dependsOn": [
+        "Terminate Serve",
+        "Npm install",
+        "Start Serve"
+      ],
+      "dependsOrder": "sequence",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Terminate Serve",
+      "dependsOn": [
+        "Terminate Gala",
+      ],
+    },
+    {
+      "label": "Terminate Gala",
+      "type": "process",
+      "command": "echo ${input:terminateGala}",
+    },
+    {
+      "label": "Npm install",
+      "type": "shell",
+      "command": "npm install",
+      "presentation": {
+        "close": true
+      }
+    },
+    {
+      "label": "Start Serve",
+      "dependsOn": [
+        "Gala",
+      ],
+    },
+    {
+      "label": "Gala",
+      "type": "shell",
+      "command": "npx nx serve gala",
+      "isBackground": true,
+
+    },
+  ]
+}

@@ -44,7 +44,7 @@ export default function EditPlayerDialog({
           <TextField
             autoFocus
             margin="dense"
-            label="Nom"
+            label="Prénom"
             type="text"
             fullWidth
             variant="standard"
@@ -58,7 +58,7 @@ export default function EditPlayerDialog({
           />
           <TextField
             margin="dense"
-            label="Prénom"
+            label="Nom"
             type="text"
             fullWidth
             variant="standard"

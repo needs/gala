@@ -11,8 +11,10 @@ import {
 } from '../lib/database';
 import {
   Avatar,
+  Box,
   Button,
   Chip,
+  Divider,
   FormControl,
   IconButton,
   InputAdornment,
@@ -20,13 +22,6 @@ import {
   OutlinedInput,
   Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
 import { Add, Clear, Delete, Edit } from '@mui/icons-material';
@@ -36,6 +31,7 @@ import EditTeamDialog from '../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../components/GenderAvatar';
 import GenderIcon from '../components/GenderIcon';
+import { groupBy, sum } from 'lodash';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -68,6 +64,10 @@ function EditTeamButton({
   );
 }
 
+function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function EditPlayerButton({
   player,
   onChange,
@@ -95,7 +95,7 @@ function EditPlayerButton({
           </Avatar>
         }
         onClick={() => setOpen(true)}
-        label={`${player.firstName} ${player.lastName.toUpperCase()}`}
+        label={`${capitalizeFirstLetter(player.firstName)} ${player.lastName.toUpperCase()}`}
         variant="outlined"
       />
     </>
@@ -149,7 +149,7 @@ function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
   );
 }
 
-export function Teams() {
+export function Index() {
   const teams = useDatabaseValue(teamsRef, teamsSchema);
   const players = useDatabaseValue(playersRef, playersSchema);
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
@@ -195,13 +195,13 @@ export function Teams() {
     remove(child(teamsRef, teamKey));
   };
 
-  const filteredTeams = useMemo<Teams | undefined>(() => {
+  const teamsByCategory = useMemo(() => {
     if (teams === undefined || players === undefined) {
       return undefined;
     }
 
-    return Object.fromEntries(
-      Object.entries(teams).filter(([teamKey, team]) => {
+    const filteredTeams = Object.entries(teams)
+      .filter(([teamKey, team]) => {
         if (searchQuery === '') {
           return true;
         }
@@ -222,17 +222,26 @@ export function Teams() {
 
         return matchMembers || matchName;
       })
-    );
+      .map(([teamKey, team]) => ({ teamKey, team }));
+
+    const ret = groupBy(filteredTeams, ({ team }) => team.category);
+    return ret;
   }, [teams, players, searchQuery]);
 
   if (
     teams === undefined ||
     players === undefined ||
     categories === undefined ||
-    filteredTeams === undefined
+    teamsByCategory === undefined
   ) {
     return <p>Loading...</p>;
   }
+
+  console.log("sum", sum(
+    Object.values(teamsByCategory).map((teams) =>
+      teams.length
+    )
+  ))
 
   return (
     <>
@@ -264,42 +273,35 @@ export function Teams() {
                 }
               />
             </FormControl>
-            <Typography variant="caption">{`${
-              Object.values(filteredTeams).length
-            } / ${Object.values(teams).length} équipe(s)`}</Typography>
+            <Typography variant="caption">{`${sum(
+              Object.values(teamsByCategory).map((teams) =>
+                teams.length
+              )
+            )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
           <AddTeamButton onAdd={addTeam} />
         </Stack>
 
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Catégorie</TableCell>
-                <TableCell>Nom</TableCell>
-                <TableCell>Joueurs</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Object.entries(filteredTeams).map(([teamKey, team]) => (
-                <TableRow
-                  key={teamKey}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {team.category !== undefined && (
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <GenderAvatar
-                          gender={categories[team.category].gender}
-                        />
-                        <span>{categories[team.category].name}</span>
-                      </Stack>
-                    )}
-                  </TableCell>
-                  <TableCell>{team.name}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" gap={1}>
+        {Object.entries(teamsByCategory).map(([categoryKey, teams]) => (
+          <Paper key={categoryKey}>
+            <Stack divider={<Divider />}>
+              <Stack gap={2} direction="row" alignItems="center" padding={2}>
+                <GenderAvatar gender={categories[categoryKey].gender} />
+                <Typography variant="h6">
+                  {categories[categoryKey].name}
+                </Typography>
+              </Stack>
+              <Stack direction="column" gap={2} padding={2} alignItems="center">
+                {teams.map(({ teamKey, team }) => (
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    key={teamKey}
+                    divider={<Divider orientation="vertical" flexItem />}
+                    width="100%"
+                  >
+                    <Box width={300} padding={1}>{team.name}</Box>
+                    <Stack direction="row" gap={1} flexGrow="1" flexWrap="wrap" alignItems="center">
                       {Object.keys(team.members).map((playerKey) => (
                         <EditPlayerButton
                           key={playerKey}
@@ -313,29 +315,29 @@ export function Teams() {
                         }}
                       />
                     </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" gap={1}>
-                      <EditTeamButton
-                        team={team}
-                        onChange={(team) => updateTeam(teamKey, team)}
-                      />
-                      <IconButton
-                        onDoubleClick={() => deleteTeam(teamKey)}
-                        sx={{ color: 'lightcoral' }}
-                      >
-                        <Delete />
-                      </IconButton>
+                    <Stack direction="column" gap={2}>
+                      <Stack direction="row" gap={1}>
+                        <EditTeamButton
+                          team={team}
+                          onChange={(team) => updateTeam(teamKey, team)}
+                        />
+                        <IconButton
+                          onDoubleClick={() => deleteTeam(teamKey)}
+                          sx={{ color: 'lightcoral' }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Stack>
                     </Stack>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  </Stack>
+                ))}
+              </Stack>
+            </Stack>
+          </Paper>
+        ))}
       </Stack>
     </>
   );
 }
 
-export default Teams;
+export default Index;
