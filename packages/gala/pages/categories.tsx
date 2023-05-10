@@ -23,6 +23,7 @@ import EditCategoryDialog from '../components/EditCategoryDialog';
 import { Delete, Edit } from '@mui/icons-material';
 import Head from 'next/head';
 import GenderAvatar from '../components/GenderAvatar';
+import Loading from '../components/Loading';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
@@ -103,7 +104,7 @@ export function Teams() {
   };
 
   if (categories === undefined || teams === undefined) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (

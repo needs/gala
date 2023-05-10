@@ -32,6 +32,7 @@ import GenderAvatar from '../components/GenderAvatar';
 import GenderIcon from '../components/GenderIcon';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../components/CategorySelector';
+import Loading from '../components/Loading';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -242,9 +243,9 @@ export function Index() {
     teams === undefined ||
     players === undefined ||
     categories === undefined ||
-    teamsByCategory === undefined
+    teamsByCategory !== undefined
   ) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
