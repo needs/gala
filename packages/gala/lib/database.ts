@@ -80,3 +80,13 @@ export const categoriesSchema = z.record(
 
 export type Category = z.infer<typeof categoriesSchema>[string];
 export type Apparatus = Category["apparatuses"][string];
+
+export const judgesSchema = z.record(
+  z.string(),
+  z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+  })
+).default({});
+
+export type Judge = z.infer<typeof judgesSchema>[string];

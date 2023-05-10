@@ -33,6 +33,7 @@ import GenderIcon from '../components/GenderIcon';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../components/CategorySelector';
 import Loading from '../components/Loading';
+import { fullName } from '../lib/utils';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -65,10 +66,6 @@ function EditTeamButton({
   );
 }
 
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function EditPlayerButton({
   player,
   onChange,
@@ -96,9 +93,7 @@ function EditPlayerButton({
           </Avatar>
         }
         onClick={() => setOpen(true)}
-        label={`${capitalizeFirstLetter(
-          player.firstName
-        )} ${player.lastName.toUpperCase()}`}
+        label={fullName(player)}
         variant="outlined"
       />
     </>
@@ -155,7 +150,7 @@ function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
   );
 }
 
-export function Index() {
+export default function TeamsPage() {
   const teams = useDatabaseValue(teamsRef, teamsSchema);
   const players = useDatabaseValue(playersRef, playersSchema);
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
@@ -243,7 +238,7 @@ export function Index() {
     teams === undefined ||
     players === undefined ||
     categories === undefined ||
-    teamsByCategory !== undefined
+    teamsByCategory === undefined
   ) {
     return <Loading />;
   }
@@ -356,5 +351,3 @@ export function Index() {
     </>
   );
 }
-
-export default Index;

@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Category, Group } from '@mui/icons-material';
+import { Category, Gavel, Group } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
@@ -25,6 +25,11 @@ const menu = [
     label: 'Catégories',
     href: '/categories',
     icon: <Category />,
+  },
+  {
+    label: 'Juges',
+    href: '/judges',
+    icon: <Gavel />,
   },
 ]
 

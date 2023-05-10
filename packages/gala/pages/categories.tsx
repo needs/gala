@@ -80,7 +80,7 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
   );
 }
 
-export function Teams() {
+export default function Categories() {
   const categories = useDatabaseValue(categoriesRef, categoriesSchema);
   const teams = useDatabaseValue(teamsRef, teamsSchema);
 
@@ -162,5 +162,3 @@ export function Teams() {
     </>
   );
 }
-
-export default Teams;
