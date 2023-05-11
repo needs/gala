@@ -46,16 +46,25 @@ function EditTeamButton({
   onChange: (team: Team) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [editedTeam, setEditedTeam] = useState<Team>(team);
 
   return (
     <>
       <EditTeamDialog
         open={open}
-        onClose={() => setOpen(false)}
-        onChange={onChange}
-        team={team}
+        onClose={() => {
+          setOpen(false);
+          onChange(editedTeam);
+        }}
+        onChange={setEditedTeam}
+        team={editedTeam}
       />
-      <IconButton onClick={() => setOpen(true)}>
+      <IconButton
+        onClick={() => {
+          setOpen(true);
+          setEditedTeam(team);
+        }}
+      >
         <Edit />
       </IconButton>
     </>
@@ -64,30 +73,25 @@ function EditTeamButton({
 
 function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
   const [open, setOpen] = useState(false);
-  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
-
-  const teamRef = useMemo(() => {
-    return teamKey !== undefined ? child(teamsRef, teamKey) : undefined;
-  }, [teamKey]);
-
-  const team = useDatabaseValue(teamRef, teamSchema);
+  const [team, setTeam] = useState<Team>(defaultTeam);
 
   return (
     <>
-      {team !== undefined && teamKey !== undefined && (
-        <EditTeamDialog
-          open={open}
-          onClose={() => setOpen(false)}
-          onChange={(team) => {
-            updateTeam(teamKey, team);
-          }}
-          team={team}
-        />
-      )}
+      <EditTeamDialog
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          onAdd(team);
+        }}
+        onChange={(team) => {
+          setTeam(team);
+        }}
+        team={team}
+      />
       <Button
         variant="contained"
         onClick={() => {
-          setTeamKey(addTeam(defaultTeam));
+          setTeam(defaultTeam);
           setOpen(true);
         }}
       >
