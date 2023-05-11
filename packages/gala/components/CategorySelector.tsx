@@ -34,7 +34,7 @@ export default function CategorySelector({
       <Select
         labelId="demo-simple-select-label"
         id="demo-simple-select"
-        value={categoryKey}
+        value={categoryKey ?? ""}
         label="Catégorie"
         renderValue={(categoryKey) => {
           if (categoryKey === undefined) {

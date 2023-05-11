@@ -1,18 +1,16 @@
-import { ref, set, push, child, remove } from 'firebase/database';
+import { ref, set, child, remove } from 'firebase/database';
 import {
-  Player,
   Team,
   categoriesSchema,
   database,
   playersSchema,
+  teamSchema,
   teamsSchema,
   useDatabaseValue,
 } from '../lib/database';
 import {
-  Avatar,
   Box,
   Button,
-  Chip,
   Divider,
   FormControl,
   IconButton,
@@ -23,17 +21,18 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { Add, Clear, Delete, Edit } from '@mui/icons-material';
-import EditPlayerDialog from '../components/EditPlayerDialog';
+import { Clear, Delete, Edit } from '@mui/icons-material';
 import { useMemo, useState } from 'react';
 import EditTeamDialog from '../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../components/GenderAvatar';
-import GenderIcon from '../components/GenderIcon';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../components/CategorySelector';
 import Loading from '../components/Loading';
-import { fullName } from '../lib/utils';
+import { addPlayer, updatePlayer } from '../lib/player';
+import EditPlayerButton from '../components/EditPlayerButton';
+import AddPlayerButton from '../components/AddPlayerButton';
+import { addTeam, defaultTeam, updateTeam } from '../lib/team';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -52,11 +51,8 @@ function EditTeamButton({
     <>
       <EditTeamDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(team) => {
-          onChange(team);
-          setOpen(false);
-        }}
+        onClose={() => setOpen(false)}
+        onChange={onChange}
         team={team}
       />
       <IconButton onClick={() => setOpen(true)}>
@@ -66,84 +62,35 @@ function EditTeamButton({
   );
 }
 
-function EditPlayerButton({
-  player,
-  onChange,
-}: {
-  player: Player;
-  onChange: (player: Player) => void;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <EditPlayerDialog
-        open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onChange(player);
-          setOpen(false);
-        }}
-        player={player}
-      />
-      <Chip
-        avatar={
-          <Avatar sx={{ bgcolor: 'transparent' }}>
-            <GenderIcon gender={player.gender} />
-          </Avatar>
-        }
-        onClick={() => setOpen(true)}
-        label={fullName(player)}
-        variant="outlined"
-      />
-    </>
-  );
-}
-
-function AddPlayerButton({ onAdd }: { onAdd: (player: Player) => void }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <EditPlayerDialog
-        open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onAdd(player);
-          setOpen(false);
-        }}
-        player={{
-          firstName: '',
-          lastName: '',
-          gender: 'man',
-        }}
-      />
-      <IconButton onClick={() => setOpen(true)} size="small">
-        <Add />
-      </IconButton>
-    </>
-  );
-}
-
 function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
   const [open, setOpen] = useState(false);
+  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
+
+  const teamRef = useMemo(() => {
+    return teamKey !== undefined ? child(teamsRef, teamKey) : undefined;
+  }, [teamKey]);
+
+  const team = useDatabaseValue(teamRef, teamSchema);
 
   return (
     <>
-      <EditTeamDialog
-        open={open}
-        onCancel={() => setOpen(false)}
-        team={{
-          name: '',
-          category: undefined,
-          members: {},
+      {team !== undefined && teamKey !== undefined && (
+        <EditTeamDialog
+          open={open}
+          onClose={() => setOpen(false)}
+          onChange={(team) => {
+            updateTeam(teamKey, team);
+          }}
+          team={team}
+        />
+      )}
+      <Button
+        variant="contained"
+        onClick={() => {
+          setTeamKey(addTeam(defaultTeam));
+          setOpen(true);
         }}
-        onValidate={(team) => {
-          onAdd(team);
-          setOpen(false);
-        }}
-      />
-      <Button variant="contained" onClick={() => setOpen(true)}>
+      >
         Ajouter
       </Button>
     </>
@@ -158,39 +105,9 @@ export default function TeamsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const addPlayer = (player: Player) => {
-    const newPlayerKey = push(playersRef).key;
-
-    if (newPlayerKey === null) {
-      throw new Error('newPlayerKey is null');
-    }
-
-    set(child(playersRef, newPlayerKey), player);
-    return newPlayerKey;
-  };
-
-  const updatePlayer = (playerKey: string, player: Player) => {
-    set(child(playersRef, playerKey), player);
-  };
-
-  const addTeam = (team: Team) => {
-    const newTeamKey = push(teamsRef).key;
-
-    if (newTeamKey === null) {
-      throw new Error('newTeamKey is null');
-    }
-
-    set(child(teamsRef, newTeamKey), team);
-    return newTeamKey;
-  };
-
   const addMember = (teamKey: string, playerKey: string) => {
     const membersRef = ref(database, `teams/${teamKey}/members`);
     set(child(membersRef, playerKey), true);
-  };
-
-  const updateTeam = (teamKey: string, team: Team) => {
-    set(child(teamsRef, teamKey), team);
   };
 
   const deleteTeam = (teamKey: string) => {
@@ -205,6 +122,10 @@ export default function TeamsPage() {
     const filteredTeams = Object.entries(teams)
       .filter(([teamKey, team]) => {
         if (categoryFilter !== '' && team.category !== categoryFilter) {
+          return false;
+        }
+
+        if (team.category === undefined) {
           return false;
         }
 
@@ -296,54 +217,54 @@ export default function TeamsPage() {
                   {categories[categoryKey].name}
                 </Typography>
               </Stack>
-                {teams.map(({ teamKey, team }) => (
+              {teams.map(({ teamKey, team }) => (
+                <Stack
+                  direction="row"
+                  gap={2}
+                  padding={2}
+                  key={teamKey}
+                  divider={<Divider orientation="vertical" flexItem />}
+                  width="100%"
+                >
+                  <Box minWidth={300} maxWidth={300} padding={1}>
+                    {team.name}
+                  </Box>
                   <Stack
                     direction="row"
-                    gap={2}
-                    padding={2}
-                    key={teamKey}
-                    divider={<Divider orientation="vertical" flexItem />}
-                    width="100%"
+                    gap={1}
+                    flexGrow="1"
+                    flexWrap="wrap"
+                    alignItems="center"
                   >
-                    <Box minWidth={300} maxWidth={300} padding={1}>
-                      {team.name}
-                    </Box>
-                    <Stack
-                      direction="row"
-                      gap={1}
-                      flexGrow="1"
-                      flexWrap="wrap"
-                      alignItems="center"
-                    >
-                      {Object.keys(team.members).map((playerKey) => (
-                        <EditPlayerButton
-                          key={playerKey}
-                          player={players[playerKey]}
-                          onChange={(player) => updatePlayer(playerKey, player)}
-                        />
-                      ))}
-                      <AddPlayerButton
-                        onAdd={(player) => {
-                          addMember(teamKey, addPlayer(player));
-                        }}
+                    {Object.keys(team.members).map((playerKey) => (
+                      <EditPlayerButton
+                        key={playerKey}
+                        player={players[playerKey]}
+                        onChange={(player) => updatePlayer(playerKey, player)}
                       />
-                    </Stack>
-                    <Stack direction="column" gap={2}>
-                      <Stack direction="row" gap={1}>
-                        <EditTeamButton
-                          team={team}
-                          onChange={(team) => updateTeam(teamKey, team)}
-                        />
-                        <IconButton
-                          onDoubleClick={() => deleteTeam(teamKey)}
-                          sx={{ color: 'lightcoral' }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Stack>
+                    ))}
+                    <AddPlayerButton
+                      onAdd={(player) => {
+                        addMember(teamKey, addPlayer(player));
+                      }}
+                    />
+                  </Stack>
+                  <Stack direction="column" gap={2}>
+                    <Stack direction="row" gap={1}>
+                      <EditTeamButton
+                        team={team}
+                        onChange={(team) => updateTeam(teamKey, team)}
+                      />
+                      <IconButton
+                        onDoubleClick={() => deleteTeam(teamKey)}
+                        sx={{ color: 'lightcoral' }}
+                      >
+                        <Delete />
+                      </IconButton>
                     </Stack>
                   </Stack>
-                ))}
+                </Stack>
+              ))}
             </Stack>
           </Paper>
         ))}

@@ -11,21 +11,25 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const database = getDatabase(app);
 
-export function useDatabaseValue<T extends z.ZodTypeAny>(ref: DatabaseReference, schema: T): z.infer<T> | undefined {
+export function useDatabaseValue<T extends z.ZodTypeAny>(ref: DatabaseReference | undefined, schema: T): z.infer<T> | undefined {
   const [value, setValue] = useState<z.infer<T> | undefined>(
     undefined
   );
 
   useEffect(() => {
-    onValue(ref, (snapshot) => {
-      const val = snapshot.val();
+    if (ref === undefined) {
+      return undefined;
+    } else {
+      onValue(ref, (snapshot) => {
+        const val = snapshot.val();
 
-      if (val === null) {
-        setValue(schema.parse(undefined));
-      } else {
-        setValue(schema.parse(val));
-      }
-    });
+        if (val === null) {
+          setValue(schema.parse(undefined));
+        } else {
+          setValue(schema.parse(val));
+        }
+      });
+    }
   }, [setValue, ref, schema]);
 
   return value;
@@ -34,16 +38,18 @@ export function useDatabaseValue<T extends z.ZodTypeAny>(ref: DatabaseReference,
 // It is recommended to flatten the data tree when using firebase realtime
 // database.
 
+export const teamSchema = z.object({
+  name: z.string(),
+  members: z.record(
+    z.string(),
+    z.boolean(),
+  ).optional().default({}),
+  category: z.string().optional(),
+});
+
 export const teamsSchema = z.record(
   z.string(),
-  z.object({
-    name: z.string(),
-    members: z.record(
-      z.string(),
-      z.oboolean(),
-    ).optional().default({}),
-    category: z.string().optional(),
-  }),
+  teamSchema,
 ).default({});
 
 export type Teams = z.infer<typeof teamsSchema>;
