@@ -8,9 +8,11 @@ import GenderIcon from "./GenderIcon";
 export default function EditPlayerButton({
   player,
   onChange,
+  onDelete,
 }: {
   player: Player;
   onChange: (player: Player) => void;
+  onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -34,6 +36,7 @@ export default function EditPlayerButton({
         onClick={() => setOpen(true)}
         label={fullName(player)}
         variant="outlined"
+        onDelete={onDelete}
       />
     </>
   );

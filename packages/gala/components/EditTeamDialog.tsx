@@ -18,11 +18,12 @@ import {
 } from '../lib/database';
 import CategorySelector from './CategorySelector';
 import { ref } from 'firebase/database';
-import { addPlayer, updatePlayer } from '../lib/player';
+import { addPlayer, deletePlayer, updatePlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import Loading from './Loading';
 import AddPlayerButton from './AddPlayerButton';
 import { produce } from 'immer';
+import { removeMember } from '../lib/team';
 
 const playersRef = ref(database, 'players');
 const categoriesRef = ref(database, 'categories');
@@ -125,6 +126,14 @@ export default function EditTeamDialog({
                     key={playerKey}
                     player={players[playerKey]}
                     onChange={(player) => updatePlayer(playerKey, player)}
+                    onDelete={() => {
+                      onChange(
+                        produce(team, (draft) => {
+                          delete draft.members[playerKey];
+                        })
+                      );
+                      deletePlayer(playerKey);
+                    }}
                   />
                 )
             )}

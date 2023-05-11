@@ -29,10 +29,10 @@ import GenderAvatar from '../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../components/CategorySelector';
 import Loading from '../components/Loading';
-import { addPlayer, updatePlayer } from '../lib/player';
+import { addPlayer, deletePlayer, updatePlayer } from '../lib/player';
 import EditPlayerButton from '../components/EditPlayerButton';
 import AddPlayerButton from '../components/AddPlayerButton';
-import { addTeam, defaultTeam, updateTeam } from '../lib/team';
+import { addTeam, defaultTeam, removeMember, updateTeam } from '../lib/team';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');
@@ -245,6 +245,7 @@ export default function TeamsPage() {
                         key={playerKey}
                         player={players[playerKey]}
                         onChange={(player) => updatePlayer(playerKey, player)}
+                        onDelete={() => {removeMember(teamKey, playerKey); deletePlayer(playerKey)}}
                       />
                     ))}
                     <AddPlayerButton

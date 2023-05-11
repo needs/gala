@@ -1,4 +1,4 @@
-import { push, child, ref, set } from "firebase/database";
+import { push, child, ref, set, remove } from "firebase/database";
 import { Team, database } from "./database";
 
 const teamsRef = ref(database, 'teams');
@@ -19,6 +19,10 @@ export function addTeam(team: Team) {
   return newTeamKey;
 };
 
-export const updateTeam = (teamKey: string, team: Team) => {
+export function updateTeam(teamKey: string, team: Team) {
   set(child(teamsRef, teamKey), team);
+};
+
+export function removeMember(teamKey: string, playerKey: string) {
+  remove(child(child(child(teamsRef, teamKey), "members"), playerKey));
 };

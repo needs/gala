@@ -1,4 +1,4 @@
-import { child, push, ref, set } from "firebase/database";
+import { child, push, ref, remove, set } from "firebase/database";
 import { Player, database } from "./database";
 
 const playersRef = ref(database, 'players');
@@ -16,4 +16,8 @@ export function addPlayer(player: Player) {
 
 export function updatePlayer(playerKey: string, player: Player) {
   set(child(playersRef, playerKey), player);
+};
+
+export function deletePlayer(playerKey: string) {
+  remove(child(playersRef, playerKey));
 };
