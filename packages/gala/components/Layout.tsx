@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Category, Gavel, Group } from '@mui/icons-material';
+import { Category, Gavel, Group, ViewAgenda, ViewDay } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
@@ -31,6 +31,11 @@ const menu = [
     href: '/judges',
     icon: <Gavel />,
   },
+  {
+    label: 'Déroulement',
+    href: '/progress',
+    icon: <ViewDay />
+  }
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {

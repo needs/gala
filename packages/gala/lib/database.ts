@@ -96,3 +96,14 @@ export const judgesSchema = z.record(
 ).default({});
 
 export type Judge = z.infer<typeof judgesSchema>[string];
+
+export const apparatusKey = z.enum(["vault", "unevenBars", "beam", "floor"]);
+
+export type ApparatusKey = z.infer<typeof apparatusKey>;
+
+export const progressSchema = z.record(
+  apparatusKey,
+  z.string()
+).default({});
+
+export type Progress = z.infer<typeof progressSchema>;

@@ -23,7 +23,6 @@ import EditPlayerButton from './EditPlayerButton';
 import Loading from './Loading';
 import AddPlayerButton from './AddPlayerButton';
 import { produce } from 'immer';
-import { removeMember } from '../lib/team';
 
 const playersRef = ref(database, 'players');
 const categoriesRef = ref(database, 'categories');

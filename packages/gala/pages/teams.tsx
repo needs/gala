@@ -4,7 +4,6 @@ import {
   categoriesSchema,
   database,
   playersSchema,
-  teamSchema,
   teamsSchema,
   useDatabaseValue,
 } from '../lib/database';
