@@ -5,7 +5,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { child, ref, set } from 'firebase/database';
+import { ref, set } from 'firebase/database';
 import {
   ApparatusKey,
   Progress,
@@ -17,61 +17,8 @@ import {
 import Loading from '../components/Loading';
 import Image from 'next/image';
 import { produce } from 'immer';
-
-const apparatuses: {
-  name: string;
-  key: ApparatusKey;
-  icon: JSX.Element;
-}[] = [
-  {
-    name: 'Saut',
-    key: 'vault',
-    icon: (
-      <Image
-        src="/icons/apparatuses/vault.png"
-        alt="Vault"
-        width={24}
-        height={24}
-      />
-    ),
-  },
-  {
-    name: 'Barres asymétriques',
-    key: 'unevenBars',
-    icon: (
-      <Image
-        src="/icons/apparatuses/unevenBars.png"
-        alt="Vault"
-        width={24}
-        height={24}
-      />
-    ),
-  },
-  {
-    name: 'Poutre',
-    key: 'beam',
-    icon: (
-      <Image
-        src="/icons/apparatuses/beam.png"
-        alt="Vault"
-        width={24}
-        height={24}
-      />
-    ),
-  },
-  {
-    name: 'Sol',
-    key: 'floor',
-    icon: (
-      <Image
-        src="/icons/apparatuses/floor.png"
-        alt="Vault"
-        width={24}
-        height={24}
-      />
-    ),
-  },
-];
+import { apparatuses } from '../lib/apparatus';
+import App from 'next/app';
 
 const teamsRef = ref(database, 'teams');
 const progressRef = ref(database, 'progress');
@@ -90,10 +37,10 @@ export default function ProgressPage() {
 
   return (
     <Stack gap={2} direction="column" padding={4} divider={<Divider />}>
-      {apparatuses.map(({ name, key, icon }) => (
+      {Object.entries(apparatuses).map(([key, { name, iconPath }]) => (
         <Stack key={key} direction="row" gap={2} alignItems="center">
           <Stack direction="row" gap={2} alignItems="center" minWidth={300}>
-            {icon}
+            <Image src={iconPath} alt="Vault" width={24} height={24} />
             <Typography variant="h6">{name}</Typography>
           </Stack>
           <Autocomplete
@@ -104,18 +51,26 @@ export default function ProgressPage() {
               teamKey,
             }))}
             value={
-              progress[key]
+              progress[key as ApparatusKey]
                 ? {
-                    teamKey: progress[key],
-                    label: teams[progress[key] ?? ''].name,
+                    teamKey: progress[key as ApparatusKey],
+                    label: teams[progress[key as ApparatusKey] ?? ''].name,
                   }
                 : null
             }
             onChange={(event, newValue) => {
               if (newValue) {
-                updateProgress(produce(progress, draft => {draft[key] = newValue.teamKey}));
+                updateProgress(
+                  produce(progress, (draft) => {
+                    draft[key as ApparatusKey] = newValue.teamKey;
+                  })
+                );
               } else {
-                updateProgress(produce(progress, draft => {delete draft[key]}));
+                updateProgress(
+                  produce(progress, (draft) => {
+                    delete draft[key as ApparatusKey];
+                  })
+                );
               }
             }}
             sx={{ width: 300 }}

@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Category, Gavel, Group, ViewAgenda, ViewDay } from '@mui/icons-material';
+import { Category, Gavel, Group, Tv, ViewAgenda, ViewDay } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
@@ -20,26 +20,42 @@ const menu = [
     label: 'Équipes',
     href: '/teams',
     icon: <Group />,
+    showLayout: true
   },
   {
     label: 'Catégories',
     href: '/categories',
     icon: <Category />,
+    showLayout: true
   },
   {
     label: 'Juges',
     href: '/judges',
     icon: <Gavel />,
+    showLayout: true
   },
   {
     label: 'Déroulement',
     href: '/progress',
-    icon: <ViewDay />
+    icon: <ViewDay />,
+    showLayout: true
+  },
+  {
+    label: 'Screen 1',
+    href: '/screens/1',
+    icon: <Tv />,
+    showLayout: false
   }
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+
+  const menuItem = menu.find(({ href }) => href === router.asPath);
+
+  if (menuItem !== undefined && !menuItem.showLayout) {
+    return <>{ children }</>;
+  }
 
   return (
     <Box sx={{ display: 'flex' }}>
