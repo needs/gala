@@ -2,7 +2,6 @@ import {
   Autocomplete,
   Button,
   Divider,
-  Paper,
   Stack,
   TextField,
   Typography,
@@ -20,31 +19,44 @@ import Loading from '../components/Loading';
 import Image from 'next/image';
 import { produce } from 'immer';
 import { apparatuses } from '../lib/apparatus';
-import App from 'next/app';
 
 const teamsRef = ref(database, 'teams');
 const progressRefA = ref(database, 'progress');
 const progressRefB = ref(database, 'progress2');
 
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
 function rotateLeft(progress: Progress) {
+  const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
+
   return produce(progress, (draft) => {
-    const keys = Object.keys(draft) as ApparatusKey[];
-    const first = draft[keys[0]];
-    for (let i = 0; i < keys.length - 1; i++) {
-      draft[keys[i]] = draft[keys[i + 1]];
-    }
-    draft[keys[keys.length - 1]] = first;
+    apparatusKeys.forEach((apparatusKey, index) => {
+      const previousApparatusKey = apparatusKeys[mod(index + 1, apparatusKeys.length)];
+
+      if (previousApparatusKey in progress) {
+        draft[apparatusKey] = progress[previousApparatusKey];
+      } else {
+        delete draft[apparatusKey];
+      }
+    });
   });
 }
 
 function rotateRight(progress: Progress) {
+  const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
+
   return produce(progress, (draft) => {
-    const keys = Object.keys(draft) as ApparatusKey[];
-    const last = draft[keys[keys.length - 1]];
-    for (let i = keys.length - 1; i > 0; i--) {
-      draft[keys[i]] = draft[keys[i - 1]];
-    }
-    draft[keys[0]] = last;
+    apparatusKeys.forEach((apparatusKey, index) => {
+      const previousApparatusKey = apparatusKeys[mod(index - 1, apparatusKeys.length)];
+
+      if (previousApparatusKey in progress) {
+        draft[apparatusKey] = progress[previousApparatusKey];
+      } else {
+        delete draft[apparatusKey];
+      }
+    });
   });
 }
 
