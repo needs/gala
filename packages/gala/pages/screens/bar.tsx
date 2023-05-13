@@ -10,7 +10,7 @@ export default function Bar() {
     Plats: {
       "Hot-Dog": [3.0],
       "Frites": [3.0],
-      "Hot-Dog+Frites": [5.0],
+      "Saucisse+Frites": [5.0],
       "Sandwich (Fromage Brie)": [3.0],
     },
     Grignotage: {
