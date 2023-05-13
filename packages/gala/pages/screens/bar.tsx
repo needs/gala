@@ -4,7 +4,7 @@ export default function Bar() {
       "Bière": [2.5],
       "Jus de pommes": [1.5],
       "Soda (Fanta/Coca/Ice Tea/Oasis)": [1.5],
-      "Eau": [1.0],
+      "Eau": [0.5],
       "Café / Thé": [1.0],
     },
     Plats: {
@@ -14,11 +14,11 @@ export default function Bar() {
       "Sandwich (Fromage Brie)": [3.0],
     },
     Grignotage: {
-      "Pommes": [0.5],
-      "Sucettes": [0.5],
+      "Pomme": [0.5],
+      "Sucette": [0.5],
       "Barre Kinder Country": [1.0],
-      "Crêpes (Sucre)": [2.0],
-      "Crêpes (Nutella)": [2.5],
+      "Crêpe (Sucre)": [2.0],
+      "Crêpe (Nutella)": [2.5],
     },
   };
 
