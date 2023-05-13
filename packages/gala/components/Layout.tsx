@@ -45,6 +45,12 @@ const menu = [
     href: '/screens/1',
     icon: <Tv />,
     showLayout: false
+  },
+  {
+    label: 'Screen 2',
+    href: '/screens/2',
+    icon: <Tv />,
+    showLayout: false
   }
 ]
 

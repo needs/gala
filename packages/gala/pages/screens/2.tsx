@@ -4,11 +4,10 @@ import {
 } from '../../lib/database';
 import Screen from '../../components/Screen';
 
-const progressRef = ref(database, 'progress');
+const progressRef = ref(database, 'progress2');
 
-
-export default function Screen1() {
+export default function Screen2() {
   return (
-    <Screen stageName="Plateau A" progressRef={progressRef} />
+    <Screen stageName="Plateau B" progressRef={progressRef} />
   );
 }

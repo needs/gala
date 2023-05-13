@@ -1,9 +1,11 @@
 import { ApparatusKey } from "./database";
 
-export const apparatuses: Record<ApparatusKey, {
+export type Apparatus = {
   name: string;
   iconPath: string;
-}> = {
+};
+
+export const apparatuses: Record<ApparatusKey, Apparatus> = {
   vault: {
     name: 'Saut',
     iconPath: "/icons/apparatuses/vault.png",
