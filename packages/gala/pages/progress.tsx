@@ -33,7 +33,8 @@ function rotateLeft(progress: Progress) {
 
   return produce(progress, (draft) => {
     apparatusKeys.forEach((apparatusKey, index) => {
-      const previousApparatusKey = apparatusKeys[mod(index + 1, apparatusKeys.length)];
+      const previousApparatusKey =
+        apparatusKeys[mod(index + 1, apparatusKeys.length)];
 
       if (previousApparatusKey in progress) {
         draft[apparatusKey] = progress[previousApparatusKey];
@@ -49,7 +50,8 @@ function rotateRight(progress: Progress) {
 
   return produce(progress, (draft) => {
     apparatusKeys.forEach((apparatusKey, index) => {
-      const previousApparatusKey = apparatusKeys[mod(index - 1, apparatusKeys.length)];
+      const previousApparatusKey =
+        apparatusKeys[mod(index - 1, apparatusKeys.length)];
 
       if (previousApparatusKey in progress) {
         draft[apparatusKey] = progress[previousApparatusKey];
@@ -80,11 +82,17 @@ function Stage({
 
   return (
     <Stack direction="column" padding={4}>
-      <Stack direction="row" gap={2} alignItems="center">
-        <Typography variant="h4" paddingY={3} paddingX={1}>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        gap={2}
+        alignItems="center"
+      >
+        <Typography variant="h4" paddingY={{ xs: 0, md: 3 }} paddingX={1}>
           {stageName}
         </Typography>
-        <Button onDoubleClick={() => updateProgress({})} color="warning">Remise à zéro</Button>
+        <Button onDoubleClick={() => updateProgress({})} color="warning">
+          Remise à zéro
+        </Button>
         <Button onClick={() => updateProgress(rotateLeft(progress))}>
           Rotation arrière
         </Button>
@@ -94,7 +102,12 @@ function Stage({
       </Stack>
       <Stack gap={2} direction="column" divider={<Divider />}>
         {Object.entries(apparatuses).map(([key, { name, iconPath }]) => (
-          <Stack key={key} direction="row" gap={2} alignItems="center">
+          <Stack
+            key={key}
+            direction={{ xs: 'column', md: 'row' }}
+            gap={2}
+            alignItems="center"
+          >
             <Stack direction="row" gap={2} alignItems="center" minWidth={300}>
               <Image src={iconPath} alt="Vault" width={24} height={24} />
               <Typography variant="h6">{name}</Typography>
