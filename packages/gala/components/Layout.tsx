@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Category, Gavel, Group, Tv, ViewAgenda, ViewDay } from '@mui/icons-material';
+import { Category, FoodBank, Gavel, Group, Tv, ViewAgenda, ViewDay } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
@@ -50,6 +50,12 @@ const menu = [
     label: 'Screen 2',
     href: '/screens/2',
     icon: <Tv />,
+    showLayout: false
+  },
+  {
+    label: 'Buvette',
+    href: '/screens/bar',
+    icon: <FoodBank />,
     showLayout: false
   }
 ]
