@@ -77,6 +77,12 @@ const menuVisitor = [
     icon: <ViewDay />,
     showLayout: true,
   },
+  {
+    label: 'Buvette',
+    href: '/bar',
+    icon: <FoodBank />,
+    showLayout: true,
+  },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

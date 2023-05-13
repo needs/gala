@@ -107,3 +107,29 @@ export const progressSchema = z.record(
 ).default({});
 
 export type Progress = z.infer<typeof progressSchema>;
+
+export const barSchema = z.record(
+  z.string(),
+  z.record(z.string(), z.array(z.number()))
+).default({
+  "Boissons": {
+    "Bière": [2.5],
+    'Jus de pommes': [1.5],
+    'Soda (Fanta,Coca,Ice Tea,Oasis)': [1.5],
+    "Eau": [0.5],
+    'Café | Thé': [1.0]
+  },
+  "Plats": {
+    'Hot-Dog': [3.0],
+    "Frites": [3.0],
+    'Saucisse+Frites': [5.0],
+    'Sandwich (Fromage Brie)': [3.0]
+  },
+  "Grignotage": {
+    "Pomme": [0.5],
+    "Sucette": [0.5],
+    'Barre Kinder Country': [1.0],
+    'Crêpe (Sucre)': [2.0],
+    'Crêpe (Nutella)': [2.5]
+  }
+});
