@@ -133,3 +133,5 @@ export const barSchema = z.record(
     'Crêpe (Nutella)': [2.5]
   }
 });
+
+export const antoinetteSchema = z.boolean().default(false);

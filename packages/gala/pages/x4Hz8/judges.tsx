@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ref, set, push, child, remove } from 'firebase/database';
 import {
   Judge,
+  antoinetteSchema,
   database,
   judgesSchema,
   useDatabaseValue,
@@ -13,6 +14,7 @@ import {
   CardActions,
   CardContent,
     Stack,
+    Switch,
 } from '@mui/material';
 import Head from 'next/head';
 import Loading from '../../components/Loading';
@@ -75,9 +77,11 @@ function EditJudgeButton({
 }
 
 const judgesRef = ref(database, 'judges');
+const antoinetteRef = ref(database, 'antoinette');
 
 export default function Judges() {
   const judges = useDatabaseValue(judgesRef, judgesSchema);
+  const antoinette = useDatabaseValue(antoinetteRef, antoinetteSchema);
 
   const addJudge = (judge: Judge) => {
     const newJudgeKey = push(judgesRef).key;
@@ -125,6 +129,7 @@ export default function Judges() {
           </Card>
         ))}
         <AddJudgeButton onAdd={addJudge} />
+        <Switch checked={antoinette === true} onChange={() => set(antoinetteRef, !antoinette)} />
       </Stack>
     </>
   );
