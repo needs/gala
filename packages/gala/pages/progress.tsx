@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Button,
   Divider,
   Paper,
   Stack,
@@ -25,7 +26,35 @@ const teamsRef = ref(database, 'teams');
 const progressRefA = ref(database, 'progress');
 const progressRefB = ref(database, 'progress2');
 
-function Stage({ stageName, databaseRef }: { stageName: string, databaseRef: DatabaseReference }) {
+function rotateLeft(progress: Progress) {
+  return produce(progress, (draft) => {
+    const keys = Object.keys(draft) as ApparatusKey[];
+    const first = draft[keys[0]];
+    for (let i = 0; i < keys.length - 1; i++) {
+      draft[keys[i]] = draft[keys[i + 1]];
+    }
+    draft[keys[keys.length - 1]] = first;
+  });
+}
+
+function rotateRight(progress: Progress) {
+  return produce(progress, (draft) => {
+    const keys = Object.keys(draft) as ApparatusKey[];
+    const last = draft[keys[keys.length - 1]];
+    for (let i = keys.length - 1; i > 0; i--) {
+      draft[keys[i]] = draft[keys[i - 1]];
+    }
+    draft[keys[0]] = last;
+  });
+}
+
+function Stage({
+  stageName,
+  databaseRef,
+}: {
+  stageName: string;
+  databaseRef: DatabaseReference;
+}) {
   const teams = useDatabaseValue(teamsRef, teamsSchema);
   const progress = useDatabaseValue(databaseRef, progressSchema);
 
@@ -39,9 +68,18 @@ function Stage({ stageName, databaseRef }: { stageName: string, databaseRef: Dat
 
   return (
     <Stack direction="column" padding={4}>
-      <Typography variant="h4" paddingY={3} paddingX={1}>
-        {stageName}
-      </Typography>
+      <Stack direction="row" gap={2} alignItems="center">
+        <Typography variant="h4" paddingY={3} paddingX={1}>
+          {stageName}
+        </Typography>
+        <Button onDoubleClick={() => updateProgress({})} color="warning">Remise à zéro</Button>
+        <Button onClick={() => updateProgress(rotateLeft(progress))}>
+          Rotation arrière
+        </Button>
+        <Button onClick={() => updateProgress(rotateRight(progress))}>
+          Rotation avant
+        </Button>
+      </Stack>
       <Stack gap={2} direction="column" divider={<Divider />}>
         {Object.entries(apparatuses).map(([key, { name, iconPath }]) => (
           <Stack key={key} direction="row" gap={2} alignItems="center">
@@ -94,7 +132,7 @@ export default function ProgressPage() {
   return (
     <Stack direction="column">
       <Stage stageName="Plateau A" databaseRef={progressRefA} />
-      <Stage stageName="Plateau B" databaseRef={progressRefB}/>
+      <Stage stageName="Plateau B" databaseRef={progressRefB} />
     </Stack>
   );
 }
