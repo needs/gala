@@ -5,7 +5,7 @@ import {
   database,
   judgesSchema,
   useDatabaseValue,
-} from '../lib/database';
+} from '../../lib/database';
 import {
   Box,
   Button,
@@ -15,10 +15,10 @@ import {
     Stack,
 } from '@mui/material';
 import Head from 'next/head';
-import Loading from '../components/Loading';
-import EditJudgeDialog from '../components/EditJudgeDialog';
+import Loading from '../../components/Loading';
+import EditJudgeDialog from '../../components/EditJudgeDialog';
 import { Add } from '@mui/icons-material';
-import { fullName } from '../lib/utils';
+import { fullName } from '../../lib/utils';
 
 function AddJudgeButton({ onAdd }: { onAdd: (judge: Judge) => void }) {
   const [open, setOpen] = useState(false);

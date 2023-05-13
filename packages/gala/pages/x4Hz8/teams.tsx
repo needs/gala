@@ -6,7 +6,7 @@ import {
   playersSchema,
   teamsSchema,
   useDatabaseValue,
-} from '../lib/database';
+} from '../../lib/database';
 import {
   Box,
   Button,
@@ -22,16 +22,16 @@ import {
 } from '@mui/material';
 import { Clear, Delete, Edit } from '@mui/icons-material';
 import { useMemo, useState } from 'react';
-import EditTeamDialog from '../components/EditTeamDialog';
+import EditTeamDialog from '../../components/EditTeamDialog';
 import Head from 'next/head';
-import GenderAvatar from '../components/GenderAvatar';
+import GenderAvatar from '../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
-import CategorySelector from '../components/CategorySelector';
-import Loading from '../components/Loading';
-import { addPlayer, deletePlayer, updatePlayer } from '../lib/player';
-import EditPlayerButton from '../components/EditPlayerButton';
-import AddPlayerButton from '../components/AddPlayerButton';
-import { addTeam, defaultTeam, removeMember, updateTeam } from '../lib/team';
+import CategorySelector from '../../components/CategorySelector';
+import Loading from '../../components/Loading';
+import { addPlayer, deletePlayer, updatePlayer } from '../../lib/player';
+import EditPlayerButton from '../../components/EditPlayerButton';
+import AddPlayerButton from '../../components/AddPlayerButton';
+import { addTeam, defaultTeam, removeMember, updateTeam } from '../../lib/team';
 
 const teamsRef = ref(database, 'teams');
 const playersRef = ref(database, 'players');

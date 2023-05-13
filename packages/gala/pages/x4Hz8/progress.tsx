@@ -14,11 +14,11 @@ import {
   progressSchema,
   teamsSchema,
   useDatabaseValue,
-} from '../lib/database';
-import Loading from '../components/Loading';
+} from '../../lib/database';
+import Loading from '../../components/Loading';
 import Image from 'next/image';
 import { produce } from 'immer';
-import { apparatuses } from '../lib/apparatus';
+import { apparatuses } from '../../lib/apparatus';
 
 const teamsRef = ref(database, 'teams');
 const progressRefA = ref(database, 'progress');

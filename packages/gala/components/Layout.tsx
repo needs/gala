@@ -25,28 +25,28 @@ import { IconButton } from '@mui/material';
 
 const drawerWidth = 240;
 
-const menu = [
+const menuAdmin = [
   {
     label: 'Équipes',
-    href: '/teams',
+    href: '/x4Hz8/teams',
     icon: <Group />,
     showLayout: true,
   },
   {
     label: 'Catégories',
-    href: '/categories',
+    href: '/x4Hz8/categories',
     icon: <Category />,
     showLayout: true,
   },
   {
     label: 'Juges',
-    href: '/judges',
+    href: '/x4Hz8/judges',
     icon: <Gavel />,
     showLayout: true,
   },
   {
     label: 'Déroulement',
-    href: '/progress',
+    href: '/x4Hz8/progress',
     icon: <ViewDay />,
     showLayout: true,
   },
@@ -70,13 +70,26 @@ const menu = [
   },
 ];
 
+const menuVisitor = [
+  {
+    label: 'Plateaux',
+    href: '/',
+    icon: <ViewDay />,
+    showLayout: true,
+  },
+];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const menuItem = menu.find(({ href }) => href === router.asPath);
+  const menuItemAdmin = menuAdmin.find(({ href }) => href === router.asPath);
+  const menuItemVisitor = menuVisitor.find(({ href }) => href === router.asPath);
 
-  if (menuItem !== undefined && !menuItem.showLayout) {
+  const menuItem = menuItemAdmin || menuItemVisitor;
+  const menu = menuItemAdmin !== undefined ? menuAdmin : menuVisitor;
+
+  if (menuItem === undefined || !menuItem.showLayout) {
     return <>{children}</>;
   }
 

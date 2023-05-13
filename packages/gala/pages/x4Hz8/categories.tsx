@@ -5,7 +5,7 @@ import {
   database,
   teamsSchema,
   useDatabaseValue,
-} from '../lib/database';
+} from '../../lib/database';
 import {
   Button,
   IconButton,
@@ -19,11 +19,11 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import EditCategoryDialog from '../components/EditCategoryDialog';
+import EditCategoryDialog from '../../components/EditCategoryDialog';
 import { Delete, Edit } from '@mui/icons-material';
 import Head from 'next/head';
-import GenderAvatar from '../components/GenderAvatar';
-import Loading from '../components/Loading';
+import GenderAvatar from '../../components/GenderAvatar';
+import Loading from '../../components/Loading';
 
 const teamsRef = ref(database, 'teams');
 const categoriesRef = ref(database, 'categories');
