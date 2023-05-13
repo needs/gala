@@ -49,6 +49,7 @@
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
+    "@vercel/analytics": "^1.0.1",
     "firebase": "^9.21.0",
     "immer": "^10.0.2",
     "lodash": "^4.17.21",
