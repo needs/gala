@@ -6,49 +6,24 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Loading from '../../components/Loading';
 import Image from 'next/image';
-import { produce } from 'immer';
 import { apparatuses } from '../../lib/apparatus';
 import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../../lib/store';
+import { useEffect } from 'react';
 
-function mod(n: number, m: number) {
-  return ((n % m) + m) % m;
-}
+const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
 function rotateLeft(progress: Progress) {
-  const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
-
-  return produce(progress, (draft) => {
-    apparatusKeys.forEach((apparatusKey, index) => {
-      const previousApparatusKey =
-        apparatusKeys[mod(index + 1, apparatusKeys.length)];
-
-      if (previousApparatusKey in progress) {
-        draft[apparatusKey] = progress[previousApparatusKey];
-      } else {
-        delete draft[apparatusKey];
-      }
-    });
-  });
+  const values = apparatusKeys.map((apparatusKey) => progress[apparatusKey]);
+  values.push(values.shift());
+  apparatusKeys.forEach((apparatusKey, index) => progress[apparatusKey] = values[index]);
 }
 
 function rotateRight(progress: Progress) {
-  const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
-
-  return produce(progress, (draft) => {
-    apparatusKeys.forEach((apparatusKey, index) => {
-      const previousApparatusKey =
-        apparatusKeys[mod(index - 1, apparatusKeys.length)];
-
-      if (previousApparatusKey in progress) {
-        draft[apparatusKey] = progress[previousApparatusKey];
-      } else {
-        delete draft[apparatusKey];
-      }
-    });
-  });
+  const values = apparatusKeys.map((apparatusKey) => progress[apparatusKey]);
+  values.unshift(values.pop());
+  apparatusKeys.forEach((apparatusKey, index) => progress[apparatusKey] = values[index]);
 }
 
 function Stage({
@@ -61,12 +36,14 @@ function Stage({
   const { teams, progresses } = useSyncedStore(store)
   const progress = progresses[stageKey];
 
-  const updateProgress = (progress: Progress) => {
-    progresses[stageKey] = progress;
-  };
+  useEffect(() => {
+    if (progresses[stageKey] === undefined) {
+      progresses[stageKey] = {};
+    }
+  }, [progresses, stageKey]);
 
-  if (teams === undefined || progress === undefined) {
-    return <Loading />;
+  if (progress === undefined) {
+    return null;
   }
 
   return (
@@ -79,13 +56,13 @@ function Stage({
         <Typography variant="h4" paddingY={{ xs: 0, md: 3 }} paddingX={1}>
           {stageName}
         </Typography>
-        <Button onDoubleClick={() => updateProgress({})} color="warning">
+        <Button onDoubleClick={() => progresses[stageKey] = {}} color="warning">
           Remise à zéro
         </Button>
-        <Button onClick={() => updateProgress(rotateLeft(progress))}>
+        <Button onClick={() => rotateLeft(progress)}>
           Rotation arrière
         </Button>
-        <Button onClick={() => updateProgress(rotateRight(progress))}>
+        <Button onClick={() => rotateRight(progress)}>
           Rotation avant
         </Button>
       </Stack>
@@ -119,17 +96,9 @@ function Stage({
               }
               onChange={(event, newValue) => {
                 if (newValue) {
-                  updateProgress(
-                    produce(progress, (draft) => {
-                      draft[key as ApparatusKey] = newValue.teamKey;
-                    })
-                  );
+                  progress[key as ApparatusKey] = newValue.teamKey;
                 } else {
-                  updateProgress(
-                    produce(progress, (draft) => {
-                      delete draft[key as ApparatusKey];
-                    })
-                  );
+                  delete progress[key as ApparatusKey];
                 }
               }}
               sx={{ width: 300 }}

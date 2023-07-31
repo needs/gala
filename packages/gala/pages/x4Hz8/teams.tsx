@@ -1,6 +1,4 @@
-import {
-  Team, store,
-} from '../../lib/store';
+import { Team, store } from '../../lib/store';
 import {
   Box,
   Button,
@@ -27,11 +25,7 @@ import AddPlayerButton from '../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
 
-function EditTeamButton({
-  team,
-}: {
-  team: Team;
-}) {
+function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -43,11 +37,7 @@ function EditTeamButton({
         }}
         team={team}
       />
-      <IconButton
-        onClick={() =>
-          setOpen(true)
-        }
-      >
+      <IconButton onClick={() => setOpen(true)}>
         <Edit />
       </IconButton>
     </>
@@ -62,13 +52,15 @@ function AddTeamButton() {
 
   return (
     <>
-      {team !== undefined && <EditTeamDialog
-        open={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-        team={team}
-      />}
+      {team !== undefined && (
+        <EditTeamDialog
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+          team={team}
+        />
+      )}
       <Button
         variant="contained"
         onClick={() => {
@@ -92,11 +84,7 @@ export default function TeamsPage() {
     delete teams[teamKey];
   };
 
-  const teamsByCategory = useMemo(() => {
-    if (teams === undefined || players === undefined) {
-      return undefined;
-    }
-
+  const teamsByCategory = (() => {
     const filteredTeams = Object.entries(teams)
       .filter(([teamKey, team]) => {
         if (team === undefined) {
@@ -118,11 +106,11 @@ export default function TeamsPage() {
         const matchMembers = Object.keys(team.members).some((playerKey) => {
           const player = players[playerKey];
           return (
-            player !== undefined && (
-            player.firstName
+            player !== undefined &&
+            (player.firstName
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            player.lastName.toLowerCase().includes(searchQuery.toLowerCase()))
+              player.lastName.toLowerCase().includes(searchQuery.toLowerCase()))
           );
         });
 
@@ -136,14 +124,9 @@ export default function TeamsPage() {
 
     const ret = groupBy(filteredTeams, ({ team }) => team?.categoryKey);
     return ret;
-  }, [teams, players, searchQuery, categoryFilter]);
+  })();
 
-  if (
-    teams === undefined ||
-    players === undefined ||
-    categories === undefined ||
-    teamsByCategory === undefined
-  ) {
+  if (teamsByCategory === undefined) {
     return <Loading />;
   }
 
@@ -193,64 +176,76 @@ export default function TeamsPage() {
 
         {Object.entries(teamsByCategory).map(([categoryKey, teams]) => {
           const category = categories[categoryKey];
-          return category !== undefined && <Paper key={categoryKey}>
-            <Stack divider={<Divider />}>
-              <Stack gap={2} direction="row" alignItems="center" padding={2}>
-                <GenderAvatar gender={category.gender} />
-                <Typography variant="h6">
-                  {category.name}
-                </Typography>
-              </Stack>
-              {teams.map(({ teamKey, team }) => team !== undefined && (
-                <Stack
-                  direction="row"
-                  gap={2}
-                  padding={2}
-                  key={teamKey}
-                  divider={<Divider orientation="vertical" flexItem />}
-                  width="100%"
-                >
-                  <Box minWidth={300} maxWidth={300} padding={1}>
-                    {team.name}
-                  </Box>
+          return (
+            category !== undefined && (
+              <Paper key={categoryKey}>
+                <Stack divider={<Divider />}>
                   <Stack
+                    gap={2}
                     direction="row"
-                    gap={1}
-                    flexGrow="1"
-                    flexWrap="wrap"
                     alignItems="center"
+                    padding={2}
                   >
-                    {Object.keys(team.members).map((playerKey) => {
-                      const player = players[playerKey];
-                      return player !== undefined && <EditPlayerButton
-                        key={playerKey}
-                        player={player}
-                        onDelete={() => {
-                          delete team.members[playerKey];
-                          delete players[playerKey];
-                        }}
-                      />
-})}
-                    <AddPlayerButton team={team} />
+                    <GenderAvatar gender={category.gender} />
+                    <Typography variant="h6">{category.name}</Typography>
                   </Stack>
-                  <Stack direction="column" gap={2}>
-                    <Stack direction="row" gap={1}>
-                      <EditTeamButton
-                        team={team}
-                      />
-                      <IconButton
-                        onDoubleClick={() => deleteTeam(teamKey)}
-                        sx={{ color: 'lightcoral' }}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Stack>
-                  </Stack>
+                  {teams.map(
+                    ({ teamKey, team }) =>
+                      team !== undefined && (
+                        <Stack
+                          direction="row"
+                          gap={2}
+                          padding={2}
+                          key={teamKey}
+                          divider={<Divider orientation="vertical" flexItem />}
+                          width="100%"
+                        >
+                          <Box minWidth={300} maxWidth={300} padding={1}>
+                            {team.name}
+                          </Box>
+                          <Stack
+                            direction="row"
+                            gap={1}
+                            flexGrow="1"
+                            flexWrap="wrap"
+                            alignItems="center"
+                          >
+                            {Object.keys(team.members).map((playerKey) => {
+                              const player = players[playerKey];
+                              return (
+                                player !== undefined && (
+                                  <EditPlayerButton
+                                    key={playerKey}
+                                    player={player}
+                                    onDelete={() => {
+                                      delete team.members[playerKey];
+                                      delete players[playerKey];
+                                    }}
+                                  />
+                                )
+                              );
+                            })}
+                            <AddPlayerButton team={team} />
+                          </Stack>
+                          <Stack direction="column" gap={2}>
+                            <Stack direction="row" gap={1}>
+                              <EditTeamButton team={team} />
+                              <IconButton
+                                onDoubleClick={() => deleteTeam(teamKey)}
+                                sx={{ color: 'lightcoral' }}
+                              >
+                                <Delete />
+                              </IconButton>
+                            </Stack>
+                          </Stack>
+                        </Stack>
+                      )
+                  )}
                 </Stack>
-              ))}
-            </Stack>
-          </Paper>
-})}
+              </Paper>
+            )
+          );
+        })}
       </Stack>
     </>
   );
