@@ -9,29 +9,20 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { Player } from '../lib/database';
 import GenderSelector from './GenderSelector';
 
 export default function EditPlayerDialog({
   open,
-  onCancel,
-  onValidate,
+  onClose,
   player,
 }: {
   open: boolean;
-  onCancel: () => void;
-  onValidate: (player: Player) => void;
+  onClose: () => void;
   player: Player;
 }) {
-  const [editedPlayer, setEditedPlayer] = useState(player);
-
-  useEffect(() => {
-    setEditedPlayer(player);
-  }, [player]);
-
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier un joueur</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -45,12 +36,9 @@ export default function EditPlayerDialog({
             type="text"
             fullWidth
             variant="standard"
-            value={editedPlayer.firstName}
+            value={player.firstName}
             onChange={(event) =>
-              setEditedPlayer({
-                ...editedPlayer,
-                firstName: event.target.value,
-              })
+              player.firstName = event.target.value
             }
           />
           <TextField
@@ -59,9 +47,9 @@ export default function EditPlayerDialog({
             type="text"
             fullWidth
             variant="standard"
-            value={editedPlayer.lastName}
+            value={player.lastName}
             onChange={(event) =>
-              setEditedPlayer({ ...editedPlayer, lastName: event.target.value })
+              player.lastName = event.target.value
             }
           />
           <Stack
@@ -72,17 +60,16 @@ export default function EditPlayerDialog({
           >
             <FormLabel>Genre</FormLabel>
             <GenderSelector
-              gender={editedPlayer.gender}
+              gender={player.gender}
               onChange={(gender) =>
-                setEditedPlayer({ ...editedPlayer, gender })
+                player.gender = gender
               }
             />
           </Stack>
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Annuler</Button>
-        <Button onClick={() => onValidate(editedPlayer)}>Valider</Button>
+        <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
   );

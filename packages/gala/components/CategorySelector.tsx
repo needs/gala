@@ -8,10 +8,8 @@ import {
   ListItemAvatar,
 } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { ref } from 'firebase/database';
-import { categoriesSchema, database, useDatabaseValue } from '../lib/database';
-
-const categoriesRef = ref(database, 'categories');
+import { useSyncedStore } from '@syncedstore/react';
+import { store } from '../lib/store';
 
 export default function CategorySelector({
   categoryKey,
@@ -22,11 +20,7 @@ export default function CategorySelector({
   onChange: (categoryKey: string) => void;
   allowAll?: boolean;
 }) {
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
-
-  if (categories === undefined) {
-    return null;
-  }
+  const categories = useSyncedStore(store.categories);
 
   return (
     <FormControl size="small" fullWidth>
@@ -41,7 +35,7 @@ export default function CategorySelector({
             return <em>Selectionner une catégorie</em>;
           } else {
             const category = categories[categoryKey];
-            return (
+            return category !== undefined && (
               <Stack direction="row" spacing={2} alignItems="center">
                 <GenderAvatar gender={category.gender} size={24}/>
                 <ListItemText>{category.name}</ListItemText>
@@ -56,7 +50,7 @@ export default function CategorySelector({
             <ListItemText>Toutes les catégories</ListItemText>
           </MenuItem>
         )}
-        {Object.entries(categories).map(([categoryKey, category]) => (
+        {Object.entries(categories).map(([categoryKey, category]) => category !== undefined && (
           <MenuItem key={categoryKey} value={categoryKey}>
             <ListItemAvatar>
               <GenderAvatar gender={category.gender} />

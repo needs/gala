@@ -1,12 +1,6 @@
-import { ref, set, child, remove } from 'firebase/database';
 import {
-  Team,
-  categoriesSchema,
-  database,
-  playersSchema,
-  teamsSchema,
-  useDatabaseValue,
-} from '../../lib/database';
+  Team, store,
+} from '../../lib/store';
 import {
   Box,
   Button,
@@ -28,24 +22,17 @@ import GenderAvatar from '../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../../components/CategorySelector';
 import Loading from '../../components/Loading';
-import { addPlayer, deletePlayer, updatePlayer } from '../../lib/player';
 import EditPlayerButton from '../../components/EditPlayerButton';
 import AddPlayerButton from '../../components/AddPlayerButton';
-import { addTeam, defaultTeam, removeMember, updateTeam } from '../../lib/team';
-
-const teamsRef = ref(database, 'teams');
-const playersRef = ref(database, 'players');
-const categoriesRef = ref(database, 'categories');
+import { addTeam, defaultTeam } from '../../lib/team';
+import { useSyncedStore } from '@syncedstore/react';
 
 function EditTeamButton({
   team,
-  onChange,
 }: {
   team: Team;
-  onChange: (team: Team) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [editedTeam, setEditedTeam] = useState<Team>(team);
 
   return (
     <>
@@ -53,16 +40,13 @@ function EditTeamButton({
         open={open}
         onClose={() => {
           setOpen(false);
-          onChange(editedTeam);
         }}
-        onChange={setEditedTeam}
-        team={editedTeam}
+        team={team}
       />
       <IconButton
-        onClick={() => {
-          setOpen(true);
-          setEditedTeam(team);
-        }}
+        onClick={() =>
+          setOpen(true)
+        }
       >
         <Edit />
       </IconButton>
@@ -70,27 +54,25 @@ function EditTeamButton({
   );
 }
 
-function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
+function AddTeamButton() {
   const [open, setOpen] = useState(false);
-  const [team, setTeam] = useState<Team>(defaultTeam);
+  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
+  const teams = useSyncedStore(store.teams);
+  const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
   return (
     <>
-      <EditTeamDialog
+      {team !== undefined && <EditTeamDialog
         open={open}
         onClose={() => {
           setOpen(false);
-          onAdd(team);
-        }}
-        onChange={(team) => {
-          setTeam(team);
         }}
         team={team}
-      />
+      />}
       <Button
         variant="contained"
         onClick={() => {
-          setTeam(defaultTeam);
+          setTeamKey(addTeam(teams, defaultTeam));
           setOpen(true);
         }}
       >
@@ -101,20 +83,15 @@ function AddTeamButton({ onAdd }: { onAdd: (team: Team) => void }) {
 }
 
 export default function TeamsPage() {
-  const teams = useDatabaseValue(teamsRef, teamsSchema);
-  const players = useDatabaseValue(playersRef, playersSchema);
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
+  const teams = useSyncedStore(store.teams);
+  const players = useSyncedStore(store.players);
+  const categories = useSyncedStore(store.categories);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const addMember = (teamKey: string, playerKey: string) => {
-    const membersRef = ref(database, `teams/${teamKey}/members`);
-    set(child(membersRef, playerKey), true);
-  };
-
   const deleteTeam = (teamKey: string) => {
-    remove(child(teamsRef, teamKey));
+    delete teams[teamKey];
   };
 
   const teamsByCategory = useMemo(() => {
@@ -124,11 +101,15 @@ export default function TeamsPage() {
 
     const filteredTeams = Object.entries(teams)
       .filter(([teamKey, team]) => {
-        if (categoryFilter !== '' && team.category !== categoryFilter) {
+        if (team === undefined) {
           return false;
         }
 
-        if (team.category === undefined) {
+        if (categoryFilter !== '' && team.categoryKey !== categoryFilter) {
+          return false;
+        }
+
+        if (team.categoryKey === undefined) {
           return false;
         }
 
@@ -139,10 +120,11 @@ export default function TeamsPage() {
         const matchMembers = Object.keys(team.members).some((playerKey) => {
           const player = players[playerKey];
           return (
+            player !== undefined && (
             player.firstName
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            player.lastName.toLowerCase().includes(searchQuery.toLowerCase())
+            player.lastName.toLowerCase().includes(searchQuery.toLowerCase()))
           );
         });
 
@@ -154,7 +136,7 @@ export default function TeamsPage() {
       })
       .map(([teamKey, team]) => ({ teamKey, team }));
 
-    const ret = groupBy(filteredTeams, ({ team }) => team.category);
+    const ret = groupBy(filteredTeams, ({ team }) => team?.categoryKey);
     return ret;
   }, [teams, players, searchQuery, categoryFilter]);
 
@@ -208,19 +190,20 @@ export default function TeamsPage() {
               Object.values(teamsByCategory).map((teams) => teams.length)
             )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
-          <AddTeamButton onAdd={addTeam} />
+          <AddTeamButton />
         </Stack>
 
-        {Object.entries(teamsByCategory).map(([categoryKey, teams]) => (
-          <Paper key={categoryKey}>
+        {Object.entries(teamsByCategory).map(([categoryKey, teams]) => {
+          const category = categories[categoryKey];
+          return category !== undefined && <Paper key={categoryKey}>
             <Stack divider={<Divider />}>
               <Stack gap={2} direction="row" alignItems="center" padding={2}>
-                <GenderAvatar gender={categories[categoryKey].gender} />
+                <GenderAvatar gender={category.gender} />
                 <Typography variant="h6">
-                  {categories[categoryKey].name}
+                  {category.name}
                 </Typography>
               </Stack>
-              {teams.map(({ teamKey, team }) => (
+              {teams.map(({ teamKey, team }) => team !== undefined && (
                 <Stack
                   direction="row"
                   gap={2}
@@ -239,25 +222,23 @@ export default function TeamsPage() {
                     flexWrap="wrap"
                     alignItems="center"
                   >
-                    {Object.keys(team.members).map((playerKey) => (
-                      <EditPlayerButton
+                    {Object.keys(team.members).map((playerKey) => {
+                      const player = players[playerKey];
+                      return player !== undefined && <EditPlayerButton
                         key={playerKey}
-                        player={players[playerKey]}
-                        onChange={(player) => updatePlayer(playerKey, player)}
-                        onDelete={() => {removeMember(teamKey, playerKey); deletePlayer(playerKey)}}
+                        player={player}
+                        onDelete={() => {
+                          delete team.members[playerKey];
+                          delete players[playerKey];
+                        }}
                       />
-                    ))}
-                    <AddPlayerButton
-                      onAdd={(player) => {
-                        addMember(teamKey, addPlayer(player));
-                      }}
-                    />
+})}
+                    <AddPlayerButton team={team} />
                   </Stack>
                   <Stack direction="column" gap={2}>
                     <Stack direction="row" gap={1}>
                       <EditTeamButton
                         team={team}
-                        onChange={(team) => updateTeam(teamKey, team)}
                       />
                       <IconButton
                         onDoubleClick={() => deleteTeam(teamKey)}
@@ -271,7 +252,7 @@ export default function TeamsPage() {
               ))}
             </Stack>
           </Paper>
-        ))}
+})}
       </Stack>
     </>
   );

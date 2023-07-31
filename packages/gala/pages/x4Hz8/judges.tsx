@@ -1,12 +1,4 @@
 import React, { useState } from 'react';
-import { ref, set, push, child, remove } from 'firebase/database';
-import {
-  Judge,
-  antoinetteSchema,
-  database,
-  judgesSchema,
-  useDatabaseValue,
-} from '../../lib/database';
 import {
   Box,
   Button,
@@ -17,29 +9,35 @@ import {
     Switch,
 } from '@mui/material';
 import Head from 'next/head';
-import Loading from '../../components/Loading';
 import EditJudgeDialog from '../../components/EditJudgeDialog';
 import { Add } from '@mui/icons-material';
 import { fullName } from '../../lib/utils';
+import { Judge, store } from '../../lib/store';
+import { useSyncedStore } from '@syncedstore/react';
+import { v4 as uuidv4 } from 'uuid';
 
-function AddJudgeButton({ onAdd }: { onAdd: (judge: Judge) => void }) {
+function AddJudgeButton() {
   const [open, setOpen] = useState(false);
+  const judges = useSyncedStore(store.judges);
+  const [judgeKey, setJudgeKey] = useState<string | undefined>(undefined);
+  const judge = judgeKey !== undefined ? judges[judgeKey] : undefined;
 
   return (
     <>
-      <EditJudgeDialog
+      {judge !== undefined && <EditJudgeDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onAdd(player);
-          setOpen(false);
-        }}
-        judge={{
-          firstName: '',
-          lastName: '',
-        }}
-      />
-        <Button variant="outlined" onClick={() => setOpen(true)} sx={{ width: 300, height: 150 }}>
+        onClose={() => setOpen(false)}
+        judge={judge}
+      />}
+        <Button variant="outlined" onClick={() => {
+          const judgeKey = uuidv4();
+          judges[judgeKey] = {
+            firstName: '',
+            lastName: '',
+          }
+          setJudgeKey(judgeKey);
+          setOpen(true);
+          }} sx={{ width: 300, height: 150 }}>
           <Stack gap={1} alignItems="center" justifyContent="center" >
             <Add />
             <Box>Ajouter un juge</Box>
@@ -51,10 +49,8 @@ function AddJudgeButton({ onAdd }: { onAdd: (judge: Judge) => void }) {
 
 function EditJudgeButton({
   judge,
-  onChange,
 }: {
   judge: Judge;
-  onChange: (judge: Judge) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -62,11 +58,7 @@ function EditJudgeButton({
     <>
       <EditJudgeDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onChange(player);
-          setOpen(false);
-        }}
+        onClose={() => setOpen(false)}
         judge={judge}
       />
       <Button onClick={() => setOpen(true)}>
@@ -76,35 +68,13 @@ function EditJudgeButton({
   );
 }
 
-const judgesRef = ref(database, 'judges');
-const antoinetteRef = ref(database, 'antoinette');
-
 export default function Judges() {
-  const judges = useDatabaseValue(judgesRef, judgesSchema);
-  const antoinette = useDatabaseValue(antoinetteRef, antoinetteSchema);
-
-  const addJudge = (judge: Judge) => {
-    const newJudgeKey = push(judgesRef).key;
-
-    if (newJudgeKey === null) {
-      throw new Error('newJudgeKey is null');
-    }
-
-    set(child(judgesRef, newJudgeKey), judge);
-    return newJudgeKey;
-  };
-
-  const updateJudge = (judgeKey: string, judge: Judge) => {
-    set(child(judgesRef, judgeKey), judge);
-  };
+  const judges = useSyncedStore(store.judges);
+  const extra = useSyncedStore(store.extra);
 
   const deleteJudge = (judgeKey: string) => {
-    remove(child(judgesRef, judgeKey));
+    delete judges[judgeKey];
   };
-
-  if (judges === undefined) {
-    return <Loading />;
-  }
 
   return (
     <>
@@ -112,13 +82,12 @@ export default function Judges() {
         <title>Juges</title>
       </Head>
       <Stack padding={4} gap={4} direction="row">
-        {Object.entries(judges).map(([judgeKey, judge]) => (
+        {Object.entries(judges).map(([judgeKey, judge]) => judge !== undefined && (
           <Card key={judgeKey} sx={{ width: 300, height: 150 }}>
             <CardContent>{fullName(judge)}</CardContent>
             <CardActions>
               <EditJudgeButton
                 judge={judge}
-                onChange={(judge) => updateJudge(judgeKey, judge)}
               />
               <Button
                 onDoubleClick={() => deleteJudge(judgeKey)}
@@ -128,8 +97,8 @@ export default function Judges() {
             </CardActions>
           </Card>
         ))}
-        <AddJudgeButton onAdd={addJudge} />
-        <Switch checked={antoinette === true} onChange={() => set(antoinetteRef, !antoinette)} />
+        <AddJudgeButton />
+        <Switch checked={extra.antoinette === true} onChange={() => { extra.antoinette = !extra.antoinette }} />
       </Stack>
     </>
   );

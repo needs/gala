@@ -6,23 +6,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { DatabaseReference, ref, set } from 'firebase/database';
-import {
-  ApparatusKey,
-  Progress,
-  database,
-  progressSchema,
-  teamsSchema,
-  useDatabaseValue,
-} from '../../lib/database';
 import Loading from '../../components/Loading';
 import Image from 'next/image';
 import { produce } from 'immer';
 import { apparatuses } from '../../lib/apparatus';
-
-const teamsRef = ref(database, 'teams');
-const progressRefA = ref(database, 'progress');
-const progressRefB = ref(database, 'progress2');
+import { useSyncedStore } from '@syncedstore/react';
+import { ApparatusKey, Progress, store } from '../../lib/store';
 
 function mod(n: number, m: number) {
   return ((n % m) + m) % m;
@@ -64,16 +53,17 @@ function rotateRight(progress: Progress) {
 
 function Stage({
   stageName,
-  databaseRef,
+  stageKey,
 }: {
   stageName: string;
-  databaseRef: DatabaseReference;
+  stageKey: 'stage1' | 'stage2';
 }) {
-  const teams = useDatabaseValue(teamsRef, teamsSchema);
-  const progress = useDatabaseValue(databaseRef, progressSchema);
+  const teams = useSyncedStore(store.teams)
+  const progresses = useSyncedStore(store.progresses);
+  const progress = progresses[stageKey];
 
   const updateProgress = (progress: Progress) => {
-    set(databaseRef, progress);
+    progresses[stageKey] = progress;
   };
 
   if (teams === undefined || progress === undefined) {
@@ -117,14 +107,14 @@ function Stage({
               autoHighlight
               size="small"
               options={Object.entries(teams).map(([teamKey, team]) => ({
-                label: team.name,
+                label: team?.name,
                 teamKey,
               }))}
               value={
                 progress[key as ApparatusKey]
                   ? {
                       teamKey: progress[key as ApparatusKey],
-                      label: teams[progress[key as ApparatusKey] ?? ''].name,
+                      label: teams[progress[key as ApparatusKey] ?? '']?.name,
                     }
                   : null
               }
@@ -156,8 +146,8 @@ function Stage({
 export default function ProgressPage() {
   return (
     <Stack direction="column">
-      <Stage stageName="Plateau A" databaseRef={progressRefA} />
-      <Stage stageName="Plateau B" databaseRef={progressRefB} />
+      <Stage stageName="Plateau A" stageKey="stage1" />
+      <Stage stageName="Plateau B" stageKey="stage2" />
     </Stack>
   );
 }

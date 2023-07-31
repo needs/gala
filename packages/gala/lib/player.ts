@@ -1,23 +1,14 @@
-import { child, push, ref, remove, set } from "firebase/database";
-import { Player, database } from "./database";
+import { Player } from "./store";
+import { v4 as uuidv4 } from 'uuid';
 
-const playersRef = ref(database, 'players');
+export const defaultPlayer: Player = {
+  firstName: "",
+  lastName: "",
+  gender: "woman",
+};
 
-export function addPlayer(player: Player) {
-  const newPlayerKey = push(playersRef).key;
-
-  if (newPlayerKey === null) {
-    throw new Error('newPlayerKey is null');
-  }
-
-  set(child(playersRef, newPlayerKey), player);
+export function addPlayer(players: Partial<Record<string, Player>>, player: Player) {
+  const newPlayerKey = uuidv4();
+  players[newPlayerKey] = player;
   return newPlayerKey;
-};
-
-export function updatePlayer(playerKey: string, player: Player) {
-  set(child(playersRef, playerKey), player);
-};
-
-export function deletePlayer(playerKey: string) {
-  remove(child(playersRef, playerKey));
 };

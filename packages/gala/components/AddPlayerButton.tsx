@@ -1,28 +1,37 @@
-import { Add } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import { useState } from "react";
-import { Player } from "../lib/database";
-import EditPlayerDialog from "./EditPlayerDialog";
+import { Add } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+import { useState } from 'react';
+import EditPlayerDialog from './EditPlayerDialog';
+import { addPlayer, defaultPlayer } from '../lib/player';
+import { useSyncedStore } from '@syncedstore/react';
+import { Team, store } from '../lib/store';
 
-export default function AddPlayerButton({ onAdd }: { onAdd: (player: Player) => void }) {
+export default function AddPlayerButton({ team }: { team?: Team }) {
+  const players = useSyncedStore(store.players);
+  const [playerKey, setPlayerKey] = useState<string | undefined>(undefined);
   const [open, setOpen] = useState(false);
+  const player = playerKey !== undefined ? players[playerKey] : undefined;
 
   return (
     <>
-      <EditPlayerDialog
-        open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onAdd(player);
-          setOpen(false);
+      {player !== undefined && (
+        <EditPlayerDialog
+          open={open}
+          onClose={() => setOpen(false)}
+          player={player}
+        />
+      )}
+      <IconButton
+        onClick={() => {
+          const playerKey = addPlayer(players, defaultPlayer);
+          if (team !== undefined) {
+            team.members[playerKey] = true;
+          }
+          setPlayerKey(playerKey);
+          setOpen(true);
         }}
-        player={{
-          firstName: '',
-          lastName: '',
-          gender: 'man',
-        }}
-      />
-      <IconButton onClick={() => setOpen(true)} size="small">
+        size="small"
+      >
         <Add />
       </IconButton>
     </>

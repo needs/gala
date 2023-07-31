@@ -1,46 +1,33 @@
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Apparatus, apparatuses } from '../lib/apparatus';
-import { DatabaseReference, ref } from 'firebase/database';
-import {
-  ApparatusKey,
-  database,
-  playersSchema,
-  progressSchema,
-  teamsSchema,
-  useDatabaseValue,
-} from '../lib/database';
 import Loading from '../components/Loading';
 import { fullName } from '../lib/utils';
 import GenderAvatar from '../components/GenderAvatar';
-
-const teamsRef = ref(database, 'teams');
-const playersRef = ref(database, 'players');
+import { useSyncedStore } from '@syncedstore/react';
+import { ApparatusKey, store } from '../lib/store';
 
 function Apparatus({
   apparatusKey,
   apparatus,
-  progressRef,
+  stageKey,
 }: {
   apparatusKey: ApparatusKey;
   apparatus: Apparatus;
-  progressRef: DatabaseReference;
+  stageKey: 'stage1' | 'stage2';
 }) {
   const width = `${(1 / Object.entries(apparatuses).length) * 100}%`;
 
-  const teams = useDatabaseValue(teamsRef, teamsSchema);
-  const progress = useDatabaseValue(progressRef, progressSchema);
-  const players = useDatabaseValue(playersRef, playersSchema);
+  const teams = useSyncedStore(store.teams);
+  const progress = useSyncedStore(store.progresses[stageKey]);
+  const players = useSyncedStore(store.players);
 
-  if (teams === undefined || progress === undefined || players === undefined) {
+  if (progress === undefined) {
     return <Loading />;
   }
-  console.log(progress)
 
   const teamKey = progress[apparatusKey];
   const team = teamKey !== undefined ? teams[teamKey] : undefined;
-
-  console.log(teamKey)
 
   return (
     <Stack
@@ -59,7 +46,10 @@ function Apparatus({
           </Typography>
 
           <Stack direction="column" gap={2} width="100%">
-            {Object.keys(team.members).map((playerKey) => (
+            {Object.keys(team.members).map((playerKey) => {
+              const player = players[playerKey];
+
+              return player !== undefined &&
               <Stack
                 key={playerKey}
                 direction="row"
@@ -67,12 +57,12 @@ function Apparatus({
                 alignItems="center"
                 padding={2}
               >
-                <GenderAvatar gender={players[playerKey].gender} />
+                <GenderAvatar gender={player.gender} />
                 <Typography key={playerKey} variant="h5">
-                  {fullName(players[playerKey])}
+                  {fullName(player)}
                 </Typography>
               </Stack>
-            ))}
+})}
           </Stack>
         </>
       )}
@@ -80,7 +70,7 @@ function Apparatus({
   );
 }
 
-export default function Screen({ stageName, progressRef}: { stageName: string, progressRef: DatabaseReference }) {
+export default function Screen({ stageName, stageKey}: { stageName: string, stageKey: 'stage1' | 'stage2' }) {
   return (
     <Stack
       direction="column"
@@ -99,7 +89,7 @@ export default function Screen({ stageName, progressRef}: { stageName: string, p
         divider={<Divider orientation="vertical" />}
       >
         {Object.entries(apparatuses).map(([apparatusKey, apparatus]) => (
-          <Apparatus progressRef={progressRef} key={apparatusKey} apparatusKey={apparatusKey as ApparatusKey} apparatus={apparatus} />
+          <Apparatus stageKey={stageKey} key={apparatusKey} apparatusKey={apparatusKey as ApparatusKey} apparatus={apparatus} />
         ))}
       </Stack>
     </Stack>

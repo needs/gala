@@ -9,41 +9,29 @@ import {
   Stack,
 } from '@mui/material';
 import { useCallback } from 'react';
-import {
-  Team,
-  categoriesSchema,
-  database,
-  playersSchema,
-  useDatabaseValue,
-} from '../lib/database';
 import CategorySelector from './CategorySelector';
-import { ref } from 'firebase/database';
-import { addPlayer, deletePlayer, updatePlayer } from '../lib/player';
+import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import Loading from './Loading';
 import AddPlayerButton from './AddPlayerButton';
-import { produce } from 'immer';
-
-const playersRef = ref(database, 'players');
-const categoriesRef = ref(database, 'categories');
+import { Team, store } from '../lib/store';
+import { useSyncedStore } from '@syncedstore/react';
 
 export default function EditTeamDialog({
   open,
   team,
-  onChange,
   onClose,
 }: {
   open: boolean;
   team: Team;
   onClose: () => void;
-  onChange: (player: Team) => void;
 }) {
-  const players = useDatabaseValue(playersRef, playersSchema);
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
+  const players = useSyncedStore(store.players);
+  const categories = useSyncedStore(store.categories);
 
   const importFromClipboard = useCallback(() => {
     navigator.clipboard.readText().then((text) => {
-      if (categories === undefined || team.category === undefined) {
+      if (team.categoryKey === undefined) {
         return;
       }
 
@@ -52,9 +40,14 @@ export default function EditTeamDialog({
       // first name and last name because last name can be multiple words and
       // sometime first name is in uppercase as well.
 
-      const gender = categories[team.category].gender;
+      const category = categories[team.categoryKey];
+
+      if (category === undefined) {
+        return;
+      }
+
+      const gender = category.gender;
       const words = text.split(/[\n ]+/);
-      const playersKey: string[] = [];
 
       while (words.length > 0) {
         const firstName = words.shift();
@@ -65,19 +58,11 @@ export default function EditTeamDialog({
             lastName += ' ' + words.shift();
           }
 
-          playersKey.push(addPlayer({ firstName, lastName, gender }));
+          team.members[(addPlayer(players, { firstName, lastName, gender }))] = true;
         }
       }
-
-      onChange(
-        produce(team, (draft) => {
-          for (const playerKey of playersKey) {
-            draft.members[playerKey] = true;
-          }
-        })
-      );
     });
-  }, [categories, team, onChange]);
+  }, [categories, team, players]);
 
   if (players === undefined || categories === undefined) {
     return <Loading />;
@@ -100,50 +85,33 @@ export default function EditTeamDialog({
             variant="standard"
             value={team.name}
             onChange={(event) =>
-              onChange(
-                produce(team, (draft) => {
-                  draft.name = event.target.value;
-                })
-              )
+              team.name = event.target.value
             }
           />
           <CategorySelector
-            categoryKey={team.category}
+            categoryKey={team.categoryKey}
             onChange={(categoryKey) =>
-              onChange(
-                produce(team, (draft) => {
-                  draft.category = categoryKey;
-                })
-              )
+              team.categoryKey = categoryKey
             }
           />
           <Stack direction="row" gap={1} flexWrap="wrap">
             {Object.keys(team.members).map(
-              (playerKey) =>
-                playerKey in players && (
+              (playerKey) => {
+                const player = players[playerKey];
+
+                return player !== undefined &&  (
                   <EditPlayerButton
                     key={playerKey}
-                    player={players[playerKey]}
-                    onChange={(player) => updatePlayer(playerKey, player)}
+                    player={player}
                     onDelete={() => {
-                      onChange(
-                        produce(team, (draft) => {
-                          delete draft.members[playerKey];
-                        })
-                      );
-                      deletePlayer(playerKey);
+                      delete team.members[playerKey];
+                      delete players[playerKey];
                     }}
                   />
-                )
+                )}
             )}
             <AddPlayerButton
-              onAdd={(player) => {
-                onChange(
-                  produce(team, (draft) => {
-                    draft.members[addPlayer(player)] = true;
-                  })
-                );
-              }}
+              team={team}
             />
           </Stack>
           <Button variant="contained" onClick={() => importFromClipboard()}>

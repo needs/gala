@@ -7,11 +7,9 @@ import GenderIcon from "./GenderIcon";
 
 export default function EditPlayerButton({
   player,
-  onChange,
   onDelete,
 }: {
   player: Player;
-  onChange: (player: Player) => void;
   onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -20,11 +18,7 @@ export default function EditPlayerButton({
     <>
       <EditPlayerDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          onChange(player);
-          setOpen(false);
-        }}
+        onClose={() => setOpen(false)}
         player={player}
       />
       <Chip

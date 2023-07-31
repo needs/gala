@@ -8,28 +8,19 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { Judge } from '../lib/database';
 
 export default function EditJudgeDialog({
   open,
-  onCancel,
-  onValidate,
+  onClose,
   judge,
 }: {
   open: boolean;
-  onCancel: () => void;
-  onValidate: (judge: Judge) => void;
+  onClose: () => void;
   judge: Judge;
 }) {
-  const [editedJudge, setEditedJudge] = useState(judge);
-
-  useEffect(() => {
-    setEditedJudge(judge);
-  }, [judge]);
-
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier un juge</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -43,12 +34,9 @@ export default function EditJudgeDialog({
             type="text"
             fullWidth
             variant="standard"
-            value={editedJudge.firstName}
+            value={judge.firstName}
             onChange={(event) =>
-              setEditedJudge({
-                ...editedJudge,
-                firstName: event.target.value,
-              })
+              judge.firstName = event.target.value
             }
           />
           <TextField
@@ -57,16 +45,15 @@ export default function EditJudgeDialog({
             type="text"
             fullWidth
             variant="standard"
-            value={editedJudge.lastName}
+            value={judge.lastName}
             onChange={(event) =>
-              setEditedJudge({ ...editedJudge, lastName: event.target.value })
+              judge.lastName = event.target.value
             }
           />
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Annuler</Button>
-        <Button onClick={() => onValidate(editedJudge)}>Valider</Button>
+        <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
   );

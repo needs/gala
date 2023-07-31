@@ -1,11 +1,3 @@
-import { ref, set, push, child, remove } from 'firebase/database';
-import {
-  Category,
-  categoriesSchema,
-  database,
-  teamsSchema,
-  useDatabaseValue,
-} from '../../lib/database';
 import {
   Button,
   IconButton,
@@ -23,17 +15,15 @@ import EditCategoryDialog from '../../components/EditCategoryDialog';
 import { Delete, Edit } from '@mui/icons-material';
 import Head from 'next/head';
 import GenderAvatar from '../../components/GenderAvatar';
-import Loading from '../../components/Loading';
+import { useSyncedStore } from '@syncedstore/react';
+import { Category, store } from '../../lib/store';
+import { v4 as uuidv4 } from 'uuid';
 
-const teamsRef = ref(database, 'teams');
-const categoriesRef = ref(database, 'categories');
 
 function EditCategoryButton({
   category,
-  onChange,
 }: {
   category: Category;
-  onChange: (category: Category) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -41,11 +31,7 @@ function EditCategoryButton({
     <>
       <EditCategoryDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(category) => {
-          onChange(category);
-          setOpen(false);
-        }}
+        onClose={() => setOpen(false)}
         category={category}
       />
       <IconButton onClick={() => setOpen(true)}>
@@ -55,25 +41,29 @@ function EditCategoryButton({
   );
 }
 
-function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
+function AddCategoryButton() {
   const [open, setOpen] = useState(false);
+  const categories = useSyncedStore(store.categories);
+  const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
+  const category = categoryKey !== undefined ? categories[categoryKey] : undefined;
 
   return (
     <>
-      <EditCategoryDialog
+      {category !== undefined && <EditCategoryDialog
         open={open}
-        onCancel={() => setOpen(false)}
-        onValidate={(player) => {
-          setOpen(false);
-          onAdd(player);
-        }}
-        category={{
+        onClose={() => setOpen(false)}
+        category={category}
+      />}
+      <Button variant="contained" onClick={() => {
+        const categoryKey = uuidv4();
+        categories[categoryKey] = {
           name: '',
-          gender: 'woman',
+          gender: "woman",
           apparatuses: {},
-        }}
-      />
-      <Button variant="contained" onClick={() => setOpen(true)}>
+        }
+        setCategoryKey(categoryKey);
+        setOpen(true);
+        }}>
         Ajouter
       </Button>
     </>
@@ -81,31 +71,12 @@ function AddCategoryButton({ onAdd }: { onAdd: (category: Category) => void }) {
 }
 
 export default function Categories() {
-  const categories = useDatabaseValue(categoriesRef, categoriesSchema);
-  const teams = useDatabaseValue(teamsRef, teamsSchema);
-
-  const addCategory = (category: Category) => {
-    const newCategoryKey = push(categoriesRef).key;
-
-    if (newCategoryKey === null) {
-      throw new Error('newCategoryKey is null');
-    }
-
-    set(child(categoriesRef, newCategoryKey), category);
-    return newCategoryKey;
-  };
-
-  const updateCategory = (categoryKey: string, category: Category) => {
-    set(child(categoriesRef, categoryKey), category);
-  };
+  const categories = useSyncedStore(store.categories);
+  const teams = useSyncedStore(store.teams);
 
   const deleteCategory = (categoryKey: string) => {
-    remove(child(categoriesRef, categoryKey));
+    delete categories[categoryKey];
   };
-
-  if (categories === undefined || teams === undefined) {
-    return <Loading />;
-  }
 
   return (
     <>
@@ -117,7 +88,7 @@ export default function Categories() {
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableBody>
-              {Object.entries(categories).map(([categoryKey, category]) => (
+              {Object.entries(categories).map(([categoryKey, category]) => category !== undefined && (
                 <TableRow
                   key={categoryKey}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -131,7 +102,7 @@ export default function Categories() {
                   <TableCell>
                     {
                       Object.values(teams).filter(
-                        (team) => team.category === categoryKey
+                        (team) => team !== undefined && team.categoryKey === categoryKey
                       ).length
                     }{' '}
                     équipe(s)
@@ -140,9 +111,6 @@ export default function Categories() {
                     <Stack direction="row" gap={1}>
                       <EditCategoryButton
                         category={category}
-                        onChange={(category) =>
-                          updateCategory(categoryKey, category)
-                        }
                       />
                       <IconButton
                         onDoubleClick={() => deleteCategory(categoryKey)}
@@ -157,7 +125,7 @@ export default function Categories() {
             </TableBody>
           </Table>
         </TableContainer>
-        <AddCategoryButton onAdd={addCategory} />
+        <AddCategoryButton />
       </Stack>
     </>
   );

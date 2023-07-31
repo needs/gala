@@ -10,29 +10,20 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { Category } from '../lib/database';
 import GenderSelector from './GenderSelector';
 
 export default function EditCategoryDialog({
   open,
-  onCancel,
-  onValidate,
+  onClose,
   category,
 }: {
   open: boolean;
-  onCancel: () => void;
-  onValidate: (category: Category) => void;
+  onClose: () => void;
   category: Category;
 }) {
-  const [editedCategory, setEditedCategory] = useState(category);
-
-  useEffect(() => {
-    setEditedCategory(category);
-  }, [category]);
-
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier une catégorie</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -46,9 +37,9 @@ export default function EditCategoryDialog({
             type="text"
             fullWidth
             variant="standard"
-            value={editedCategory.name}
+            value={category.name}
             onChange={(event) =>
-              setEditedCategory({ ...editedCategory, name: event.target.value })
+              category.name = event.target.value
             }
           />
           <Stack
@@ -59,9 +50,9 @@ export default function EditCategoryDialog({
           >
             <FormLabel>Genre</FormLabel>
             <GenderSelector
-              gender={editedCategory.gender}
+              gender={category.gender}
               onChange={(gender) =>
-                setEditedCategory({ ...editedCategory, gender })
+                category.gender = gender
               }
             />
           </Stack>
@@ -70,8 +61,7 @@ export default function EditCategoryDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel}>Annuler</Button>
-        <Button onClick={() => onValidate(editedCategory)}>Valider</Button>
+        <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
   );
