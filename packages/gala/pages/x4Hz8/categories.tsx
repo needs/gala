@@ -43,7 +43,7 @@ function EditCategoryButton({
 
 function AddCategoryButton() {
   const [open, setOpen] = useState(false);
-  const categories = useSyncedStore(store.categories);
+  const { categories } = useSyncedStore(store);
   const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
   const category = categoryKey !== undefined ? categories[categoryKey] : undefined;
 
@@ -71,8 +71,7 @@ function AddCategoryButton() {
 }
 
 export default function Categories() {
-  const categories = useSyncedStore(store.categories);
-  const teams = useSyncedStore(store.teams);
+  const { categories, teams } = useSyncedStore(store);
 
   const deleteCategory = (categoryKey: string) => {
     delete categories[categoryKey];

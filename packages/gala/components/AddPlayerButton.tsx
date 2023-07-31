@@ -7,7 +7,7 @@ import { useSyncedStore } from '@syncedstore/react';
 import { Team, store } from '../lib/store';
 
 export default function AddPlayerButton({ team }: { team?: Team }) {
-  const players = useSyncedStore(store.players);
+  const { players } = useSyncedStore(store);
   const [playerKey, setPlayerKey] = useState<string | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const player = playerKey !== undefined ? players[playerKey] : undefined;

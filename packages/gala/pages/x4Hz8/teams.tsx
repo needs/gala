@@ -57,7 +57,7 @@ function EditTeamButton({
 function AddTeamButton() {
   const [open, setOpen] = useState(false);
   const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
-  const teams = useSyncedStore(store.teams);
+  const { teams } = useSyncedStore(store);
   const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
   return (
@@ -83,9 +83,7 @@ function AddTeamButton() {
 }
 
 export default function TeamsPage() {
-  const teams = useSyncedStore(store.teams);
-  const players = useSyncedStore(store.players);
-  const categories = useSyncedStore(store.categories);
+  const { teams, players, categories } = useSyncedStore(store);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');

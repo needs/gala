@@ -58,8 +58,7 @@ function Stage({
   stageName: string;
   stageKey: 'stage1' | 'stage2';
 }) {
-  const teams = useSyncedStore(store.teams)
-  const progresses = useSyncedStore(store.progresses);
+  const { teams, progresses } = useSyncedStore(store)
   const progress = progresses[stageKey];
 
   const updateProgress = (progress: Progress) => {

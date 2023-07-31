@@ -26,8 +26,7 @@ export default function EditTeamDialog({
   team: Team;
   onClose: () => void;
 }) {
-  const players = useSyncedStore(store.players);
-  const categories = useSyncedStore(store.categories);
+  const { players, categories } = useSyncedStore(store);
 
   const importFromClipboard = useCallback(() => {
     navigator.clipboard.readText().then((text) => {

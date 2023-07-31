@@ -20,7 +20,7 @@ export default function CategorySelector({
   onChange: (categoryKey: string) => void;
   allowAll?: boolean;
 }) {
-  const categories = useSyncedStore(store.categories);
+  const { categories } = useSyncedStore(store);
 
   return (
     <FormControl size="small" fullWidth>

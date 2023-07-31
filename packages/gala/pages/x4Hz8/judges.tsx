@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 function AddJudgeButton() {
   const [open, setOpen] = useState(false);
-  const judges = useSyncedStore(store.judges);
+  const { judges } = useSyncedStore(store);
   const [judgeKey, setJudgeKey] = useState<string | undefined>(undefined);
   const judge = judgeKey !== undefined ? judges[judgeKey] : undefined;
 
@@ -69,8 +69,7 @@ function EditJudgeButton({
 }
 
 export default function Judges() {
-  const judges = useSyncedStore(store.judges);
-  const extra = useSyncedStore(store.extra);
+  const { judges, extra } = useSyncedStore(store);
 
   const deleteJudge = (judgeKey: string) => {
     delete judges[judgeKey];

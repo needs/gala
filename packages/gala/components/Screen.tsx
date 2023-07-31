@@ -18,9 +18,9 @@ function Apparatus({
 }) {
   const width = `${(1 / Object.entries(apparatuses).length) * 100}%`;
 
-  const teams = useSyncedStore(store.teams);
-  const progress = useSyncedStore(store.progresses[stageKey]);
-  const players = useSyncedStore(store.players);
+  const { teams, progresses, players } = useSyncedStore(store);
+
+  const progress = progresses[stageKey];
 
   if (progress === undefined) {
     return <Loading />;
