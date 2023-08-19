@@ -12,7 +12,6 @@ import { useCallback } from 'react';
 import CategorySelector from './CategorySelector';
 import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
-import Loading from './Loading';
 import AddPlayerButton from './AddPlayerButton';
 import { Team, store } from '../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
@@ -62,10 +61,6 @@ export default function EditTeamDialog({
       }
     });
   }, [categories, team, players]);
-
-  if (players === undefined || categories === undefined) {
-    return <Loading />;
-  }
 
   return (
     <Dialog open={open} onClose={onClose}>

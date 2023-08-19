@@ -1,7 +1,6 @@
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Apparatus, apparatuses } from '../lib/apparatus';
-import Loading from '../components/Loading';
 import { fullName } from '../lib/utils';
 import GenderAvatar from '../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
@@ -23,7 +22,7 @@ function Apparatus({
   const progress = progresses[stageKey];
 
   if (progress === undefined) {
-    return <Loading />;
+    return null;
   }
 
   const teamKey = progress[apparatusKey];

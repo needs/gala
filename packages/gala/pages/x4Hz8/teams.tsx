@@ -19,7 +19,6 @@ import Head from 'next/head';
 import GenderAvatar from '../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
 import CategorySelector from '../../components/CategorySelector';
-import Loading from '../../components/Loading';
 import EditPlayerButton from '../../components/EditPlayerButton';
 import AddPlayerButton from '../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../lib/team';
@@ -125,10 +124,6 @@ export default function TeamsPage() {
     const ret = groupBy(filteredTeams, ({ team }) => team?.categoryKey);
     return ret;
   })();
-
-  if (teamsByCategory === undefined) {
-    return <Loading />;
-  }
 
   return (
     <>
