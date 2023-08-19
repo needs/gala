@@ -8,10 +8,16 @@
   },
   "inputs": [
     {
-      "id": "terminateGala",
+      "id": "terminateFrontend",
       "type": "command",
       "command": "workbench.action.tasks.terminate",
-      "args": "Gala"
+      "args": "Frontend"
+    },
+    {
+      "id": "terminateWebsocket",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "Websocket"
     },
   ],
   "tasks": [
@@ -31,13 +37,19 @@
     {
       "label": "Terminate Serve",
       "dependsOn": [
-        "Terminate Gala",
+        "Terminate Frontend",
+        "Terminate Websocket",
       ],
     },
     {
-      "label": "Terminate Gala",
+      "label": "Terminate Frontend",
       "type": "process",
-      "command": "echo ${input:terminateGala}",
+      "command": "echo ${input:terminateFrontend}",
+    },
+    {
+      "label": "Terminate Websocket",
+      "type": "process",
+      "command": "echo ${input:terminateWebsocket}",
     },
     {
       "label": "Npm install",
@@ -50,13 +62,21 @@
     {
       "label": "Start Serve",
       "dependsOn": [
-        "Gala",
+        "Frontend",
+        "Websocket",
       ],
     },
     {
-      "label": "Gala",
+      "label": "Frontend",
       "type": "shell",
       "command": "npx nx serve gala",
+      "isBackground": true,
+
+    },
+    {
+      "label": "Websocket",
+      "type": "shell",
+      "command": "HOST=localhost PORT=1234 npx y-websocket",
       "isBackground": true,
 
     },

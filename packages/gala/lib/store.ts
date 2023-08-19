@@ -1,5 +1,5 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
-import { WebrtcProvider } from "y-webrtc";
+import { WebsocketProvider } from "y-websocket";
 
 export type Gender = "man" | "woman" | "mixed";
 export type ApparatusKey = "vault" | "unevenBars" | "beam" | "floor";
@@ -24,8 +24,8 @@ export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}
 
 export function initStore() {
   const doc = getYjsDoc(store);
-  const webrtcProvider = new WebrtcProvider("gala-test", doc)
+  const wsProvider = new WebsocketProvider('ws://localhost:1234', 'gala-test', doc)
   return () => {
-    webrtcProvider.destroy();
+    wsProvider.destroy();
   }
 }
