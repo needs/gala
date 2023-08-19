@@ -14,10 +14,10 @@
       "args": "Frontend"
     },
     {
-      "id": "terminateWebsocket",
+      "id": "terminateServer",
       "type": "command",
       "command": "workbench.action.tasks.terminate",
-      "args": "Websocket"
+      "args": "Server"
     },
   ],
   "tasks": [
@@ -38,7 +38,7 @@
       "label": "Terminate Serve",
       "dependsOn": [
         "Terminate Frontend",
-        "Terminate Websocket",
+        "Terminate Server",
       ],
     },
     {
@@ -47,9 +47,9 @@
       "command": "echo ${input:terminateFrontend}",
     },
     {
-      "label": "Terminate Websocket",
+      "label": "Terminate Server",
       "type": "process",
-      "command": "echo ${input:terminateWebsocket}",
+      "command": "echo ${input:terminateServer}",
     },
     {
       "label": "Npm install",
@@ -63,7 +63,7 @@
       "label": "Start Serve",
       "dependsOn": [
         "Frontend",
-        "Websocket",
+        "Server",
       ],
     },
     {
@@ -74,9 +74,9 @@
 
     },
     {
-      "label": "Websocket",
+      "label": "Server",
       "type": "shell",
-      "command": "HOST=localhost PORT=1234 npx y-websocket",
+      "command": "npx nx serve server",
       "isBackground": true,
 
     },

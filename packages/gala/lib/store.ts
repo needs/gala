@@ -1,5 +1,5 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
-import { WebsocketProvider } from "y-websocket";
+import { SocketIOProvider } from 'y-socket.io'
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
@@ -50,7 +50,7 @@ export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}
 
 export function initStore() {
   const doc = getYjsDoc(store);
-  const wsProvider = new WebsocketProvider('ws://localhost:1234', 'gala-test', doc)
+  const wsProvider = new SocketIOProvider('ws://localhost:1234', 'gala-test', doc, {});
   return () => {
     wsProvider.destroy();
   }
