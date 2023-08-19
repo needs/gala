@@ -1,5 +1,5 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
-import { SocketIOProvider } from 'y-socket.io'
+import { HocuspocusProvider } from "@hocuspocus/provider";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
@@ -50,8 +50,12 @@ export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}
 
 export function initStore() {
   const doc = getYjsDoc(store);
-  const wsProvider = new SocketIOProvider('ws://localhost:1234', 'gala-test', doc, {});
+  const provider = new HocuspocusProvider({
+    url: "ws://127.0.0.1:1234",
+    name: "gala-test",
+    document: doc,
+  });
   return () => {
-    wsProvider.destroy();
+    provider.destroy();
   }
 }

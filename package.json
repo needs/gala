@@ -52,6 +52,9 @@
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^4.5.8",
+    "@hocuspocus/extension-sqlite": "^2.4.0",
+    "@hocuspocus/provider": "^2.4.0",
+    "@hocuspocus/server": "^2.4.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
     "@syncedstore/core": "^0.5.2",
@@ -66,9 +69,6 @@
     "tslib": "^2.3.0",
     "use-immer": "^0.9.0",
     "uuid": "^9.0.0",
-    "y-socket.io": "^1.1.0",
-    "y-webrtc": "^10.2.5",
-    "y-websocket": "^1.5.0",
     "yjs": "^13.6.7"
   }
 }

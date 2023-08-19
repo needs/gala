@@ -11,6 +11,7 @@ import { apparatuses } from '../../lib/apparatus';
 import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../../lib/store';
 import { useEffect } from 'react';
+import { isEmpty } from 'lodash';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
@@ -28,23 +29,12 @@ function rotateRight(progress: Progress) {
 
 function Stage({
   stageName,
-  stageKey,
+  progress,
 }: {
   stageName: string;
-  stageKey: 'stage1' | 'stage2';
+  progress: Progress;
 }) {
-  const { teams, progresses } = useSyncedStore(store)
-  const progress = progresses[stageKey];
-
-  useEffect(() => {
-    if (progresses[stageKey] === undefined) {
-      progresses[stageKey] = {};
-    }
-  }, [progresses, stageKey]);
-
-  if (progress === undefined) {
-    return null;
-  }
+  const { teams } = useSyncedStore(store)
 
   return (
     <Stack direction="column" padding={4}>
@@ -56,7 +46,7 @@ function Stage({
         <Typography variant="h4" paddingY={{ xs: 0, md: 3 }} paddingX={1}>
           {stageName}
         </Typography>
-        <Button onDoubleClick={() => progresses[stageKey] = {}} color="warning">
+        <Button onDoubleClick={() => progress = {}} color="warning">
           Remise à zéro
         </Button>
         <Button onClick={() => rotateLeft(progress)}>
@@ -112,10 +102,22 @@ function Stage({
 }
 
 export default function ProgressPage() {
+  const { progresses } = useSyncedStore(store)
+
+  console.log("progress", JSON.stringify(progresses));
+
+  useEffect(() => {
+    if (isEmpty(progresses)) {
+      progresses["Plateau A"] = {};
+      progresses["Plateau B"] = {};
+    }
+  }, [progresses]);
+
   return (
     <Stack direction="column">
-      <Stage stageName="Plateau A" stageKey="stage1" />
-      <Stage stageName="Plateau B" stageKey="stage2" />
+      {Object.entries(progresses).map(([stageName, progress]) => (
+        progress !== undefined && <Stage stageName={stageName} progress={progress} key={stageName} />
+      ))}
     </Stack>
   );
 }

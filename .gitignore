@@ -43,3 +43,6 @@ Thumbs.db
 
 # Screenshots
 /screenshots
+
+# Dev SQLite database
+/db.sqlite
