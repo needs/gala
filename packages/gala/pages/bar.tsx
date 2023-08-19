@@ -1,22 +1,14 @@
-import { ref } from "firebase/database";
-import Loading from "../components/Loading";
-import { database, useDatabaseValue, barSchema } from "../lib/database";
 import { Divider, Stack, Typography } from "@mui/material";
-
-const barRef = ref(database, 'bar');
+import { barDefault } from "../lib/store";
 
 export default function Bar() {
-  const bar = useDatabaseValue(barRef, barSchema);
+  const bar = barDefault;
 
   const toEuro = (value: number) =>
     new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: 'EUR',
     }).format(value);
-
-  if (bar === undefined) {
-    return <Loading />
-  }
 
   return (
     <Stack direction="column" divider={<Divider />}>

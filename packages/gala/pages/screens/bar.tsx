@@ -1,24 +1,17 @@
-import { ref } from 'firebase/database';
 import Image from 'next/image';
-import { antoinetteSchema, barSchema, database, useDatabaseValue } from '../../lib/database';
-import Loading from '../../components/Loading';
-
-const barRef = ref(database, 'bar');
-const antoinetteRef = ref(database, 'antoinette');
+import { useSyncedStore } from '@syncedstore/react';
+import { barDefault, store } from '../../lib/store';
 
 export default function Bar() {
-  const bar = useDatabaseValue(barRef, barSchema);
-  const antoinette = useDatabaseValue(antoinetteRef, antoinetteSchema);
+  const bar = barDefault;
+  const { extra } = useSyncedStore(store);
+  const antoinette = extra?.antoinette || false;
 
   const toEuro = (value: number) =>
     new Intl.NumberFormat('de-DE', {
       style: 'currency',
       currency: 'EUR',
     }).format(value);
-
-  if (bar === undefined || antoinette === undefined) {
-    return <Loading />
-  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-20 p-4">

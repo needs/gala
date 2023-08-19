@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Clear, Delete, Edit } from '@mui/icons-material';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import EditTeamDialog from '../../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../../components/GenderAvatar';

@@ -1,44 +1,22 @@
 import { Avatar, Box, Chip, Divider, Stack, Typography } from '@mui/material';
-import {
-  ApparatusKey,
-  database,
-  playersSchema,
-  progressSchema,
-  teamsSchema,
-  useDatabaseValue,
-} from '../lib/database';
-import { DatabaseReference, ref } from 'firebase/database';
-import { Apparatus, apparatuses } from '../lib/apparatus';
-import GenderAvatar from '../components/GenderAvatar';
-import Loading from '../components/Loading';
+import { apparatuses } from '../lib/apparatus';
 import { fullName } from '../lib/utils';
 import Image from 'next/image';
 import GenderIcon from '../components/GenderIcon';
-
-const progressARef = ref(database, 'progress');
-const progressBRef = ref(database, 'progress2');
-const teamsRef = ref(database, 'teams');
-const playersRef = ref(database, 'players');
+import { useSyncedStore } from '@syncedstore/react';
+import { ApparatusKey, Progress, store } from '../lib/store';
 
 function Apparatus({
   apparatusKey,
-  apparatus,
-  progressRef,
+  teamKey,
 }: {
   apparatusKey: ApparatusKey;
-  apparatus: Apparatus;
-  progressRef: DatabaseReference;
+  teamKey: string;
 }) {
-  const teams = useDatabaseValue(teamsRef, teamsSchema);
-  const progress = useDatabaseValue(progressRef, progressSchema);
-  const players = useDatabaseValue(playersRef, playersSchema);
+  const { teams, players } = useSyncedStore(store);
 
-  if (teams === undefined || progress === undefined || players === undefined) {
-    return <Loading />;
-  }
-
-  const teamKey = progress[apparatusKey];
-  const team = teamKey !== undefined ? teams[teamKey] : undefined;
+  const team = teams[teamKey];
+  const apparatus = apparatuses[apparatusKey];
 
   return (
     <Stack direction="column" gap={2} alignItems="center">
@@ -46,25 +24,39 @@ function Apparatus({
         <Image src={apparatus.iconPath} alt="Vault" width={24} height={24} />
         <Typography variant="h5">{apparatus.name}</Typography>
       </Stack>
-      {team === undefined ? <Typography color="gray">Aucune équipe</Typography> : (
+      {team === undefined ? (
+        <Typography color="gray">Aucune équipe</Typography>
+      ) : (
         <>
           <Typography variant="h6" paddingY={3} paddingX={1}>
             {team.name}
           </Typography>
 
-          <Stack direction="row" gap={2} width="100%" justifyContent="center" flexWrap="wrap">
-            {Object.keys(team.members).map((playerKey) => (
-              <Chip
-                key={playerKey}
-                avatar={
-                  <Avatar sx={{ bgcolor: 'transparent' }}>
-                    <GenderIcon gender={players[playerKey].gender} />
-                  </Avatar>
-                }
-                label={fullName(players[playerKey])}
-                variant="outlined"
-              />
-            ))}
+          <Stack
+            direction="row"
+            gap={2}
+            width="100%"
+            justifyContent="center"
+            flexWrap="wrap"
+          >
+            {Object.keys(team.members).map((playerKey) => {
+              const player = players[playerKey];
+
+              return (
+                player !== undefined && (
+                  <Chip
+                    key={playerKey}
+                    avatar={
+                      <Avatar sx={{ bgcolor: 'transparent' }}>
+                        <GenderIcon gender={player.gender} />
+                      </Avatar>
+                    }
+                    label={fullName(player)}
+                    variant="outlined"
+                  />
+                )
+              );
+            })}
           </Stack>
         </>
       )}
@@ -74,10 +66,10 @@ function Apparatus({
 
 function Stage({
   stageName,
-  progressRef,
+  progress,
 }: {
   stageName: string;
-  progressRef: DatabaseReference;
+  progress: Progress;
 }) {
   return (
     <Stack
@@ -91,13 +83,17 @@ function Stage({
         <Typography variant="h4">{stageName}</Typography>
       </Box>
 
-      <Stack direction="column" justifyContent="center" divider={<Divider />} gap={4}>
-        {Object.entries(apparatuses).map(([apparatusKey, apparatus]) => (
+      <Stack
+        direction="column"
+        justifyContent="center"
+        divider={<Divider />}
+        gap={4}
+      >
+        {Object.entries(progress).map(([apparatusKey, teamKey]) => (
           <Apparatus
-            progressRef={progressRef}
             key={apparatusKey}
             apparatusKey={apparatusKey as ApparatusKey}
-            apparatus={apparatus}
+            teamKey={teamKey}
           />
         ))}
       </Stack>
@@ -106,10 +102,16 @@ function Stage({
 }
 
 export default function Index() {
+  const { progresses } = useSyncedStore(store);
+
   return (
     <Stack gap={10}>
-      <Stage stageName="Plateau A" progressRef={progressARef} />
-      <Stage stageName="Plateau B" progressRef={progressBRef} />
+      {Object.entries(progresses).map(
+        ([stageName, progress]) =>
+          progress !== undefined && (
+            <Stage stageName={stageName} progress={progress} key={stageName} />
+          )
+      )}
     </Stack>
   );
 }

@@ -1,4 +1,4 @@
-import { ApparatusKey } from "./database";
+import { ApparatusKey } from "./store";
 
 export type Apparatus = {
   name: string;
