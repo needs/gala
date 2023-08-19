@@ -104,8 +104,6 @@ function Stage({
 export default function ProgressPage() {
   const { progresses } = useSyncedStore(store)
 
-  console.log("progress", JSON.stringify(progresses));
-
   useEffect(() => {
     if (isEmpty(progresses)) {
       progresses["Plateau A"] = {};

@@ -2,22 +2,16 @@ import { AppProps } from 'next/app';
 import Layout from '../components/Layout';
 import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
-import { useEffect } from 'react';
-import { initStore } from '../lib/store';
-
+import StoreProvider from '../components/StoreProvider';
 
 function CustomApp({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      return initStore();
-    }
-  }, []);
-
   return (
-    <Layout>
-      <Component {...pageProps} />
-      <Analytics />
-    </Layout>
+    <StoreProvider>
+      <Layout>
+        <Component {...pageProps} />
+        <Analytics />
+      </Layout>
+    </StoreProvider>
   );
 }
 
