@@ -10,7 +10,7 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { Category } from '../lib/database';
+import { Category } from '../lib/store';
 import GenderSelector from './GenderSelector';
 
 export default function EditCategoryDialog({

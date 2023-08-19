@@ -1,6 +1,5 @@
 import { Wc, Woman, Man } from '@mui/icons-material';
-import { Gender, Player } from '../lib/database';
-import { Avatar } from '@mui/material';
+import { Gender } from '../lib/store';
 
 export function genderColor(gender: Gender) {
   switch (gender) {

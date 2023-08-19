@@ -1,9 +1,10 @@
-import { Team, database } from "./database";
+import { Team } from "./store";
 import { v4 as uuidv4 } from 'uuid';
 
 export const defaultTeam: Team = {
   name: '',
   members: {},
+  categoryKey: undefined,
 };
 
 export function addTeam(teams: Partial<Record<string, Team>>, team: Team) {

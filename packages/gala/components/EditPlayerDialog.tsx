@@ -9,7 +9,7 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { Player } from '../lib/database';
+import { Player } from '../lib/store';
 import GenderSelector from './GenderSelector';
 
 export default function EditPlayerDialog({

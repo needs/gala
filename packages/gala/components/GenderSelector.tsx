@@ -1,5 +1,5 @@
 import { ToggleButtonGroup, ToggleButton } from '@mui/material';
-import { Gender, genderSchema } from '../lib/database';
+import { Gender, genders } from '../lib/store';
 import GenderIcon from './GenderIcon';
 
 export default function GenderSelector({
@@ -16,7 +16,7 @@ export default function GenderSelector({
       onChange={(event, gender: Gender) => onChange(gender)}
       size="small"
     >
-      {genderSchema.options.map((gender) => (
+      {genders.map((gender) => (
         <ToggleButton value={gender} key={gender}>
           <GenderIcon gender={gender} />
         </ToggleButton>

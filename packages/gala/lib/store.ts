@@ -1,7 +1,8 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
 import { WebsocketProvider } from "y-websocket";
 
-export type Gender = "man" | "woman" | "mixed";
+export const genders = ["man", "woman", "mixed"] as const;
+export type Gender = (typeof genders)[number];
 export type ApparatusKey = "vault" | "unevenBars" | "beam" | "floor";
 
 export type Player = { firstName: string, lastName: string, gender: Gender };

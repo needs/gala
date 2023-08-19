@@ -8,7 +8,7 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { Judge } from '../lib/database';
+import { Judge } from '../lib/store';
 
 export default function EditJudgeDialog({
   open,

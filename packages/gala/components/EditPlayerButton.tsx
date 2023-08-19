@@ -1,6 +1,6 @@
 import { Chip, Avatar } from "@mui/material";
 import { useState } from "react";
-import { Player } from "../lib/database";
+import { Player } from "../lib/store";
 import { fullName } from "../lib/utils";
 import EditPlayerDialog from "./EditPlayerDialog";
 import GenderIcon from "./GenderIcon";

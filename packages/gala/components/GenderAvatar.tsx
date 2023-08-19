@@ -1,6 +1,5 @@
-import { Girl, Boy, Wc, Woman, Man } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
-import { Gender } from '../lib/database';
+import { Gender } from '../lib/store';
 import GenderIcon, { genderColor } from './GenderIcon';
 
 export default function GenderAvatar({
