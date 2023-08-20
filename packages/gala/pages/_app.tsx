@@ -4,10 +4,19 @@ import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
+import { NextPage } from 'next';
 
-function CustomApp({ Component, pageProps }: AppProps) {
+export type NextPageWithProperties<P = {}, IP = P> = NextPage<P, IP> & {
+  disableStoreProvider?: boolean
+}
+
+type AppPropsWithProoperties = AppProps & {
+  Component: NextPageWithProperties
+}
+
+function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
-    <StoreProvider>
+    <StoreProvider disabled={Component.disableStoreProvider}>
       <Layout>
         <Component {...pageProps} />
         <Analytics />

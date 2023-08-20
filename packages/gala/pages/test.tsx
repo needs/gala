@@ -13,3 +13,5 @@ export default function Test() {
     </div>
   );
 }
+
+Test.disableStoreProvider = true;
