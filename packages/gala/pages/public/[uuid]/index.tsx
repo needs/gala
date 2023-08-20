@@ -1,11 +1,12 @@
 import { Avatar, Box, Chip, Divider, Stack, Typography } from '@mui/material';
-import { apparatuses } from '../../lib/apparatus';
-import { fullName } from '../../lib/utils';
+import { apparatuses } from '../../../lib/apparatus';
+import { fullName } from '../../../lib/utils';
 import Image from 'next/image';
-import GenderIcon from '../../components/GenderIcon';
+import GenderIcon from '../../../components/GenderIcon';
 import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, Progress, store } from '../../lib/store';
-import { getLayoutInfo, menuVisitor } from '../../components/Layout';
+import { ApparatusKey, Progress, store } from '../../../lib/store';
+import { GetServerSideProps } from 'next';
+import { PageProps } from '../../_app';
 
 function Apparatus({
   apparatusKey,
@@ -117,4 +118,19 @@ export default function Index() {
   );
 }
 
-Index.layoutInfo = getLayoutInfo(menuVisitor, '/');
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
+
+      layoutInfo: {
+        menu: "visitor",
+        selected: "home",
+        uuid: galaUuid,
+      }
+    },
+  };
+};

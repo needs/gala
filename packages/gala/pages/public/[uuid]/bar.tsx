@@ -1,6 +1,7 @@
 import { Divider, Stack, Typography } from "@mui/material";
-import { barDefault } from "../../lib/store";
-import { getLayoutInfo, menuVisitor } from "../../components/Layout";
+import { barDefault } from "../../../lib/store";
+import { GetServerSideProps } from "next";
+import { PageProps } from "../../_app";
 
 export default function Bar() {
   const bar = barDefault;
@@ -32,4 +33,19 @@ export default function Bar() {
   );
 }
 
-Bar.layoutInfo = getLayoutInfo(menuVisitor, '/bar');
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
+
+      layoutInfo: {
+        menu: "visitor",
+        selected: "bar",
+        uuid: galaUuid,
+      }
+    },
+  };
+};

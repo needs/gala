@@ -23,59 +23,85 @@ import { IconButton } from '@mui/material';
 
 const drawerWidth = 240;
 
-export const menuAdmin = {
-  '/x4Hz8/teams': {
+type MenuItem = {
+  href: string,
+  label: string,
+  icon: React.ReactNode,
+};
+
+type Menu = Record<string, MenuItem>;
+
+export const menuAdmin = (uuid: string): Menu => ({
+  'teams': {
+    href: `/gala/${uuid}/teams`,
     label: 'Équipes',
     icon: <Group />,
   },
-  '/x4Hz8/categories': {
+  'categories': {
+    href: `/gala/${uuid}/categories`,
     label: 'Catégories',
     icon: <Category />,
   },
-  '/x4Hz8/judges': {
+  'judges': {
+    href: `/gala/${uuid}/judges`,
     label: 'Juges',
     icon: <Gavel />,
   },
-  '/x4Hz8/progress': {
+  'progress': {
+    href: `/gala/${uuid}/progress`,
     label: 'Déroulement',
     icon: <ViewDay />,
   },
-  '/screens/1': {
+  'screens-1': {
+    href: `/gala/${uuid}/screens/1`,
     label: 'Screen 1',
     icon: <Tv />,
   },
-  '/screens/2': {
+  'screens-2': {
+    href: `/gala/${uuid}/screens/2`,
     label: 'Screen 2',
     icon: <Tv />,
   },
-  '/screens/bar': {
+  'screens-bar': {
+    href: `/gala/${uuid}/screens/bar`,
     label: 'Buvette',
     icon: <FoodBank />,
   },
-};
+});
 
-export const menuVisitor = {
-  '/': {
+export const menuVisitor = (uuid: string): Menu => ({
+  'home': {
+    href: `/public/${uuid}`,
     label: 'Plateaux',
     icon: <ViewDay />,
   },
-  '/bar': {
+  'bar': {
+    href: `/public/${uuid}/bar`,
     label: 'Buvette',
     icon: <FoodBank />,
   },
-};
+});
 
-type Menu = typeof menuAdmin | typeof menuVisitor;
+type LayoutInfoAdmin = {
+  menu: "admin",
+  selected: keyof ReturnType<typeof menuAdmin>
+  uuid: string;
+}
 
-export interface LayoutInfo<T = Menu> {
-  menu: T,
-  menuItemHref: keyof T;
-};
+type LayoutInfoVisitor = {
+  menu: "visitor",
+  selected: keyof ReturnType<typeof menuVisitor>
+  uuid: string;
+}
 
-export function getLayoutInfo<T = Menu>(menu: T, href: keyof T): LayoutInfo<T> {
-  return {
-    menu,
-    menuItemHref: href,
+export type LayoutInfo = LayoutInfoAdmin | LayoutInfoVisitor;
+
+function getMenu(layoutInfo: LayoutInfo): Menu {
+  switch (layoutInfo.menu) {
+    case "admin":
+      return menuAdmin(layoutInfo.uuid);
+    case "visitor":
+      return menuVisitor(layoutInfo.uuid);
   }
 }
 
@@ -86,16 +112,18 @@ export default function Layout({ children, layoutInfo }: { children: React.React
     return <>{children}</>;
   }
 
-  const { menu, menuItemHref } = layoutInfo;
+  const menu = getMenu(layoutInfo);
+  const selectedMenuItem = menu[layoutInfo.selected];
+  console.log(selectedMenuItem);
 
   const drawer = (
     <>
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {Object.entries(menu).map(([href, { label, icon }]) => (
+          {Object.entries(menu).map(([key, { label, icon, href }]) => (
             <ListItem key={label} disablePadding>
-              <ListItemButton selected={href === menuItemHref} href={href}>
+              <ListItemButton selected={key === layoutInfo.selected} href={href}>
                 <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText primary={label} />
               </ListItemButton>

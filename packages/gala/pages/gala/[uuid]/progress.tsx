@@ -12,8 +12,8 @@ import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../../../lib/store';
 import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
-import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
 import { GetServerSideProps } from 'next';
+import { PageProps } from '../../_app';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
@@ -122,10 +122,19 @@ export default function ProgressPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<{
-  galaUuid: string;
-}> = async (context) => {
-  return { props: { galaUuid: context.query.uuid as string }};
-}
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
 
-ProgressPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/progress');
+      layoutInfo: {
+        menu: "admin",
+        selected: "progress",
+        uuid: galaUuid,
+      }
+    },
+  };
+};

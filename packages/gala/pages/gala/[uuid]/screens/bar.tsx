@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import { useSyncedStore } from '@syncedstore/react';
-import { barDefault, store } from '../../lib/store';
+import { barDefault, store } from '../../../../lib/store';
+import { PageProps } from '../../../_app';
+import { GetServerSideProps } from 'next';
 
 export default function Bar() {
   const bar = barDefault;
@@ -53,4 +55,13 @@ export default function Bar() {
   );
 }
 
-Bar.disableLayout = true;
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
+    },
+  };
+};

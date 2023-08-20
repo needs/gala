@@ -4,24 +4,20 @@ import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
-import { NextPage } from 'next';
 
-export type NextPageWithProperties<P = {}, IP = P> = NextPage<P, IP> & {
-  disableStoreProvider?: boolean
+export type PageProps = {
+  galaUuid?: string
   layoutInfo?: LayoutInfo
 }
 
 type AppPropsWithProoperties = AppProps & {
-  Component: NextPageWithProperties
-  pageProps: {
-    galaUuid?: string
-  }
+  pageProps: PageProps
 }
 
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
     <StoreProvider galaUuid={pageProps.galaUuid}>
-      <Layout layoutInfo={Component.layoutInfo}>
+      <Layout layoutInfo={pageProps.layoutInfo}>
         <Component {...pageProps} />
         <Analytics />
       </Layout>

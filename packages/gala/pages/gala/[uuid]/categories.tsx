@@ -18,15 +18,10 @@ import GenderAvatar from '../../../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
 import { Category, store } from '../../../lib/store';
 import { v4 as uuidv4 } from 'uuid';
-import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
 import { GetServerSideProps } from 'next';
+import { PageProps } from '../../_app';
 
-
-function EditCategoryButton({
-  category,
-}: {
-  category: Category;
-}) {
+function EditCategoryButton({ category }: { category: Category }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -47,25 +42,31 @@ function AddCategoryButton() {
   const [open, setOpen] = useState(false);
   const { categories } = useSyncedStore(store);
   const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
-  const category = categoryKey !== undefined ? categories[categoryKey] : undefined;
+  const category =
+    categoryKey !== undefined ? categories[categoryKey] : undefined;
 
   return (
     <>
-      {category !== undefined && <EditCategoryDialog
-        open={open}
-        onClose={() => setOpen(false)}
-        category={category}
-      />}
-      <Button variant="contained" onClick={() => {
-        const categoryKey = uuidv4();
-        categories[categoryKey] = {
-          name: '',
-          gender: "woman",
-          apparatuses: {},
-        }
-        setCategoryKey(categoryKey);
-        setOpen(true);
-        }}>
+      {category !== undefined && (
+        <EditCategoryDialog
+          open={open}
+          onClose={() => setOpen(false)}
+          category={category}
+        />
+      )}
+      <Button
+        variant="contained"
+        onClick={() => {
+          const categoryKey = uuidv4();
+          categories[categoryKey] = {
+            name: '',
+            gender: 'woman',
+            apparatuses: {},
+          };
+          setCategoryKey(categoryKey);
+          setOpen(true);
+        }}
+      >
         Ajouter
       </Button>
     </>
@@ -89,40 +90,43 @@ export default function Categories() {
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableBody>
-              {Object.entries(categories).map(([categoryKey, category]) => category !== undefined && (
-                <TableRow
-                  key={categoryKey}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    <GenderAvatar gender={category.gender} />
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {category.name}
-                  </TableCell>
-                  <TableCell>
-                    {
-                      Object.values(teams).filter(
-                        (team) => team !== undefined && team.categoryKey === categoryKey
-                      ).length
-                    }{' '}
-                    équipe(s)
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" gap={1}>
-                      <EditCategoryButton
-                        category={category}
-                      />
-                      <IconButton
-                        onDoubleClick={() => deleteCategory(categoryKey)}
-                        sx={{ color: 'lightcoral' }}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {Object.entries(categories).map(
+                ([categoryKey, category]) =>
+                  category !== undefined && (
+                    <TableRow
+                      key={categoryKey}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        <GenderAvatar gender={category.gender} />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {category.name}
+                      </TableCell>
+                      <TableCell>
+                        {
+                          Object.values(teams).filter(
+                            (team) =>
+                              team !== undefined &&
+                              team.categoryKey === categoryKey
+                          ).length
+                        }{' '}
+                        équipe(s)
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" gap={1}>
+                          <EditCategoryButton category={category} />
+                          <IconButton
+                            onDoubleClick={() => deleteCategory(categoryKey)}
+                            sx={{ color: 'lightcoral' }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  )
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -132,10 +136,19 @@ export default function Categories() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<{
-  galaUuid: string;
-}> = async (context) => {
-  return { props: { galaUuid: context.query.uuid as string }};
-}
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
 
-Categories.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/categories');
+      layoutInfo: {
+        menu: "admin",
+        selected: "categories",
+        uuid: galaUuid,
+      }
+    },
+  };
+};

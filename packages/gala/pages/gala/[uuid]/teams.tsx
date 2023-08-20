@@ -23,8 +23,8 @@ import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
-import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
 import { GetServerSideProps } from 'next';
+import { PageProps } from '../../_app';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -248,10 +248,19 @@ export default function TeamsPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<{
-  galaUuid: string;
-}> = async (context) => {
-  return { props: { galaUuid: context.query.uuid as string }};
-}
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
 
-TeamsPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/teams');
+      layoutInfo: {
+        menu: "admin",
+        selected: "teams",
+        uuid: galaUuid,
+      }
+    },
+  };
+};

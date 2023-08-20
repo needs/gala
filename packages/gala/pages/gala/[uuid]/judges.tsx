@@ -15,7 +15,8 @@ import { fullName } from '../../../lib/utils';
 import { Judge, store } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import { v4 as uuidv4 } from 'uuid';
-import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
+import { GetServerSideProps } from 'next';
+import { PageProps } from '../../_app';
 
 function AddJudgeButton() {
   const [open, setOpen] = useState(false);
@@ -104,4 +105,19 @@ export default function Judges() {
   );
 }
 
-Judges.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/judges');
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const galaUuid = context.query.uuid as string;
+  return {
+    props: {
+      galaUuid,
+
+      layoutInfo: {
+        menu: "admin",
+        selected: "judges",
+        uuid: galaUuid,
+      }
+    },
+  };
+};
