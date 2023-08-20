@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField } from '@mui/material';
+import { Box, Button, CssBaseline, Stack, TextField, Typography } from '@mui/material';
 
 export default function Index() {
   return (
@@ -9,8 +9,10 @@ export default function Index() {
       flexDirection="column"
       sx={{ backgroundImage: 'url("/background.svg")', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
+      <CssBaseline />
+
       <Stack gap={2} maxWidth="400px" marginTop="auto" marginBottom="auto" marginLeft="auto" marginRight="auto" padding={4} sx={{ backgroundColor: "white" }} borderRadius="10px">
-        <p>Authentifiez vous ou créez un compte pour retrouver vos GALA</p>
+        <Typography>Authentifiez vous ou créez un compte pour retrouver vos GALA.</Typography>
         <TextField required label="Email" variant="outlined" />
         <TextField
           required
