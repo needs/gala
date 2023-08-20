@@ -3,6 +3,7 @@ import Layout from '../components/Layout';
 import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
+import { trpc } from '../utils/trpc';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
@@ -15,4 +16,4 @@ function CustomApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default CustomApp;
+export default trpc.withTRPC(CustomApp);
