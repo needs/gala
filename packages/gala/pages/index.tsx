@@ -7,12 +7,14 @@ export default function Index() {
       minHeight="100vh"
       display="flex"
       flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
       sx={{ backgroundImage: 'url("/background.svg")', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
       <CssBaseline />
 
-      <Stack gap={2} maxWidth="400px" marginTop="auto" marginBottom="auto" marginLeft="auto" marginRight="auto" padding={4} sx={{ backgroundColor: "white" }} borderRadius="10px">
-        <Typography>Authentifiez vous ou créez un compte pour retrouver vos GALA.</Typography>
+      <Stack gap={2} width="400px" padding={4} sx={{ backgroundColor: "white" }} borderRadius="10px">
+        <Typography>Authentifiez vous ou créez un compte pour retrouver vos GALA de gymnastique.</Typography>
         <TextField required label="Email" variant="outlined" />
         <TextField
           required
