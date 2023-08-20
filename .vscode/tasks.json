@@ -19,6 +19,12 @@
       "command": "workbench.action.tasks.terminate",
       "args": "Server"
     },
+    {
+      "id": "terminateDocker",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "Docker"
+    },
   ],
   "tasks": [
     {
@@ -39,6 +45,7 @@
       "dependsOn": [
         "Terminate Frontend",
         "Terminate Server",
+        "Terminate Docker"
       ],
     },
     {
@@ -50,6 +57,11 @@
       "label": "Terminate Server",
       "type": "process",
       "command": "echo ${input:terminateServer}",
+    },
+    {
+      "label": "Terminate Docker",
+      "type": "process",
+      "command": "echo ${input:terminateDocker}",
     },
     {
       "label": "Npm install",
