@@ -17,7 +17,6 @@ import {
   Group,
   Menu,
   Tv,
-  ViewAgenda,
   ViewDay,
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
@@ -30,43 +29,36 @@ const menuAdmin = [
     label: 'Équipes',
     href: '/x4Hz8/teams',
     icon: <Group />,
-    showLayout: true,
   },
   {
     label: 'Catégories',
     href: '/x4Hz8/categories',
     icon: <Category />,
-    showLayout: true,
   },
   {
     label: 'Juges',
     href: '/x4Hz8/judges',
     icon: <Gavel />,
-    showLayout: true,
   },
   {
     label: 'Déroulement',
     href: '/x4Hz8/progress',
     icon: <ViewDay />,
-    showLayout: true,
   },
   {
     label: 'Screen 1',
     href: '/screens/1',
     icon: <Tv />,
-    showLayout: false,
   },
   {
     label: 'Screen 2',
     href: '/screens/2',
     icon: <Tv />,
-    showLayout: false,
   },
   {
     label: 'Buvette',
     href: '/screens/bar',
     icon: <FoodBank />,
-    showLayout: false,
   },
 ];
 
@@ -75,17 +67,15 @@ const menuVisitor = [
     label: 'Plateaux',
     href: '/',
     icon: <ViewDay />,
-    showLayout: true,
   },
   {
     label: 'Buvette',
     href: '/bar',
     icon: <FoodBank />,
-    showLayout: true,
   },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children, disabled }: { children: React.ReactNode, disabled?: boolean }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -95,7 +85,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const menuItem = menuItemAdmin || menuItemVisitor;
   const menu = menuItemAdmin !== undefined ? menuAdmin : menuVisitor;
 
-  if (menuItem === undefined || !menuItem.showLayout) {
+  if (disabled || menuItem === undefined) {
     return <>{children}</>;
   }
 

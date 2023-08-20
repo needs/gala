@@ -5,3 +5,5 @@ export default function Screen1() {
     <Screen stageName="Plateau A" stageKey="stage1" />
   );
 }
+
+Screen1.disableLayout = true;

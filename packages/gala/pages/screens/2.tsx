@@ -5,3 +5,5 @@ export default function Screen2() {
     <Screen stageName="Plateau B" stageKey="stage2" />
   );
 }
+
+Screen2.disableLayout = true;

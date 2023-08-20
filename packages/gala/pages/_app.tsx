@@ -8,6 +8,7 @@ import { NextPage } from 'next';
 
 export type NextPageWithProperties<P = {}, IP = P> = NextPage<P, IP> & {
   disableStoreProvider?: boolean
+  disableLayout?: boolean
 }
 
 type AppPropsWithProoperties = AppProps & {
@@ -17,7 +18,7 @@ type AppPropsWithProoperties = AppProps & {
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
     <StoreProvider disabled={Component.disableStoreProvider}>
-      <Layout>
+      <Layout disabled={Component.disableLayout}>
         <Component {...pageProps} />
         <Analytics />
       </Layout>
