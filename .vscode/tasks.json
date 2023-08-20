@@ -62,9 +62,16 @@
     {
       "label": "Start Serve",
       "dependsOn": [
+        "Docker",
         "Frontend",
         "Server",
       ],
+    },
+    {
+      "label": "Docker",
+      "type": "shell",
+      "command": "docker compose up",
+      "isBackground": true,
     },
     {
       "label": "Frontend",

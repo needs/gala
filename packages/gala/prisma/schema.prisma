@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  name       String?
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  galas      GalaUser[]
+}
+
+enum Role {
+  OWNER
+  USER
+}
+
+model GalaUser {
+  id         Int      @id @default(autoincrement())
+  role       Role     @default(USER)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    Int
+  gala       Gala     @relation(fields: [gala_uuid], references: [uuid])
+  gala_uuid  String
+}
+
+model Gala {
+  uuid       String     @id @default(uuid())
+  data       Bytes
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  users      GalaUser[]
+}
