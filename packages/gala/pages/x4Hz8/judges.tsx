@@ -15,6 +15,7 @@ import { fullName } from '../../lib/utils';
 import { Judge, store } from '../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import { v4 as uuidv4 } from 'uuid';
+import { getLayoutInfo, menuAdmin } from '../../components/Layout';
 
 function AddJudgeButton() {
   const [open, setOpen] = useState(false);
@@ -102,3 +103,5 @@ export default function Judges() {
     </>
   );
 }
+
+Judges.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/judges');

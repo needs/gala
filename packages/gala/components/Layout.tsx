@@ -19,84 +19,83 @@ import {
   Tv,
   ViewDay,
 } from '@mui/icons-material';
-import { useRouter } from 'next/router';
 import { IconButton } from '@mui/material';
 
 const drawerWidth = 240;
 
-const menuAdmin = [
-  {
+export const menuAdmin = {
+  '/x4Hz8/teams': {
     label: 'Équipes',
-    href: '/x4Hz8/teams',
     icon: <Group />,
   },
-  {
+  '/x4Hz8/categories': {
     label: 'Catégories',
-    href: '/x4Hz8/categories',
     icon: <Category />,
   },
-  {
+  '/x4Hz8/judges': {
     label: 'Juges',
-    href: '/x4Hz8/judges',
     icon: <Gavel />,
   },
-  {
+  '/x4Hz8/progress': {
     label: 'Déroulement',
-    href: '/x4Hz8/progress',
     icon: <ViewDay />,
   },
-  {
+  '/screens/1': {
     label: 'Screen 1',
-    href: '/screens/1',
     icon: <Tv />,
   },
-  {
+  '/screens/2': {
     label: 'Screen 2',
-    href: '/screens/2',
     icon: <Tv />,
   },
-  {
+  '/screens/bar': {
     label: 'Buvette',
-    href: '/screens/bar',
     icon: <FoodBank />,
   },
-];
+};
 
-const menuVisitor = [
-  {
+export const menuVisitor = {
+  '/': {
     label: 'Plateaux',
-    href: '/',
     icon: <ViewDay />,
   },
-  {
+  '/bar': {
     label: 'Buvette',
-    href: '/bar',
     icon: <FoodBank />,
   },
-];
+};
 
-export default function Layout({ children, disabled }: { children: React.ReactNode, disabled?: boolean }) {
-  const router = useRouter();
+type Menu = typeof menuAdmin | typeof menuVisitor;
+
+export interface LayoutInfo<T = Menu> {
+  menu: T,
+  menuItemHref: keyof T;
+};
+
+export function getLayoutInfo<T = Menu>(menu: T, href: keyof T): LayoutInfo<T> {
+  return {
+    menu,
+    menuItemHref: href,
+  }
+}
+
+export default function Layout({ children, layoutInfo }: { children: React.ReactNode, layoutInfo?: LayoutInfo }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const menuItemAdmin = menuAdmin.find(({ href }) => href === router.asPath);
-  const menuItemVisitor = menuVisitor.find(({ href }) => href === router.asPath);
-
-  const menuItem = menuItemAdmin || menuItemVisitor;
-  const menu = menuItemAdmin !== undefined ? menuAdmin : menuVisitor;
-
-  if (disabled || menuItem === undefined) {
+  if (layoutInfo === undefined) {
     return <>{children}</>;
   }
+
+  const { menu, menuItemHref } = layoutInfo;
 
   const drawer = (
     <>
       <Toolbar />
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {menu.map(({ label, href, icon }) => (
+          {Object.entries(menu).map(([href, { label, icon }]) => (
             <ListItem key={label} disablePadding>
-              <ListItemButton selected={href === router.asPath} href={href}>
+              <ListItemButton selected={href === menuItemHref} href={href}>
                 <ListItemIcon>{icon}</ListItemIcon>
                 <ListItemText primary={label} />
               </ListItemButton>

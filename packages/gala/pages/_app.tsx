@@ -1,5 +1,5 @@
 import { AppProps } from 'next/app';
-import Layout from '../components/Layout';
+import Layout, { LayoutInfo } from '../components/Layout';
 import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
@@ -8,7 +8,7 @@ import { NextPage } from 'next';
 
 export type NextPageWithProperties<P = {}, IP = P> = NextPage<P, IP> & {
   disableStoreProvider?: boolean
-  disableLayout?: boolean
+  layoutInfo?: LayoutInfo
 }
 
 type AppPropsWithProoperties = AppProps & {
@@ -18,7 +18,7 @@ type AppPropsWithProoperties = AppProps & {
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
     <StoreProvider disabled={Component.disableStoreProvider}>
-      <Layout disabled={Component.disableLayout}>
+      <Layout layoutInfo={Component.layoutInfo}>
         <Component {...pageProps} />
         <Analytics />
       </Layout>

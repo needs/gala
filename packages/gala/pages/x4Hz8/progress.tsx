@@ -12,6 +12,7 @@ import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../../lib/store';
 import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
+import { getLayoutInfo, menuAdmin } from '../../components/Layout';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
@@ -119,3 +120,5 @@ export default function ProgressPage() {
     </Stack>
   );
 }
+
+ProgressPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/progress');

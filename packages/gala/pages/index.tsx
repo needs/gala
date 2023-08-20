@@ -5,6 +5,7 @@ import Image from 'next/image';
 import GenderIcon from '../components/GenderIcon';
 import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../lib/store';
+import { getLayoutInfo, menuVisitor } from '../components/Layout';
 
 function Apparatus({
   apparatusKey,
@@ -115,3 +116,5 @@ export default function Index() {
     </Stack>
   );
 }
+
+Index.layoutInfo = getLayoutInfo(menuVisitor, '/');

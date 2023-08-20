@@ -23,6 +23,7 @@ import EditPlayerButton from '../../components/EditPlayerButton';
 import AddPlayerButton from '../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
+import { getLayoutInfo, menuAdmin } from '../../components/Layout';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -245,3 +246,5 @@ export default function TeamsPage() {
     </>
   );
 }
+
+TeamsPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/teams');

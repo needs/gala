@@ -18,6 +18,7 @@ import GenderAvatar from '../../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
 import { Category, store } from '../../lib/store';
 import { v4 as uuidv4 } from 'uuid';
+import { getLayoutInfo, menuAdmin } from '../../components/Layout';
 
 
 function EditCategoryButton({
@@ -129,3 +130,5 @@ export default function Categories() {
     </>
   );
 }
+
+Categories.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/categories');

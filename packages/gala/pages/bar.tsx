@@ -1,5 +1,6 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import { barDefault } from "../lib/store";
+import { getLayoutInfo, menuVisitor } from "../components/Layout";
 
 export default function Bar() {
   const bar = barDefault;
@@ -30,3 +31,5 @@ export default function Bar() {
     </Stack>
   );
 }
+
+Bar.layoutInfo = getLayoutInfo(menuVisitor, '/bar');
