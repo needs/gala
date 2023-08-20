@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 
 export default function ListPage() {
   const create = trpc.create.useMutation();
+  const { data: galas } = trpc.list.useQuery(null);
   const router = useRouter();
 
   return (
@@ -65,19 +66,22 @@ export default function ListPage() {
           </Button>
         </Stack>
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Avatar>
-                  <EmojiEvents />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary="GALA de l'Arbresle"
-                secondary="140 équipes"
-              />
-            </ListItemButton>
-          </ListItem>
+          {galas !== undefined &&
+            galas.map((gala) => (
+              <ListItem key={gala.uuid} disablePadding>
+                <ListItemButton onClick={() => router.push(`/gala/${gala.uuid}/teams`)}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <EmojiEvents />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary="GALA de l'Arbresle"
+                    secondary={`${gala.teamCount} équipes`}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
         </List>
       </Stack>
     </Box>

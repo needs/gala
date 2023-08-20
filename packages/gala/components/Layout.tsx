@@ -113,8 +113,6 @@ export default function Layout({ children, layoutInfo }: { children: React.React
   }
 
   const menu = getMenu(layoutInfo);
-  const selectedMenuItem = menu[layoutInfo.selected];
-  console.log(selectedMenuItem);
 
   const drawer = (
     <>
