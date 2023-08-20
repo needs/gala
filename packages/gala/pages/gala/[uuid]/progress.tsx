@@ -7,12 +7,13 @@ import {
   Typography,
 } from '@mui/material';
 import Image from 'next/image';
-import { apparatuses } from '../../lib/apparatus';
+import { apparatuses } from '../../../lib/apparatus';
 import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, Progress, store } from '../../lib/store';
+import { ApparatusKey, Progress, store } from '../../../lib/store';
 import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
-import { getLayoutInfo, menuAdmin } from '../../components/Layout';
+import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
+import { GetServerSideProps } from 'next';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
@@ -119,6 +120,12 @@ export default function ProgressPage() {
       ))}
     </Stack>
   );
+}
+
+export const getServerSideProps: GetServerSideProps<{
+  galaUuid: string;
+}> = async (context) => {
+  return { props: { galaUuid: context.query.uuid as string }};
 }
 
 ProgressPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/progress');

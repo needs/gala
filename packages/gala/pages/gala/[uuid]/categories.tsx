@@ -11,14 +11,15 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import EditCategoryDialog from '../../components/EditCategoryDialog';
+import EditCategoryDialog from '../../../components/EditCategoryDialog';
 import { Delete, Edit } from '@mui/icons-material';
 import Head from 'next/head';
-import GenderAvatar from '../../components/GenderAvatar';
+import GenderAvatar from '../../../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
-import { Category, store } from '../../lib/store';
+import { Category, store } from '../../../lib/store';
 import { v4 as uuidv4 } from 'uuid';
-import { getLayoutInfo, menuAdmin } from '../../components/Layout';
+import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
+import { GetServerSideProps } from 'next';
 
 
 function EditCategoryButton({
@@ -129,6 +130,12 @@ export default function Categories() {
       </Stack>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps<{
+  galaUuid: string;
+}> = async (context) => {
+  return { props: { galaUuid: context.query.uuid as string }};
 }
 
 Categories.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/categories');

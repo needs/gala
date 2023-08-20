@@ -1,10 +1,32 @@
 import { Hocuspocus } from "@hocuspocus/server";
-import { SQLite } from "@hocuspocus/extension-sqlite";
+import { Database } from "@hocuspocus/extension-database";
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient();
 
 const server = new Hocuspocus({
+  debounce: 5000,
   extensions: [
-    new SQLite({
-      database: "db.sqlite",
+    new Database({
+      fetch: async ({ documentName }) => {
+        const gala = await prisma.gala.findUnique({
+          where: {
+            uuid: documentName
+          },
+        });
+
+        return Uint8Array.from(gala.data);
+      },
+      store: async ({ documentName, state }) => {
+        await prisma.gala.update({
+          where: {
+            uuid: documentName
+          },
+          data: {
+            data: state
+          },
+        });
+      },
     }),
   ],
   port: 1234,

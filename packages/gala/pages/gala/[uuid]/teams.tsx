@@ -1,4 +1,4 @@
-import { Team, store } from '../../lib/store';
+import { Team, store } from '../../../lib/store';
 import {
   Box,
   Button,
@@ -14,16 +14,17 @@ import {
 } from '@mui/material';
 import { Clear, Delete, Edit } from '@mui/icons-material';
 import { useState } from 'react';
-import EditTeamDialog from '../../components/EditTeamDialog';
+import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
-import GenderAvatar from '../../components/GenderAvatar';
+import GenderAvatar from '../../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
-import CategorySelector from '../../components/CategorySelector';
-import EditPlayerButton from '../../components/EditPlayerButton';
-import AddPlayerButton from '../../components/AddPlayerButton';
-import { addTeam, defaultTeam } from '../../lib/team';
+import CategorySelector from '../../../components/CategorySelector';
+import EditPlayerButton from '../../../components/EditPlayerButton';
+import AddPlayerButton from '../../../components/AddPlayerButton';
+import { addTeam, defaultTeam } from '../../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
-import { getLayoutInfo, menuAdmin } from '../../components/Layout';
+import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
+import { GetServerSideProps } from 'next';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -245,6 +246,12 @@ export default function TeamsPage() {
       </Stack>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps<{
+  galaUuid: string;
+}> = async (context) => {
+  return { props: { galaUuid: context.query.uuid as string }};
 }
 
 TeamsPage.layoutInfo = getLayoutInfo(menuAdmin, '/x4Hz8/teams');

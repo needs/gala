@@ -13,11 +13,14 @@ export type NextPageWithProperties<P = {}, IP = P> = NextPage<P, IP> & {
 
 type AppPropsWithProoperties = AppProps & {
   Component: NextPageWithProperties
+  pageProps: {
+    galaUuid?: string
+  }
 }
 
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
-    <StoreProvider disabled={Component.disableStoreProvider}>
+    <StoreProvider galaUuid={pageProps.galaUuid}>
       <Layout layoutInfo={Component.layoutInfo}>
         <Component {...pageProps} />
         <Analytics />

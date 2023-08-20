@@ -48,12 +48,12 @@ export const barDefault = {
 
 export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, judges: {}, extra: {} as Extra, bar: {} });
 
-export function initStore(onLoad: () => void, onUnload: () => void) {
+export function initStore(uuid: string, onLoad: () => void, onUnload: () => void) {
   console.time("initStore");
   const doc = getYjsDoc(store);
   const provider = new HocuspocusProvider({
     url: "ws://127.0.0.1:1234",
-    name: "gala-test",
+    name: uuid,
     document: doc,
     onSynced: () => {
       console.timeEnd("initStore");

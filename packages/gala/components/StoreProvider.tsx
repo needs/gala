@@ -2,19 +2,20 @@ import { ReactNode, useEffect, useState } from 'react';
 import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 
-const StoreProvider = ({ children, disabled }: { children: ReactNode, disabled?: boolean }) => {
+const StoreProvider = ({ children, galaUuid }: { children: ReactNode, galaUuid?: string }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !disabled) {
+    if (typeof window !== 'undefined' && galaUuid !== undefined) {
       return initStore(
+        galaUuid,
         () => setStoreLoaded(true),
         () => setStoreLoaded(false)
       );
     }
-  }, [disabled]);
+  }, [galaUuid]);
 
-  if (!disabled && !storeLoaded) {
+  if (galaUuid !== undefined && !storeLoaded) {
     return (
       <Box
         display="flex"

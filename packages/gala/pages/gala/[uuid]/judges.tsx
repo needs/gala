@@ -9,13 +9,13 @@ import {
     Switch,
 } from '@mui/material';
 import Head from 'next/head';
-import EditJudgeDialog from '../../components/EditJudgeDialog';
+import EditJudgeDialog from '../../../components/EditJudgeDialog';
 import { Add } from '@mui/icons-material';
-import { fullName } from '../../lib/utils';
-import { Judge, store } from '../../lib/store';
+import { fullName } from '../../../lib/utils';
+import { Judge, store } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import { v4 as uuidv4 } from 'uuid';
-import { getLayoutInfo, menuAdmin } from '../../components/Layout';
+import { getLayoutInfo, menuAdmin } from '../../../components/Layout';
 
 function AddJudgeButton() {
   const [open, setOpen] = useState(false);

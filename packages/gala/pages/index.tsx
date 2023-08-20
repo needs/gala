@@ -13,7 +13,7 @@ export default function Index() {
     >
       <CssBaseline />
 
-      <Stack gap={2} width="400px" padding={4} sx={{ backgroundColor: "white" }} borderRadius="10px">
+      <Stack gap={2} width="600px" padding={4} sx={{ backgroundColor: "white" }} borderRadius="10px">
         <Typography>Authentifiez vous ou créez un compte pour retrouver vos GALA de gymnastique.</Typography>
         <TextField required label="Email" variant="outlined" />
         <TextField
@@ -34,3 +34,5 @@ export default function Index() {
     </Box>
   );
 }
+
+Index.disableStoreProvider = true;
