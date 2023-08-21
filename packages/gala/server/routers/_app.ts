@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { procedure, router } from '../trpc';
-import { PrismaClient } from '@prisma/client';
 import * as Y from 'yjs';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../lib/prisma';
 
 export const appRouter = router({
   list: procedure

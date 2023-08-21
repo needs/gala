@@ -10,6 +10,7 @@ import {
 import {
   UserCredential,
   createUserWithEmailAndPassword,
+  getIdToken,
   onAuthStateChanged,
   sendEmailVerification,
   signInWithEmailAndPassword,
@@ -17,6 +18,8 @@ import {
 import { auth } from '../lib/firebase';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { cookies } from 'next/dist/client/components/headers';
+import { useCookies } from 'react-cookie';
 
 function Success() {
   const router = useRouter();
@@ -167,15 +170,20 @@ function Login() {
 
 export default function Index() {
   const [step, setStep] = useState<'login' | 'verify' | 'success'>('login');
+  const [cookies, setCookie, removeCookie] = useCookies(['token']);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (user) => {
+    return onAuthStateChanged(auth, async (user) => {
       if (user === null) {
         setStep('login');
+        removeCookie('token');
       } else if (!user.emailVerified) {
         setStep('verify');
       } else {
         setStep('success');
+        setCookie('token', await getIdToken(user), {
+          maxAge: 60 * 60 * 24 * 7,
+        });
       }
     });
   }, []);
