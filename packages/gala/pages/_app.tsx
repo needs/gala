@@ -5,10 +5,12 @@ import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
 import { CookiesProvider } from 'react-cookie';
+import { UserInfo } from '../lib/auth';
 
 export type PageProps = {
   galaUuid?: string;
   layoutInfo?: LayoutInfo;
+  userInfo?: UserInfo;
 };
 
 type AppPropsWithProoperties = AppProps & {

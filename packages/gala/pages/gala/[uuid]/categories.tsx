@@ -140,6 +140,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
   context
 ) => {
   const galaUuid = context.query.uuid as string;
+
   return {
     props: {
       galaUuid,

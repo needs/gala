@@ -233,5 +233,3 @@ export default function Index() {
     </Box>
   );
 }
-
-Index.disableStoreProvider = true;

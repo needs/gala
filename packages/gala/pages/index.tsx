@@ -16,6 +16,7 @@ import { trpc } from '../utils/trpc';
 import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { withAuth } from '../lib/auth';
 
 export default function ListPage() {
   const create = trpc.create.useMutation();
@@ -106,4 +107,4 @@ export default function ListPage() {
   );
 }
 
-ListPage.disableStoreProvider = true;
+export const getServerSideProps = withAuth();
