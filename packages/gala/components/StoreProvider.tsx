@@ -1,7 +1,8 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useId, useState } from 'react';
 import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { auth } from '../lib/firebase';
+import { useIdToken } from 'react-firebase-hooks/auth';
 
 const StoreProvider = ({
   children,
@@ -11,11 +12,12 @@ const StoreProvider = ({
   galaUuid?: string;
 }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
+  const [user, loadingUser] = useIdToken(auth);
 
   useEffect(() => {
     const init = async () => {
-      if (typeof window !== 'undefined' && galaUuid !== undefined) {
-        const token = await auth.currentUser?.getIdToken() ?? "";
+      if (typeof window !== 'undefined' && galaUuid !== undefined && !loadingUser) {
+        const token = await user?.getIdToken() ?? "";
 
         return initStore(
           galaUuid,
@@ -26,7 +28,7 @@ const StoreProvider = ({
       }
     };
     init();
-  }, [galaUuid]);
+  }, [galaUuid, loadingUser, user]);
 
   if (galaUuid !== undefined && !storeLoaded) {
     return (
