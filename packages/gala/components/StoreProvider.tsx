@@ -1,18 +1,31 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
+import { auth } from '../lib/firebase';
 
-const StoreProvider = ({ children, galaUuid }: { children: ReactNode, galaUuid?: string }) => {
+const StoreProvider = ({
+  children,
+  galaUuid,
+}: {
+  children: ReactNode;
+  galaUuid?: string;
+}) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && galaUuid !== undefined) {
-      return initStore(
-        galaUuid,
-        () => setStoreLoaded(true),
-        () => setStoreLoaded(false)
-      );
-    }
+    const init = async () => {
+      if (typeof window !== 'undefined' && galaUuid !== undefined) {
+        const token = await auth.currentUser?.getIdToken() ?? "";
+
+        return initStore(
+          galaUuid,
+          token,
+          () => setStoreLoaded(true),
+          () => setStoreLoaded(false)
+        );
+      }
+    };
+    init();
   }, [galaUuid]);
 
   if (galaUuid !== undefined && !storeLoaded) {
