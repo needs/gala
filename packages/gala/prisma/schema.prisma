@@ -36,6 +36,7 @@ model GalaUser {
 
 model Gala {
   uuid       String     @id @default(uuid())
+  teamCount  Int
   data       Bytes
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt

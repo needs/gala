@@ -6,6 +6,8 @@ import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
 import { CookiesProvider } from 'react-cookie';
 import { UserInfo } from '../lib/auth';
+import { useEffect } from 'react';
+import { onIdTokenChanged } from 'firebase/auth';
 
 export type PageProps = {
   galaUuid?: string;

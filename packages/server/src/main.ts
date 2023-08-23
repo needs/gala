@@ -32,13 +32,16 @@ const server = new Hocuspocus({
 
         return Uint8Array.from(gala.data);
       },
-      store: async ({ documentName, state }) => {
+      store: async ({ documentName, state, document }) => {
+        const teamCount = document.getMap("teams").size;
+
         await prisma.gala.update({
           where: {
             uuid: documentName
           },
           data: {
-            data: state
+            data: state,
+            teamCount,
           },
         });
       },

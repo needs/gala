@@ -28,7 +28,7 @@ export const appRouter = router({
       const galas = await prisma.gala.findMany({
         select: {
           uuid: true,
-          data: true
+          teamCount: true,
         },
         where: {
           users: {
@@ -39,22 +39,7 @@ export const appRouter = router({
         }
       });
 
-      const ret = galas.map(gala => {
-        const doc = new Y.Doc()
-
-        try {
-          Y.applyUpdate(doc, Uint8Array.from(gala.data));
-        } catch (e) {
-          console.error(e)
-        }
-
-        return {
-          uuid: gala.uuid,
-          teamCount: doc.getMap('teams').size,
-        }
-      })
-
-      return ret;
+      return galas;
     }),
 
   create: authedProcedure
@@ -66,6 +51,7 @@ export const appRouter = router({
       const gala = await prisma.gala.create({
         data: {
           data: Buffer.from(data),
+          teamCount: 0,
 
           users: {
             create: {

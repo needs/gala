@@ -2,6 +2,8 @@ import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
 import { getUser } from '@gala/auth';
+import { cookies } from 'next/dist/client/components/headers';
+import { auth } from './firebase';
 
 export type UserInfo = {
   foo: string
