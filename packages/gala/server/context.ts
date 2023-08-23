@@ -5,9 +5,7 @@ import { getUser } from '@gala/auth';
 export async function createContext({
   req,
 }: trpcNext.CreateNextContextOptions) {
-  const token = req.headers["token"];
-
-  console.log(req.headers);
+  const token = req.headers.authorization
 
   if (typeof token !== "string") {
     return {

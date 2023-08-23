@@ -1,9 +1,7 @@
 import { Hocuspocus } from "@hocuspocus/server";
 import { Database } from "@hocuspocus/extension-database";
-import { PrismaClient } from '@prisma/client'
 import { getRole, getUser } from "@gala/auth";
-
-const prisma = new PrismaClient();
+import { prisma } from "./prisma";
 
 const server = new Hocuspocus({
   debounce: 5000,
