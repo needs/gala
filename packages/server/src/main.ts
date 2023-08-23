@@ -1,7 +1,7 @@
 import { Hocuspocus } from "@hocuspocus/server";
 import { Database } from "@hocuspocus/extension-database";
 import { PrismaClient } from '@prisma/client'
-import { getRole, getUserEmail } from "@gala/auth";
+import { getRole, getUser } from "@gala/auth";
 
 const prisma = new PrismaClient();
 
@@ -11,8 +11,8 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token, documentName } = data;
 
-    const email = await getUserEmail(token);
-    const role = await getRole(documentName, email);
+    const user = await getUser(token);
+    const role = await getRole(documentName, user);
 
     if (role !== "EDITOR" && role !== "OWNER") {
       data.connection.readOnly = true;

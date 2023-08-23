@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
-import { getUserEmail } from '@gala/auth';
+import { getUser } from '@gala/auth';
 
 export type UserInfo = {
   foo: string
@@ -16,9 +16,9 @@ const redirectToLogin = {
 
 export const withAuth: (callback?: GetServerSideProps<PageProps>) => GetServerSideProps<PageProps> = (callback) => {
   return async (context) => {
-    const userEmail = await getUserEmail(context.req.cookies['token']);
+    const user = await getUser(context.req.cookies['token']);
 
-    if (userEmail === undefined) {
+    if (user === undefined) {
       return redirectToLogin;
     }
 
@@ -30,7 +30,7 @@ export const withAuth: (callback?: GetServerSideProps<PageProps>) => GetServerSi
 
     return merge(extraProps, {
       props: {
-        userInfo: userEmail
+        userInfo: user.email
       }
     });
   }

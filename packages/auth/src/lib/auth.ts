@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
-export const getUserEmail = async (token: string | undefined) => {
+export const getUser = async (token: string | undefined) => {
   if (token === undefined) {
     return undefined;
   }
@@ -21,23 +21,21 @@ export const getUserEmail = async (token: string | undefined) => {
     return undefined;
   }
 
-  return email;
+  return await prisma.user.upsert({
+    where: {
+      email: email
+    },
+    update: {},
+    create: {
+      email: email,
+    }
+  });
 }
 
 const prisma = new PrismaClient();
 
-export const getRole = async (uuid: string, email: string | undefined) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email: email
-    },
-    select: {
-      id: true,
-      is_admin: true
-    }
-  });
-
-  if (user === null) {
+export const getRole = async (uuid: string, user: User | undefined) => {
+  if (user === undefined) {
     return undefined;
   }
 
