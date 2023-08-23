@@ -14,6 +14,7 @@ import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
+import { withAuthGala } from 'packages/gala/lib/auth';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 
@@ -122,19 +123,4 @@ export default function ProgressPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async (
-  context
-) => {
-  const galaUuid = context.query.uuid as string;
-  return {
-    props: {
-      galaUuid,
-
-      layoutInfo: {
-        menu: "admin",
-        selected: "progress",
-        uuid: galaUuid,
-      }
-    },
-  };
-};
+export const getServerSideProps = withAuthGala("progress");

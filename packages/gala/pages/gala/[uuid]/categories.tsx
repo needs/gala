@@ -20,6 +20,7 @@ import { Category, store } from '../../../lib/store';
 import { v4 as uuidv4 } from 'uuid';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
+import { withAuthGala } from 'packages/gala/lib/auth';
 
 function EditCategoryButton({ category }: { category: Category }) {
   const [open, setOpen] = useState(false);
@@ -136,20 +137,4 @@ export default function Categories() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async (
-  context
-) => {
-  const galaUuid = context.query.uuid as string;
-
-  return {
-    props: {
-      galaUuid,
-
-      layoutInfo: {
-        menu: "admin",
-        selected: "categories",
-        uuid: galaUuid,
-      }
-    },
-  };
-};
+export const getServerSideProps = withAuthGala("categories");

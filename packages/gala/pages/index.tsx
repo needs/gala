@@ -107,4 +107,4 @@ export default function ListPage() {
   );
 }
 
-export const getServerSideProps = withAuth();
+export const getServerSideProps = withAuth({});

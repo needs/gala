@@ -1,9 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
-import { getUser } from '@gala/auth';
-import { cookies } from 'next/dist/client/components/headers';
-import { auth } from './firebase';
+import { getRole, getUser } from '@gala/auth';
 
 export type UserInfo = {
   foo: string
@@ -16,12 +14,28 @@ const redirectToLogin = {
   },
 }
 
-export const withAuth: (callback?: GetServerSideProps<PageProps>) => GetServerSideProps<PageProps> = (callback) => {
+const redirectToHome = {
+  redirect: {
+    destination: '/',
+    permanent: false,
+  },
+}
+
+export const withAuth: (option: { checkMembership?: boolean, callback?: GetServerSideProps<PageProps> }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
     const user = await getUser(context.req.cookies['token']);
 
     if (user === undefined) {
       return redirectToLogin;
+    }
+
+    if (checkMembership === true) {
+      const galaUuid = context.query.uuid as string;
+      const role = await getRole(galaUuid, user);
+
+      if (role === undefined) {
+        return redirectToHome;
+      }
     }
 
     let extraProps: GetServerSidePropsResult<PageProps> = { props: {} };
@@ -37,3 +51,22 @@ export const withAuth: (callback?: GetServerSideProps<PageProps>) => GetServerSi
     });
   }
 }
+
+export const withAuthGala = (selected: string) => withAuth({
+  checkMembership: true,
+  callback: async (context) => {
+    const galaUuid = context.query.uuid as string;
+
+    return {
+      props: {
+        galaUuid,
+
+        layoutInfo: {
+          menu: 'admin',
+          selected,
+          uuid: galaUuid,
+        },
+      },
+    };
+  }
+});

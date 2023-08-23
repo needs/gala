@@ -25,6 +25,7 @@ import { addTeam, defaultTeam } from '../../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
+import { withAuth, withAuthGala } from 'packages/gala/lib/auth';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -248,19 +249,4 @@ export default function TeamsPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<PageProps> = async (
-  context
-) => {
-  const galaUuid = context.query.uuid as string;
-  return {
-    props: {
-      galaUuid,
-
-      layoutInfo: {
-        menu: "admin",
-        selected: "teams",
-        uuid: galaUuid,
-      }
-    },
-  };
-};
+export const getServerSideProps = withAuthGala("teams");
