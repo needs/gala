@@ -27,14 +27,28 @@ export const getUserEmail = async (token: string | undefined) => {
 const prisma = new PrismaClient();
 
 export const getRole = async (uuid: string, email: string | undefined) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email
+    },
+    select: {
+      id: true,
+      is_admin: true
+    }
+  });
+
+  if (user === null) {
+    return undefined;
+  }
+
+  if (user.is_admin === true) {
+    return "OWNER";
+  }
+
   const galaUser = await prisma.galaUser.findFirst({
     where: {
-      user: {
-        email: email
-      },
-      gala: {
-        uuid: uuid
-      }
+      user_id: user.id,
+      gala_uuid: uuid
     },
     select: {
       role: true
