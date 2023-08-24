@@ -83,11 +83,14 @@ export default function EditTeamDialog({
             }
           />
           <CategorySelector
+            allowNone
             value={categoryKeyToCategorySelectorValue(team.categoryKey)}
 
             onChange={(value) => {
               if (value.type === 'category') {
                 team.categoryKey = value.categoryKey
+              } else {
+                team.categoryKey = undefined;
               }
             }}
           />

@@ -20,34 +20,35 @@ import {
   ViewDay,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import Link from 'next/link';
 
 const drawerWidth = 240;
 
 type MenuItem = {
-  href: string,
-  label: string,
-  icon: React.ReactNode,
+  href: string;
+  label: string;
+  icon: React.ReactNode;
 };
 
 type Menu = Record<string, MenuItem>;
 
 export const menuAdmin = (uuid: string): Menu => ({
-  'teams': {
+  teams: {
     href: `/gala/${uuid}/teams`,
     label: 'Équipes',
     icon: <Group />,
   },
-  'categories': {
+  categories: {
     href: `/gala/${uuid}/categories`,
     label: 'Catégories',
     icon: <Category />,
   },
-  'judges': {
+  judges: {
     href: `/gala/${uuid}/judges`,
     label: 'Juges',
     icon: <Gavel />,
   },
-  'progress': {
+  progress: {
     href: `/gala/${uuid}/progress`,
     label: 'Déroulement',
     icon: <ViewDay />,
@@ -70,12 +71,12 @@ export const menuAdmin = (uuid: string): Menu => ({
 });
 
 export const menuVisitor = (uuid: string): Menu => ({
-  'home': {
+  home: {
     href: `/public/${uuid}`,
     label: 'Plateaux',
     icon: <ViewDay />,
   },
-  'bar': {
+  bar: {
     href: `/public/${uuid}/bar`,
     label: 'Buvette',
     icon: <FoodBank />,
@@ -83,29 +84,35 @@ export const menuVisitor = (uuid: string): Menu => ({
 });
 
 type LayoutInfoAdmin = {
-  menu: "admin",
-  selected: keyof ReturnType<typeof menuAdmin>
+  menu: 'admin';
+  selected: keyof ReturnType<typeof menuAdmin>;
   uuid: string;
-}
+};
 
 type LayoutInfoVisitor = {
-  menu: "visitor",
-  selected: keyof ReturnType<typeof menuVisitor>
+  menu: 'visitor';
+  selected: keyof ReturnType<typeof menuVisitor>;
   uuid: string;
-}
+};
 
 export type LayoutInfo = LayoutInfoAdmin | LayoutInfoVisitor;
 
 function getMenu(layoutInfo: LayoutInfo): Menu {
   switch (layoutInfo.menu) {
-    case "admin":
+    case 'admin':
       return menuAdmin(layoutInfo.uuid);
-    case "visitor":
+    case 'visitor':
       return menuVisitor(layoutInfo.uuid);
   }
 }
 
-export default function Layout({ children, layoutInfo }: { children: React.ReactNode, layoutInfo?: LayoutInfo }) {
+export default function Layout({
+  children,
+  layoutInfo,
+}: {
+  children: React.ReactNode;
+  layoutInfo?: LayoutInfo;
+}) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   if (layoutInfo === undefined) {
@@ -121,10 +128,14 @@ export default function Layout({ children, layoutInfo }: { children: React.React
         <List>
           {Object.entries(menu).map(([key, { label, icon, href }]) => (
             <ListItem key={label} disablePadding>
-              <ListItemButton selected={key === layoutInfo.selected} href={href}>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={label} />
-              </ListItemButton>
+              <Link href={href} legacyBehavior>
+                <ListItemButton
+                  selected={key === layoutInfo.selected}
+                >
+                  <ListItemIcon>{icon}</ListItemIcon>
+                  <ListItemText primary={label} />
+                </ListItemButton>
+              </Link>
             </ListItem>
           ))}
         </List>

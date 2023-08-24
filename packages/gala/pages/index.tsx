@@ -18,6 +18,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { withAuth } from '../lib/auth';
 import { useCookies } from 'react-cookie';
+import Link from 'next/link';
 
 export default function ListPage() {
   const create = trpc.create.useMutation();
@@ -77,12 +78,16 @@ export default function ListPage() {
                 primary="Vous n'avez pas encore créé de GALA"
                 secondary="Cliquez sur le bouton ci-dessus pour en créer un"
               />
-              </ListItem>
+            </ListItem>
           )}
-          {galas !== undefined && galas.length > 0 &&
+          {galas !== undefined &&
+            galas.length > 0 &&
             galas.map((gala) => (
-              <ListItem key={gala.uuid} disablePadding>
-                <ListItemButton onClick={() => router.push(`/gala/${gala.uuid}/teams`)}>
+              <Link key={gala.uuid} href={`/gala/${gala.uuid}/teams`} legacyBehavior>
+              <ListItem disablePadding>
+                <ListItemButton
+
+                >
                   <ListItemAvatar>
                     <Avatar>
                       <EmojiEvents />
@@ -94,15 +99,19 @@ export default function ListPage() {
                   />
                 </ListItemButton>
               </ListItem>
+              </Link>
             ))}
         </List>
 
-        <Button onClick={() => {
-          removeCookies('session');
-          signOut(auth).then(() => {
-            router.push('/login');
-          })
-        }} color="secondary">
+        <Button
+          onClick={() => {
+            removeCookies('session');
+            signOut(auth).then(() => {
+              router.push('/login');
+            });
+          }}
+          color="secondary"
+        >
           Deconnexion
         </Button>
       </Stack>
