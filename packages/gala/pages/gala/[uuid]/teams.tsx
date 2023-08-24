@@ -1,5 +1,6 @@
 import { Team, store } from '../../../lib/store';
 import {
+  Avatar,
   Box,
   Button,
   Divider,
@@ -12,7 +13,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { Clear, Delete, Edit } from '@mui/icons-material';
+import { Clear, Delete, Edit, QuestionMark } from '@mui/icons-material';
 import { useState } from 'react';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
@@ -23,9 +24,7 @@ import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
-import { GetServerSideProps } from 'next';
-import { PageProps } from '../../_app';
-import { withAuth, withAuthGala } from 'packages/gala/lib/auth';
+import { withAuthGala } from '../../../lib/auth';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -94,10 +93,6 @@ export default function TeamsPage() {
         }
 
         if (categoryFilter !== '' && team.categoryKey !== categoryFilter) {
-          return false;
-        }
-
-        if (team.categoryKey === undefined) {
           return false;
         }
 
@@ -174,74 +169,86 @@ export default function TeamsPage() {
 
         {Object.entries(teamsByCategory).map(([categoryKey, teams]) => {
           const category = categories[categoryKey];
+
+          const icon =
+            category === undefined ? (
+              <Avatar>
+                <QuestionMark />
+              </Avatar>
+            ) : (
+              <GenderAvatar gender={category.gender} />
+            );
+
+          const name =
+            category === undefined ? (
+              <Typography variant="h6" sx={{ fontStyle: 'italic' }}>
+                Sans catégorie
+              </Typography>
+            ) : (
+              <Typography variant="h6">{category.name}</Typography>
+            );
+
           return (
-            category !== undefined && (
-              <Paper key={categoryKey}>
-                <Stack divider={<Divider />}>
-                  <Stack
-                    gap={2}
-                    direction="row"
-                    alignItems="center"
-                    padding={2}
-                  >
-                    <GenderAvatar gender={category.gender} />
-                    <Typography variant="h6">{category.name}</Typography>
-                  </Stack>
-                  {teams.map(
-                    ({ teamKey, team }) =>
-                      team !== undefined && (
+            <Paper key={categoryKey}>
+              <Stack divider={<Divider />}>
+                <Stack gap={2} direction="row" alignItems="center" padding={2}>
+                  {icon}
+                  {name}
+                </Stack>
+                {teams.map(
+                  ({ teamKey, team }) =>
+                    team !== undefined && (
+                      <Stack
+                        direction="row"
+                        gap={2}
+                        padding={2}
+                        key={teamKey}
+                        divider={<Divider orientation="vertical" flexItem />}
+                        width="100%"
+                      >
+                        <Box minWidth={300} maxWidth={300} padding={1}>
+                          {team.name}
+                        </Box>
                         <Stack
                           direction="row"
-                          gap={2}
-                          padding={2}
-                          key={teamKey}
-                          divider={<Divider orientation="vertical" flexItem />}
-                          width="100%"
+                          gap={1}
+                          flexGrow="1"
+                          flexWrap="wrap"
+                          alignItems="center"
                         >
-                          <Box minWidth={300} maxWidth={300} padding={1}>
-                            {team.name}
-                          </Box>
-                          <Stack
-                            direction="row"
-                            gap={1}
-                            flexGrow="1"
-                            flexWrap="wrap"
-                            alignItems="center"
-                          >
-                            {Object.keys(team.members).map((playerKey) => {
-                              const player = players[playerKey];
-                              return (
-                                player !== undefined && (
-                                  <EditPlayerButton
-                                    key={playerKey}
-                                    player={player}
-                                    onDelete={() => {
-                                      delete team.members[playerKey];
-                                      delete players[playerKey];
-                                    }}
-                                  />
-                                )
-                              );
-                            })}
-                            <AddPlayerButton team={team} />
-                          </Stack>
-                          <Stack direction="column" gap={2}>
-                            <Stack direction="row" gap={1}>
-                              <EditTeamButton team={team} />
-                              <IconButton
-                                onDoubleClick={() => deleteTeam(teamKey)}
-                                sx={{ color: 'lightcoral' }}
-                              >
-                                <Delete />
-                              </IconButton>
-                            </Stack>
+                          {Object.keys(team.members).map((playerKey) => {
+                            const player = players[playerKey];
+                            return (
+                              player !== undefined && (
+                                <EditPlayerButton
+                                  key={playerKey}
+                                  player={player}
+                                  onDelete={() => {
+                                    delete team.members[playerKey];
+                                    delete players[playerKey];
+                                  }}
+                                />
+                              )
+                            );
+                          })}
+                          <AddPlayerButton team={team} />
+                        </Stack>
+                        <Stack direction="column" gap={2}>
+                          <Stack direction="row" gap={1}>
+                            <EditTeamButton team={team} />
+                            <IconButton
+                              onDoubleClick={() => deleteTeam(teamKey)}
+                              sx={{ color: 'lightcoral' }}
+                            >
+                              <Delete />
+                            </IconButton>
                           </Stack>
                         </Stack>
-                      )
-                  )}
-                </Stack>
-              </Paper>
-            )
+                      </Stack>
+                    )
+                )}
+              </Stack>
+            </Paper>
           );
         })}
       </Stack>
@@ -249,4 +256,4 @@ export default function TeamsPage() {
   );
 }
 
-export const getServerSideProps = withAuthGala("teams");
+export const getServerSideProps = withAuthGala('teams');
