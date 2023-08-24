@@ -19,7 +19,7 @@ import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
-import CategorySelector from '../../../components/CategorySelector';
+import CategorySelector, { CategorySelectorValue } from '../../../components/CategorySelector';
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
@@ -79,7 +79,7 @@ export default function TeamsPage() {
   const { teams, players, categories } = useSyncedStore(store);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({ type: "all"});
 
   const deleteTeam = (teamKey: string) => {
     delete teams[teamKey];
@@ -92,8 +92,19 @@ export default function TeamsPage() {
           return false;
         }
 
-        if (categoryFilter !== '' && team.categoryKey !== categoryFilter) {
-          return false;
+        switch (categoryFilter.type) {
+          case 'all':
+            break;
+          case 'none':
+            if (team.categoryKey !== undefined) {
+              return false;
+            }
+            break;
+          case 'category':
+            if (team.categoryKey !== categoryFilter.categoryKey) {
+              return false;
+            }
+            break;
         }
 
         if (searchQuery === '') {
@@ -155,9 +166,10 @@ export default function TeamsPage() {
             </FormControl>
             <Box width={300}>
               <CategorySelector
-                categoryKey={categoryFilter}
+                value={categoryFilter}
                 onChange={setCategoryFilter}
                 allowAll
+                allowNone
               />
             </Box>
             <Typography variant="caption">{`${sum(

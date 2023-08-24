@@ -11,14 +11,38 @@ import GenderAvatar from './GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
 import { store } from '../lib/store';
 
+export type CategorySelectorValue =
+  | {
+      type: 'all';
+    }
+  | {
+      type: 'category';
+      categoryKey: string;
+    }
+  | {
+      type: 'none';
+    };
+
+export const categoryKeyToCategorySelectorValue = (
+  categoryKey: string | undefined
+): CategorySelectorValue => {
+  if (categoryKey === undefined) {
+    return { type: 'none' };
+  } else {
+    return { type: 'category', categoryKey };
+  }
+};
+
 export default function CategorySelector({
-  categoryKey,
+  value,
   onChange,
   allowAll,
+  allowNone,
 }: {
-  categoryKey: string | undefined;
-  onChange: (categoryKey: string) => void;
+  value: CategorySelectorValue;
+  onChange: (value: CategorySelectorValue) => void;
   allowAll?: boolean;
+  allowNone?: boolean;
 }) {
   const { categories } = useSyncedStore(store);
 
@@ -28,36 +52,66 @@ export default function CategorySelector({
       <Select
         labelId="demo-simple-select-label"
         id="demo-simple-select"
-        value={categoryKey ?? ""}
+        value={value}
         label="Catégorie"
-        renderValue={(categoryKey) => {
-          if (categoryKey === undefined) {
+        renderValue={(value) => {
+          if (value.type === 'all') {
             return <em>Selectionner une catégorie</em>;
-          } else {
-            const category = categories[categoryKey];
-            return category !== undefined && (
+          } else if (value.type === 'none') {
+            return (
               <Stack direction="row" spacing={2} alignItems="center">
-                <GenderAvatar gender={category.gender} size={24}/>
-                <ListItemText>{category.name}</ListItemText>
+                <GenderAvatar size={24} />
+                <ListItemText sx={{ fontStyle: 'italic' }}>
+                  Sans catégorie
+                </ListItemText>
               </Stack>
+            );
+          } else {
+            const category = categories[value.categoryKey];
+            return (
+              category !== undefined && (
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <GenderAvatar gender={category.gender} size={24} />
+                  <ListItemText>{category.name}</ListItemText>
+                </Stack>
+              )
             );
           }
         }}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) => {
+          if (typeof event.target.value === 'string') return;
+          onChange(event.target.value);
+        }}
       >
         {allowAll && (
-          <MenuItem value="">
+          <MenuItem value={{ type: 'all' } as any}>
             <ListItemText>Toutes les catégories</ListItemText>
           </MenuItem>
         )}
-        {Object.entries(categories).map(([categoryKey, category]) => category !== undefined && (
-          <MenuItem key={categoryKey} value={categoryKey}>
+        {allowNone && (
+          <MenuItem value={{ type: 'none' } as any}>
             <ListItemAvatar>
-              <GenderAvatar gender={category.gender} />
+              <GenderAvatar />
             </ListItemAvatar>
-            <ListItemText>{category.name}</ListItemText>
+            <ListItemText sx={{ fontStyle: 'italic' }}>
+              Sans catégorie
+            </ListItemText>
           </MenuItem>
-        ))}
+        )}
+        {Object.entries(categories).map(
+          ([categoryKey, category]) =>
+            category !== undefined && (
+              <MenuItem
+                key={categoryKey}
+                value={{ type: 'category', categoryKey } as any}
+              >
+                <ListItemAvatar>
+                  <GenderAvatar gender={category.gender} />
+                </ListItemAvatar>
+                <ListItemText>{category.name}</ListItemText>
+              </MenuItem>
+            )
+        )}
       </Select>
     </FormControl>
   );

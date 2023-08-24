@@ -9,7 +9,7 @@ import {
   Stack,
 } from '@mui/material';
 import { useCallback } from 'react';
-import CategorySelector from './CategorySelector';
+import CategorySelector, { categoryKeyToCategorySelectorValue } from './CategorySelector';
 import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import AddPlayerButton from './AddPlayerButton';
@@ -83,10 +83,13 @@ export default function EditTeamDialog({
             }
           />
           <CategorySelector
-            categoryKey={team.categoryKey}
-            onChange={(categoryKey) =>
-              team.categoryKey = categoryKey
-            }
+            value={categoryKeyToCategorySelectorValue(team.categoryKey)}
+
+            onChange={(value) => {
+              if (value.type === 'category') {
+                team.categoryKey = value.categoryKey
+              }
+            }}
           />
           <Stack direction="row" gap={1} flexWrap="wrap">
             {Object.keys(team.members).map(

@@ -6,7 +6,7 @@ export default function GenderAvatar({
   gender,
   size,
 }: {
-  gender: Gender;
+  gender?: Gender;
   size?: number;
 }) {
   const sx = { width: size, height: size, bgcolor: genderColor(gender) };
