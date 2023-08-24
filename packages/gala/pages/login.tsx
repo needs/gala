@@ -17,7 +17,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'next-client-cookies';
+import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
 import Router from 'next/router';
 
@@ -97,7 +97,7 @@ function Login() {
         setErrorMessage(error.message);
       });
     } else {
-      Router.push('/')
+      //Router.push('/')
     }
   };
 
@@ -165,10 +165,10 @@ function Login() {
 
 export default function Index() {
   const [step, setStep] = useState<'login' | 'verify' | 'success'>('login');
-  const cookies = useCookies();
+  const [cookies, setCookies, removeCookies] = useCookies(['session']);
   const { mutateAsync: login } = trpc.login.useMutation();
 
-  const sessionCookie = cookies.get('session');
+  const sessionCookie = cookies.session;
 
   useEffect(() => {
     if (sessionCookie !== undefined) {
@@ -178,25 +178,20 @@ export default function Index() {
       return onAuthStateChanged(auth, async (user) => {
         if (user === null) {
           setStep('login');
-          cookies.remove('session');
+          removeCookies('session')
         } else if (!user.emailVerified) {
           setStep('verify');
         } else {
           const idToken = await getIdToken(user);
           const { sessionCookie, expiresIn } = await login({ idToken });
 
-          cookies.set('session', sessionCookie, {
-            expires: expiresIn,
-            sameSite: 'strict',
-            secure: true
+          setCookies('session', sessionCookie, {
+            maxAge: expiresIn,
           });
-
-          setStep('success');
-          Router.push('/');
         }
       });
     }
-  }, [login, sessionCookie, cookies]);
+  }, [login, sessionCookie, setCookies, removeCookies]);
 
   useEffect(() => {
     if (step === 'verify') {

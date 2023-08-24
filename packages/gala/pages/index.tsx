@@ -17,11 +17,13 @@ import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { withAuth } from '../lib/auth';
+import { useCookies } from 'react-cookie';
 
 export default function ListPage() {
   const create = trpc.create.useMutation();
   const { data: galas } = trpc.list.useQuery(null);
   const router = useRouter();
+  const [cookies, setCookies, removeCookies] = useCookies(['session']);
 
   return (
     <Box
@@ -96,6 +98,7 @@ export default function ListPage() {
         </List>
 
         <Button onClick={() => {
+          removeCookies('session');
           signOut(auth).then(() => {
             router.push('/login');
           })

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
-import { useCookies } from 'next-client-cookies';
+import { useCookies } from 'react-cookie';
 
 const StoreProvider = ({
   children,
@@ -11,8 +11,8 @@ const StoreProvider = ({
   galaUuid?: string;
 }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
-  const cookies = useCookies();
-  const sessionCookie = cookies.get('session');
+  const [cookies] = useCookies(['session']);
+  const sessionCookie = cookies.session;
 
   useEffect(() => {
     const init = async () => {
