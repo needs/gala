@@ -4,7 +4,7 @@ import { middleware, procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
 import { auth } from 'firebase-admin';
-import { getUser } from '@gala/auth';
+import { isIdTokenValid } from '@gala/auth';
 
 const isAuthed = middleware((opts) => {
   const { ctx } = opts;
@@ -16,7 +16,6 @@ const isAuthed = middleware((opts) => {
   return opts.next({
     ctx: {
       user: ctx.user,
-      crsfToken: ctx.crsfToken
     },
   });
 });
@@ -35,9 +34,7 @@ export const appRouter = router({
       // Set session expiration to 10 days.
       const expiresIn = 60 * 60 * 24 * 10 * 1000;
 
-      const user = getUser({ idToken });
-
-      if (user === undefined) {
+      if (!(await isIdTokenValid(idToken))) {
         throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
       }
 

@@ -6,7 +6,7 @@ export async function createContext({
   req,
 }: trpcNext.CreateNextContextOptions) {
   const sessionCookie = req.cookies['session'];
-  const user = sessionCookie === undefined ? undefined : await getUser({ sessionCookie });
+  const user = await getUser(sessionCookie);
 
   return {
     user,

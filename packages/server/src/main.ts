@@ -9,7 +9,7 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
-    const user = await getUser({ sessionCookie });
+    const user = await getUser(sessionCookie);
     const role = await getRole(documentName, user);
 
     if (role !== "EDITOR" && role !== "OWNER") {

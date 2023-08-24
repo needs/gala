@@ -1,24 +1,24 @@
 import admin from 'firebase-admin';
 import { PrismaClient, User } from '@prisma/client';
 
-const getTokenData = async ({ idToken, sessionCookie }: { idToken?: string, sessionCookie?: string }) => {
-  if (idToken !== undefined) {
-    return await admin.auth().verifyIdToken(idToken).catch(() => {
-      return undefined;
-    })
-  }
+export const isIdTokenValid = async (idToken: string) => {
+  const user = await admin.auth().verifyIdToken(idToken).catch(() => {
+    return undefined;
+  })
 
-  if (sessionCookie !== undefined) {
-    return await admin.auth().verifySessionCookie(sessionCookie, true).catch(() => {
-      return undefined;
-    })
-  }
-
-  return undefined;
+  // If email is not yet verified, it's easy to impersonate someone else if an
+  // account doesn't already exist.
+  return user !== undefined && user.email_verified;
 }
 
-export const getUser = async ({ idToken, sessionCookie }: { idToken?: string, sessionCookie?: string }) => {
-  const tokenData = await getTokenData({ idToken, sessionCookie });
+export const getUser = async (sessionCookie: string | undefined) => {
+  if (sessionCookie === undefined) {
+    return undefined;
+  }
+
+  const tokenData = await admin.auth().verifySessionCookie(sessionCookie, true).catch(() => {
+    return undefined;
+  })
 
   if (tokenData === undefined) {
     return undefined;
