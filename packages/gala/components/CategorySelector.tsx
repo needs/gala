@@ -10,18 +10,22 @@ import {
 import GenderAvatar from './GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
 import { store } from '../lib/store';
+import { z } from "zod";
 
-export type CategorySelectorValue =
-  | {
-      type: 'all';
-    }
-  | {
-      type: 'category';
-      categoryKey: string;
-    }
-  | {
-      type: 'none';
-    };
+const categorySelectorValueSchema = z.union([
+  z.object({
+    type: z.literal('all'),
+  }),
+  z.object({
+    type: z.literal('category'),
+    categoryKey: z.string(),
+  }),
+  z.object({
+    type: z.literal('none'),
+  }),
+]);
+
+export type CategorySelectorValue = z.infer<typeof categorySelectorValueSchema>;
 
 export const categoryKeyToCategorySelectorValue = (
   categoryKey: string | undefined
@@ -52,9 +56,11 @@ export default function CategorySelector({
       <Select
         labelId="demo-simple-select-label"
         id="demo-simple-select"
-        value={value}
+        value={JSON.stringify(value)}
         label="Catégorie"
-        renderValue={(value) => {
+        renderValue={(valueString) => {
+          const value = categorySelectorValueSchema.parse(JSON.parse(valueString));
+
           if (value.type === 'all') {
             return <em>Selectionner une catégorie</em>;
           } else if (value.type === 'none') {
@@ -78,18 +84,22 @@ export default function CategorySelector({
             );
           }
         }}
+
         onChange={(event) => {
-          if (typeof event.target.value === 'string') return;
-          onChange(event.target.value);
+          if (typeof event.target.value === 'string') {
+            onChange(categorySelectorValueSchema.parse(JSON.parse(event.target.value)));
+          } else {
+            onChange(event.target.value);
+          }
         }}
       >
         {allowAll && (
-          <MenuItem value={{ type: 'all' } as any}>
+          <MenuItem value={JSON.stringify({ type: 'all' })}>
             <ListItemText>Toutes les catégories</ListItemText>
           </MenuItem>
         )}
         {allowNone && (
-          <MenuItem value={{ type: 'none' } as any}>
+          <MenuItem value={JSON.stringify({ type: 'none' })} selected={true}>
             <ListItemAvatar>
               <GenderAvatar />
             </ListItemAvatar>
@@ -103,7 +113,7 @@ export default function CategorySelector({
             category !== undefined && (
               <MenuItem
                 key={categoryKey}
-                value={{ type: 'category', categoryKey } as any}
+                value={JSON.stringify({ type: 'category', categoryKey })}
               >
                 <ListItemAvatar>
                   <GenderAvatar gender={category.gender} />
