@@ -1,14 +1,24 @@
 import admin from 'firebase-admin';
 import { PrismaClient, User } from '@prisma/client';
 
-export const getUser = async (token: string | undefined) => {
-  if (token === undefined) {
-    return undefined;
+const getTokenData = async ({ idToken, sessionCookie }: { idToken?: string, sessionCookie?: string }) => {
+  if (idToken !== undefined) {
+    return await admin.auth().verifyIdToken(idToken).catch(() => {
+      return undefined;
+    })
   }
 
-  const tokenData = await admin.auth().verifyIdToken(token).catch(() => {
-    return undefined;
-  })
+  if (sessionCookie !== undefined) {
+    return await admin.auth().verifySessionCookie(sessionCookie, true).catch(() => {
+      return undefined;
+    })
+  }
+
+  return undefined;
+}
+
+export const getUser = async ({ idToken, sessionCookie }: { idToken?: string, sessionCookie?: string }) => {
+  const tokenData = await getTokenData({ idToken, sessionCookie });
 
   if (tokenData === undefined) {
     return undefined;

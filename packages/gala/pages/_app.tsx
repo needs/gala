@@ -4,10 +4,9 @@ import '../styles/global.css';
 import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
-import { CookiesProvider } from 'react-cookie';
+import { CookiesProvider } from 'next-client-cookies';
 import { UserInfo } from '../lib/auth';
-import { useEffect } from 'react';
-import { onIdTokenChanged } from 'firebase/auth';
+import { cookies } from 'next/dist/client/components/headers';
 
 export type PageProps = {
   galaUuid?: string;
@@ -21,7 +20,7 @@ type AppPropsWithProoperties = AppProps & {
 
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
-    <CookiesProvider>
+    <CookiesProvider value={cookies().getAll()}>
       <StoreProvider galaUuid={pageProps.galaUuid}>
         <Layout layoutInfo={pageProps.layoutInfo}>
           <Component {...pageProps} />

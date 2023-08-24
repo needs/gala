@@ -31,13 +31,6 @@ export const trpc = createTRPCNext<AppRouter>({
            * @link https://trpc.io/docs/ssr
            **/
           url: `${getBaseUrl()}/api/trpc`,
-
-          // You can pass any HTTP headers you wish here
-          async headers() {
-            return {
-              authorization: await auth.currentUser?.getIdToken(),
-            };
-          },
         }),
       ],
     };

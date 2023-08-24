@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { middleware, procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
+import { auth } from 'firebase-admin';
+import { getUser } from '@gala/auth';
 
 const isAuthed = middleware((opts) => {
   const { ctx } = opts;
@@ -13,7 +15,8 @@ const isAuthed = middleware((opts) => {
 
   return opts.next({
     ctx: {
-      user: ctx.user
+      user: ctx.user,
+      crsfToken: ctx.crsfToken
     },
   });
 });
@@ -21,6 +24,31 @@ const isAuthed = middleware((opts) => {
 const authedProcedure = procedure.use(isAuthed);
 
 export const appRouter = router({
+  login: procedure
+    .input(z.object({ idToken: z.string() }))
+    .output(z.object({ sessionCookie: z.string(), expiresIn: z.number() }))
+    .mutation(async (opts) => {
+      const { idToken } = opts.input
+
+      // TODO: Double check that this flow is not subject to CSRF attacks.
+
+      // Set session expiration to 10 days.
+      const expiresIn = 60 * 60 * 24 * 10 * 1000;
+
+      const user = getUser({ idToken });
+
+      if (user === undefined) {
+        throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+      }
+
+      const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
+
+      return {
+        sessionCookie,
+        expiresIn
+      }
+    }),
+
   list: authedProcedure
     .input(z.null())
     .output(z.array(z.object({ uuid: z.string().uuid(), teamCount: z.number() })))

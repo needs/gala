@@ -17,17 +17,14 @@ import {
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { cookies } from 'next/dist/client/components/headers';
-import { useCookies } from 'react-cookie';
+import { useCookies } from 'next-client-cookies';
+import { trpc } from '../utils/trpc';
+import Router from 'next/router';
 
 function Success() {
-  const router = useRouter();
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
-    router.push('/');
-
     const timeout = setTimeout(() => {
       setDisabled(false);
     }, 2000);
@@ -35,7 +32,7 @@ function Success() {
     return () => {
       clearTimeout(timeout);
     };
-  }, [router]);
+  }, []);
 
   return (
     <>
@@ -87,8 +84,6 @@ function VerifyEmail() {
 }
 
 function Login() {
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
@@ -102,7 +97,7 @@ function Login() {
         setErrorMessage(error.message);
       });
     } else {
-      router.push('/');
+      Router.push('/')
     }
   };
 
@@ -170,23 +165,38 @@ function Login() {
 
 export default function Index() {
   const [step, setStep] = useState<'login' | 'verify' | 'success'>('login');
-  const [cookies, setCookie, removeCookie] = useCookies(['token']);
+  const cookies = useCookies();
+  const { mutateAsync: login } = trpc.login.useMutation();
+
+  const sessionCookie = cookies.get('session');
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (user) => {
-      if (user === null) {
-        setStep('login');
-        removeCookie('token');
-      } else if (!user.emailVerified) {
-        setStep('verify');
-      } else {
-        setStep('success');
-        setCookie('token', await getIdToken(user), {
-          maxAge: 60 * 60 * 24 * 7,
-        });
-      }
-    });
-  }, []);
+    if (sessionCookie !== undefined) {
+      setStep('success');
+      Router.push('/');
+    } else {
+      return onAuthStateChanged(auth, async (user) => {
+        if (user === null) {
+          setStep('login');
+          cookies.remove('session');
+        } else if (!user.emailVerified) {
+          setStep('verify');
+        } else {
+          const idToken = await getIdToken(user);
+          const { sessionCookie, expiresIn } = await login({ idToken });
+
+          cookies.set('session', sessionCookie, {
+            expires: expiresIn,
+            sameSite: 'strict',
+            secure: true
+          });
+
+          setStep('success');
+          Router.push('/');
+        }
+      });
+    }
+  }, [login, sessionCookie, cookies]);
 
   useEffect(() => {
     if (step === 'verify') {
@@ -198,7 +208,7 @@ export default function Index() {
 
       return () => {
         clearInterval(interval);
-      }
+      };
     }
   }, [step]);
 

@@ -1,8 +1,7 @@
-import { ReactNode, useEffect, useId, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
-import { auth } from '../lib/firebase';
-import { useIdToken } from 'react-firebase-hooks/auth';
+import { useCookies } from 'next-client-cookies';
 
 const StoreProvider = ({
   children,
@@ -12,23 +11,23 @@ const StoreProvider = ({
   galaUuid?: string;
 }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
-  const [user, loadingUser] = useIdToken(auth);
+  const cookies = useCookies();
+  const sessionCookie = cookies.get('session');
 
   useEffect(() => {
     const init = async () => {
-      if (typeof window !== 'undefined' && galaUuid !== undefined && !loadingUser) {
-        const token = await user?.getIdToken() ?? "";
+      if (typeof window !== 'undefined' && galaUuid !== undefined && sessionCookie !== undefined) {
 
         return initStore(
           galaUuid,
-          token,
+          sessionCookie,
           () => setStoreLoaded(true),
           () => setStoreLoaded(false)
         );
       }
     };
     init();
-  }, [galaUuid, loadingUser, user]);
+  }, [galaUuid, sessionCookie]);
 
   if (galaUuid !== undefined && !storeLoaded) {
     return (

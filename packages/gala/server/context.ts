@@ -5,18 +5,12 @@ import { getUser } from '@gala/auth';
 export async function createContext({
   req,
 }: trpcNext.CreateNextContextOptions) {
-  const token = req.headers.authorization
-
-  if (typeof token !== "string") {
-    return {
-      user: undefined,
-    }
-  }
-
-  const user = await getUser(token);
+  const sessionCookie = req.cookies['session'];
+  const user = sessionCookie === undefined ? undefined : await getUser({ sessionCookie });
 
   return {
     user,
+    sessionCookie
   };
 }
 

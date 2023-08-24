@@ -23,7 +23,7 @@ const redirectToHome = {
 
 export const withAuth: (option: { checkMembership?: boolean, callback?: GetServerSideProps<PageProps> }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
-    const user = await getUser(context.req.cookies['token']);
+    const user = await getUser({ sessionCookie: context.req.cookies['session'] });
 
     if (user === undefined) {
       return redirectToLogin;
