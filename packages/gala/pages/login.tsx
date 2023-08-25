@@ -22,13 +22,19 @@ import { trpc } from '../utils/trpc';
 import Router from 'next/router';
 import { GetServerSideProps } from 'next';
 import { getUser } from '@gala/auth';
+import Link from 'next/link';
 
 function Login({
   onLogin,
 }: {
   onLogin: (sessionCookie: string, expiresIn: number) => void;
 }) {
-  const { mutateAsync: login, isLoading, error, isSuccess } = trpc.login.useMutation();
+  const {
+    mutateAsync: login,
+    isLoading,
+    error,
+    isSuccess,
+  } = trpc.login.useMutation();
 
   const authenticate = useCallback(() => {
     if (auth.currentUser !== null) {
@@ -47,7 +53,9 @@ function Login({
 
   return (
     <>
-      {(isLoading || isSuccess) && <Alert severity="success">{'Authentification...'}</Alert>}
+      {(isLoading || isSuccess) && (
+        <Alert severity="success">{'Authentification...'}</Alert>
+      )}
       {error && (
         <>
           <Alert severity="warning">{"Échec de l'authentification"}</Alert>
@@ -174,29 +182,38 @@ function Form({
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        <Stack direction="row" gap={2}>
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={() => {
-              setErrorMessage(undefined);
-              createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                  onUserCredential(userCredential);
-                })
-                .catch((error) => {
-                  console.error(error);
-                  setErrorMessage(
-                    'Échec de la création du compte. Veuillez réessayer.'
-                  );
-                });
-            }}
-          >
-            Inscription
-          </Button>
-          <Button type="submit" variant="contained" fullWidth>
-            Connexion
-          </Button>
+        <Stack
+          direction="row"
+          gap={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Link href="/reset-password" legacyBehavior>
+            Mot de passe perdu ?
+          </Link>
+          <Stack direction="row" gap={2}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setErrorMessage(undefined);
+                createUserWithEmailAndPassword(auth, email, password)
+                  .then((userCredential) => {
+                    onUserCredential(userCredential);
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                    setErrorMessage(
+                      'Échec de la création du compte. Veuillez réessayer.'
+                    );
+                  });
+              }}
+            >
+              Inscription
+            </Button>
+            <Button type="submit" variant="contained">
+              Connexion
+            </Button>
+          </Stack>
         </Stack>
       </Stack>
     </form>
