@@ -68,7 +68,7 @@ function AddTeamButton() {
         />
       )}
       <Button
-        variant="contained"
+        variant="outlined"
         onClick={() => {
           setTeamKey(addTeam(teams, defaultTeam));
           setOpen(true);
@@ -268,10 +268,7 @@ export default function TeamsPage() {
               Object.values(teamsByCategory).map((teams) => teams.length)
             )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
-          <Stack direction="row" gap={2}>
-            <AddCategoryButton />
-            <AddTeamButton />
-          </Stack>
+          <AddCategoryButton />
         </Stack>
 
         {Object.entries(teamsByCategory).map(([categoryKey, categoryTeams]) => {
@@ -320,7 +317,9 @@ export default function TeamsPage() {
                       </Typography>
                     </Stack>
                   </Stack>
-                  <Stack direction="row" gap={1}>
+                  <Stack direction="row" gap={2} divider={<Divider orientation='vertical' flexItem />}>
+                    <AddTeamButton />
+                    <Stack direction="row" gap={1}>
                     {category !== undefined && (
                       <EditCategoryButton category={category} />
                     )}
@@ -345,6 +344,7 @@ export default function TeamsPage() {
                         </span>
                       </Tooltip>
                     )}
+                    </Stack>
                   </Stack>
                 </Stack>
                 {categoryTeams.map(
