@@ -156,6 +156,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
   });
 
   const { mutateAsync: removeMember } = trpc.members.remove.useMutation();
+  const { mutateAsync: updateMemberRole } = trpc.members.updateRole.useMutation();
   const [inviteMemberDialogOpen, setInviteMemberDialogOpen] = useState(false);
 
   return (
@@ -238,7 +239,15 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                     })}`}
                   />
                   <Stack direction="row" gap={2} alignItems="center">
-                    <RoleSelector value={member.role} onChange={() => ({})} />
+                    <RoleSelector value={member.role} onChange={(role) => {
+                      updateMemberRole({
+                        uuid: galaUuid,
+                        email: member.email,
+                        role,
+                      }).then(() => {
+                        refetchMembers();
+                      });
+                    }} />
                     <IconButton edge="end" onClick={() => {
                       removeMember({
                         uuid: galaUuid,

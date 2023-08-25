@@ -216,6 +216,28 @@ export const appRouter = router({
 
         return null;
       }),
+
+    updateRole: procedure
+      .input(z.object({ uuid: z.string().uuid(), email: z.string(), role: z.enum(["OWNER", "EDITOR", "READER"]) }))
+      .output(z.null())
+      .use(isOwnerMiddleware)
+      .mutation(async (opts) => {
+        const { uuid, email, role } = opts.input;
+
+        await prisma.galaUser.updateMany({
+          where: {
+            gala_uuid: uuid,
+            user: {
+              email: email
+            }
+          },
+          data: {
+            role: role,
+          }
+        });
+
+        return null;
+      }),
   })
 });
 
