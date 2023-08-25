@@ -41,14 +41,9 @@ export const menuAdmin = (uuid: string): Menu => ({
     label: 'Général',
     icon: <EmojiEvents />,
   },
-  categories: {
-    href: `/gala/${uuid}/categories`,
-    label: 'Catégories',
-    icon: <Category />,
-  },
   teams: {
-    href: `/gala/${uuid}/teams`,
-    label: 'Équipes',
+    href: `/gala/${uuid}/registrations`,
+    label: 'Inscriptions',
     icon: <Group />,
   },
   judges: {

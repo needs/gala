@@ -1,4 +1,4 @@
-import { Team, store } from '../../../lib/store';
+import { Category, Team, store } from '../../../lib/store';
 import {
   Avatar,
   Box,
@@ -13,18 +13,22 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { Clear, Delete, Edit, QuestionMark } from '@mui/icons-material';
+import { v4 as uuidv4 } from 'uuid';
+import { Add, Clear, Delete, Edit, QuestionMark } from '@mui/icons-material';
 import { useState } from 'react';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../../../components/GenderAvatar';
 import { groupBy, sum } from 'lodash';
-import CategorySelector, { CategorySelectorValue } from '../../../components/CategorySelector';
+import CategorySelector, {
+  CategorySelectorValue,
+} from '../../../components/CategorySelector';
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
 import { useSyncedStore } from '@syncedstore/react';
 import { withAuthGala } from '../../../lib/auth';
+import EditCategoryDialog from '../../../components/EditCategoryDialog';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -68,9 +72,63 @@ function AddTeamButton() {
           setTeamKey(addTeam(teams, defaultTeam));
           setOpen(true);
         }}
+        startIcon={<Add />}
       >
-        Ajouter
+        Équipe
       </Button>
+    </>
+  );
+}
+
+function AddCategoryButton() {
+  const [open, setOpen] = useState(false);
+  const { categories } = useSyncedStore(store);
+  const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
+  const category =
+    categoryKey !== undefined ? categories[categoryKey] : undefined;
+
+  return (
+    <>
+      {category !== undefined && (
+        <EditCategoryDialog
+          open={open}
+          onClose={() => setOpen(false)}
+          category={category}
+        />
+      )}
+      <Button
+        variant="contained"
+        onClick={() => {
+          const categoryKey = uuidv4();
+          categories[categoryKey] = {
+            name: '',
+            gender: 'woman',
+            apparatuses: {},
+          };
+          setCategoryKey(categoryKey);
+          setOpen(true);
+        }}
+        startIcon={<Add />}
+      >
+        Catégorie
+      </Button>
+    </>
+  );
+}
+
+function EditCategoryButton({ category }: { category: Category }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditCategoryDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        category={category}
+      />
+      <IconButton onClick={() => setOpen(true)}>
+        <Edit />
+      </IconButton>
     </>
   );
 }
@@ -79,7 +137,9 @@ export default function TeamsPage() {
   const { teams, players, categories } = useSyncedStore(store);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({ type: "all"});
+  const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({
+    type: 'all',
+  });
 
   const deleteTeam = (teamKey: string) => {
     delete teams[teamKey];
@@ -134,6 +194,10 @@ export default function TeamsPage() {
     return ret;
   })();
 
+  const deleteCategory = (categoryKey: string) => {
+    delete categories[categoryKey];
+  };
+
   return (
     <>
       <Head>
@@ -176,7 +240,10 @@ export default function TeamsPage() {
               Object.values(teamsByCategory).map((teams) => teams.length)
             )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
-          <AddTeamButton />
+          <Stack direction="row" gap={2}>
+            <AddCategoryButton />
+            <AddTeamButton />
+          </Stack>
         </Stack>
 
         {Object.entries(teamsByCategory).map(([categoryKey, teams]) => {
@@ -203,9 +270,31 @@ export default function TeamsPage() {
           return (
             <Paper key={categoryKey}>
               <Stack divider={<Divider />}>
-                <Stack gap={2} direction="row" alignItems="center" padding={2}>
-                  {icon}
-                  {name}
+                <Stack
+                  padding={2}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack gap={2} direction="row" alignItems="center">
+                    {icon}
+                    <Stack direction="column">
+                      <Typography variant="body1">{name}</Typography>
+                      <Typography variant="caption">{`${teams.length} équipe(s)`}</Typography>
+                    </Stack>
+                  </Stack>
+                  <Stack direction="row" gap={1}>
+                    {category !== undefined && (
+                      <EditCategoryButton category={category} />
+                    )}
+                    <IconButton
+                      onDoubleClick={() => deleteCategory(categoryKey)}
+                      sx={{ color: 'lightcoral' }}
+                      disabled={category === undefined || teams.length > 0}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Stack>
                 </Stack>
                 {teams.map(
                   ({ teamKey, team }) =>
