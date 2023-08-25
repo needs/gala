@@ -50,10 +50,14 @@ function EditTeamButton({ team }: { team: Team }) {
   );
 }
 
-function AddTeamButton() {
+function AddTeamButton({
+  defaultCategoryKey,
+}: {
+  defaultCategoryKey: string | undefined;
+}) {
   const [open, setOpen] = useState(false);
-  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
   const { teams } = useSyncedStore(store);
+  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
   const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
   return (
@@ -70,7 +74,9 @@ function AddTeamButton() {
       <Button
         variant="outlined"
         onClick={() => {
-          setTeamKey(addTeam(teams, defaultTeam));
+          setTeamKey(
+            addTeam(teams, { ...defaultTeam, categoryKey: defaultCategoryKey })
+          );
           setOpen(true);
         }}
         startIcon={<Add />}
@@ -317,35 +323,35 @@ export default function TeamsPage() {
                       </Typography>
                     </Stack>
                   </Stack>
-                  <Stack direction="row" gap={2} divider={<Divider orientation='vertical' flexItem />}>
-                    <AddTeamButton />
-                    <Stack direction="row" gap={1}>
-                    {category !== undefined && (
-                      <EditCategoryButton category={category} />
-                    )}
-                    {category !== undefined && (
-                      <Tooltip
-                        title={
-                          categoryTeams.length === 0
-                            ? 'Doubler cliquez pour supprimer'
-                            : 'Enlevez toutes les équipes avant de pouvoir supprimer cette catégorie'
-                        }
-                      >
-                        <span>
-                          <IconButton
-                            onDoubleClick={() => deleteCategory(categoryKey)}
-                            sx={{ color: 'lightcoral' }}
-                            disabled={
-                              category === undefined || categoryTeams.length > 0
-                            }
-                          >
-                            <Delete />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    )}
+                  {category !== undefined && (
+                    <Stack
+                      direction="row"
+                      gap={2}
+                      divider={<Divider orientation="vertical" flexItem />}
+                    >
+                      <AddTeamButton defaultCategoryKey={categoryKey} />
+                      <Stack direction="row" gap={1}>
+                        <EditCategoryButton category={category} />
+                        <Tooltip
+                          title={
+                            categoryTeams.length === 0
+                              ? 'Doubler cliquez pour supprimer'
+                              : 'Enlevez toutes les équipes avant de pouvoir supprimer cette catégorie'
+                          }
+                        >
+                          <span>
+                            <IconButton
+                              onDoubleClick={() => deleteCategory(categoryKey)}
+                              sx={{ color: 'lightcoral' }}
+                              disabled={categoryTeams.length > 0}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Stack>
                     </Stack>
-                  </Stack>
+                  )}
                 </Stack>
                 {categoryTeams.map(
                   ({ teamKey, team }) =>
