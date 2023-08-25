@@ -21,10 +21,10 @@ import { useCookies } from 'react-cookie';
 import Link from 'next/link';
 
 export default function ListPage() {
+  const [cookies, setCookies, removeCookies] = useCookies(['session']);
+  const router = useRouter();
   const create = trpc.create.useMutation();
   const { data: galas } = trpc.list.useQuery(null);
-  const router = useRouter();
-  const [cookies, setCookies, removeCookies] = useCookies(['session']);
 
   return (
     <Box
