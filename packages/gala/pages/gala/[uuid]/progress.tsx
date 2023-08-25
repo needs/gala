@@ -12,9 +12,7 @@ import { useSyncedStore } from '@syncedstore/react';
 import { ApparatusKey, Progress, store } from '../../../lib/store';
 import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
-import { GetServerSideProps } from 'next';
-import { PageProps } from '../../_app';
-import { withAuthGala } from 'packages/gala/lib/auth';
+import { withAuthGala } from '../../../lib/auth';
 
 const apparatusKeys = Object.keys(apparatuses) as ApparatusKey[];
 

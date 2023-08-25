@@ -18,9 +18,7 @@ import GenderAvatar from '../../../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
 import { Category, store } from '../../../lib/store';
 import { v4 as uuidv4 } from 'uuid';
-import { GetServerSideProps } from 'next';
-import { PageProps } from '../../_app';
-import { withAuthGala } from 'packages/gala/lib/auth';
+import { withAuthGala } from '../../../lib/auth';
 
 function EditCategoryButton({ category }: { category: Category }) {
   const [open, setOpen] = useState(false);
