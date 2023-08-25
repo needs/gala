@@ -56,8 +56,6 @@ export default function EditCategoryDialog({
               }
             />
           </Stack>
-
-          <Select>{/* TODO: Category apparatuses */}</Select>
         </Stack>
       </DialogContent>
       <DialogActions>
