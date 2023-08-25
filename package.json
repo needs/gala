@@ -70,7 +70,7 @@
     "@trpc/server": "^10.37.1",
     "@vercel/analytics": "^1.0.1",
     "axios": "^1.0.0",
-    "firebase": "^10.2.0",
+    "firebase": "^10.3.0",
     "firebase-admin": "^11.10.1",
     "immer": "^10.0.2",
     "lodash": "^4.17.21",

@@ -22,7 +22,6 @@ import { trpc } from '../utils/trpc';
 import Router from 'next/router';
 import { GetServerSideProps } from 'next';
 import { getUser } from '@gala/auth';
-import { PageProps } from './_app';
 
 function Success() {
   const [disabled, setDisabled] = useState(true);
@@ -97,72 +96,76 @@ function Login() {
     const user = userCredential.user;
     if (!user.emailVerified) {
       sendEmailVerification(user).catch((error) => {
-        setErrorMessage(error.message);
+        console.error(error);
+        setErrorMessage("Erreur lors de l'envoi de l'email de vérification. Veuillez réessayer.");
       });
     } else {
-      //Router.push('/')
+      Router.push('/')
     }
   };
 
   return (
-    <>
-      <Typography>
-        Authentifiez vous ou créez un compte pour retrouver vos GALA de
-        gymnastique.
-      </Typography>
-      {errorMessage !== undefined && (
-        <Alert severity="error">{errorMessage}</Alert>
-      )}
-      <TextField
-        required
-        label="Email"
-        variant="outlined"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-      />
-      <TextField
-        required
-        label="Mot de passe"
-        variant="outlined"
-        type="password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-      />
-      <Stack direction="row" gap={2}>
-        <Button
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+
+        setErrorMessage(undefined);
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            validateUser(userCredential);
+          })
+          .catch((error) => {
+            console.error(error);
+            setErrorMessage("Email ou mot de passe incorrect.");
+          });
+      }}
+    >
+      <Stack gap={2}>
+        <Typography>
+          Authentifiez vous ou créez un compte pour retrouver vos GALA de
+          gymnastique.
+        </Typography>
+        {errorMessage !== undefined && (
+          <Alert severity="error">{errorMessage}</Alert>
+        )}
+        <TextField
+          required
+          label="Email"
           variant="outlined"
-          fullWidth
-          onClick={() => {
-            setErrorMessage(undefined);
-            createUserWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                validateUser(userCredential);
-              })
-              .catch((error) => {
-                setErrorMessage(error.message);
-              });
-          }}
-        >
-          Inscription
-        </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={() => {
-            setErrorMessage(undefined);
-            signInWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                validateUser(userCredential);
-              })
-              .catch((error) => {
-                setErrorMessage(error.message);
-              });
-          }}
-        >
-          Connexion
-        </Button>
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <TextField
+          required
+          label="Mot de passe"
+          variant="outlined"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <Stack direction="row" gap={2}>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => {
+              setErrorMessage(undefined);
+              createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                  validateUser(userCredential);
+                })
+                .catch((error) => {
+                  setErrorMessage(error.message);
+                });
+            }}
+          >
+            Inscription
+          </Button>
+          <Button type="submit" variant="contained" fullWidth>
+            Connexion
+          </Button>
+        </Stack>
       </Stack>
-    </>
+    </form>
   );
 }
 
@@ -181,7 +184,7 @@ export default function Index() {
       return onAuthStateChanged(auth, async (user) => {
         if (user === null) {
           setStep('login');
-          removeCookies('session')
+          removeCookies('session');
         } else if (!user.emailVerified) {
           setStep('verify');
         } else {
@@ -257,4 +260,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       props: {},
     };
   }
-}
+};
