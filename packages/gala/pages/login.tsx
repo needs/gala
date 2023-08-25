@@ -20,6 +20,9 @@ import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
 import Router from 'next/router';
+import { GetServerSideProps } from 'next';
+import { getUser } from '@gala/auth';
+import { PageProps } from './_app';
 
 function Success() {
   const [disabled, setDisabled] = useState(true);
@@ -237,4 +240,21 @@ export default function Index() {
       </Stack>
     </Box>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const user = await getUser(req.cookies['session']);
+
+  if (user !== undefined) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  } else {
+    return {
+      props: {},
+    };
+  }
 }
