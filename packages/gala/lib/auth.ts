@@ -1,7 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
-import { merge } from 'lodash';
+import { merge, remove } from 'lodash';
 import { getRole, getUser } from '@gala/auth';
+import { cookies } from 'next/dist/client/components/headers';
 
 export type UserInfo = {
   foo: string
@@ -26,6 +27,7 @@ export const withAuth: (option: { checkMembership?: boolean, callback?: GetServe
     const user = await getUser(context.req.cookies['session']);
 
     if (user === undefined) {
+      context.res.setHeader('Set-Cookie', [ "session=deleted; Max-Age=0"]);
       return redirectToLogin;
     }
 

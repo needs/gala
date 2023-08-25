@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   CssBaseline,
   Stack,
   TextField,
@@ -11,47 +12,57 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
   getIdToken,
-  onAuthStateChanged,
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
 import Router from 'next/router';
 import { GetServerSideProps } from 'next';
 import { getUser } from '@gala/auth';
 
-function Success() {
-  const [disabled, setDisabled] = useState(true);
+function Login({
+  onLogin,
+}: {
+  onLogin: (sessionCookie: string, expiresIn: number) => void;
+}) {
+  const { mutateAsync: login, isLoading, error, isSuccess } = trpc.login.useMutation();
+
+  const authenticate = useCallback(() => {
+    if (auth.currentUser !== null) {
+      // Force refresh token so that email_verified is updated
+      getIdToken(auth.currentUser, true).then((idToken) => {
+        login({ idToken }).then(({ sessionCookie, expiresIn }) => {
+          onLogin(sessionCookie, expiresIn);
+        });
+      });
+    }
+  }, [login, onLogin]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDisabled(false);
-    }, 2000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
+    authenticate();
+  }, [authenticate]);
 
   return (
     <>
-      <Alert severity="success">
-        {
-          "Redirection vers l'application en cours. Si la redirection ne fonctionne pas, veuillez cliquer sur le bouton ci-dessous."
-        }
-      </Alert>
-      <Button href="/" disabled={disabled}>
-        Redirection
-      </Button>
+      {(isLoading || isSuccess) && <Alert severity="success">{'Authentification...'}</Alert>}
+      {error && (
+        <>
+          <Alert severity="warning">{"Échec de l'authentification"}</Alert>
+          <Button onClick={authenticate}>Réessayer</Button>
+        </>
+      )}
     </>
   );
 }
 
-function VerifyEmail() {
+function Verify({ onEmailVerified }: { onEmailVerified: () => void }) {
   const [disabled, setDisabled] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -63,18 +74,46 @@ function VerifyEmail() {
     };
   }, []);
 
+  useEffect(() => {
+    // Firebase doesn't update emailVerified in real time, so we need to poll.
+    const interval = setInterval(() => {
+      if (auth.currentUser !== null) {
+        auth.currentUser.reload().then(() => {
+          if (auth.currentUser !== null && auth.currentUser.emailVerified) {
+            onEmailVerified();
+          }
+        });
+      }
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [onEmailVerified]);
+
   return (
     <>
-      <Alert severity="info">
-        {
-          "Un email de confirmation vous a été envoyé. Veuillez cliquer sur le lien dans l'email pour continuer."
-        }
-      </Alert>
+      {errorMessage !== undefined && (
+        <Alert severity="error">{errorMessage}</Alert>
+      )}
+
+      {errorMessage === undefined && (
+        <Alert severity="info">
+          {
+            "Un email de confirmation vous a été envoyé. Veuillez cliquer sur le lien dans l'email pour continuer."
+          }
+        </Alert>
+      )}
 
       <Button
         onClick={() => {
           if (auth.currentUser !== null) {
-            sendEmailVerification(auth.currentUser);
+            sendEmailVerification(auth.currentUser).catch((error) => {
+              console.error(error);
+              setErrorMessage(
+                "Erreur lors de l'envoi de l'email de vérification. Veuillez réessayer."
+              );
+            });
           }
         }}
         disabled={disabled}
@@ -85,24 +124,16 @@ function VerifyEmail() {
   );
 }
 
-function Login() {
+function Form({
+  onUserCredential: onUserCredential,
+}: {
+  onUserCredential: (userCredential: UserCredential) => void;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
-
-  const validateUser = (userCredential: UserCredential) => {
-    const user = userCredential.user;
-    if (!user.emailVerified) {
-      sendEmailVerification(user).catch((error) => {
-        console.error(error);
-        setErrorMessage("Erreur lors de l'envoi de l'email de vérification. Veuillez réessayer.");
-      });
-    } else {
-      Router.push('/')
-    }
-  };
 
   return (
     <form
@@ -112,11 +143,11 @@ function Login() {
         setErrorMessage(undefined);
         signInWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
-            validateUser(userCredential);
+            onUserCredential(userCredential);
           })
           .catch((error) => {
             console.error(error);
-            setErrorMessage("Email ou mot de passe incorrect.");
+            setErrorMessage('Email ou mot de passe incorrect.');
           });
       }}
     >
@@ -151,10 +182,13 @@ function Login() {
               setErrorMessage(undefined);
               createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                  validateUser(userCredential);
+                  onUserCredential(userCredential);
                 })
                 .catch((error) => {
-                  setErrorMessage(error.message);
+                  console.error(error);
+                  setErrorMessage(
+                    'Échec de la création du compte. Veuillez réessayer.'
+                  );
                 });
             }}
           >
@@ -170,48 +204,32 @@ function Login() {
 }
 
 export default function Index() {
-  const [step, setStep] = useState<'login' | 'verify' | 'success'>('login');
-  const [cookies, setCookies, removeCookies] = useCookies(['session']);
-  const { mutateAsync: login } = trpc.login.useMutation();
+  const [step, setStep] = useState<'form' | 'verify' | 'login' | 'loading'>(
+    'loading'
+  );
 
+  const [cookies, setCookies, removeCookies] = useCookies(['session']);
   const sessionCookie = cookies.session;
 
   useEffect(() => {
     if (sessionCookie !== undefined) {
-      setStep('success');
       Router.push('/');
-    } else {
-      return onAuthStateChanged(auth, async (user) => {
-        if (user === null) {
-          setStep('login');
-          removeCookies('session');
-        } else if (!user.emailVerified) {
-          setStep('verify');
-        } else {
-          const idToken = await getIdToken(user);
-          const { sessionCookie, expiresIn } = await login({ idToken });
-
-          setCookies('session', sessionCookie, {
-            maxAge: expiresIn,
-          });
-        }
-      });
     }
-  }, [login, sessionCookie, setCookies, removeCookies]);
+  }, [sessionCookie]);
 
   useEffect(() => {
-    if (step === 'verify') {
-      const interval = setInterval(() => {
-        if (auth.currentUser !== null) {
-          auth.currentUser.reload();
-        }
-      }, 1000);
+    removeCookies('session');
 
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [step]);
+    auth.authStateReady().then(() => {
+      if (auth.currentUser === null) {
+        setStep('form');
+      } else if (!auth.currentUser.emailVerified) {
+        setStep('verify');
+      } else {
+        setStep('login');
+      }
+    });
+  }, [removeCookies]);
 
   return (
     <Box
@@ -237,9 +255,35 @@ export default function Index() {
         sx={{ backgroundColor: 'white' }}
         borderRadius="10px"
       >
-        {step === 'login' && <Login />}
-        {step === 'verify' && <VerifyEmail />}
-        {step === 'success' && <Success />}
+        {step === 'loading' && <CircularProgress />}
+        {step === 'form' && (
+          <Form
+            onUserCredential={(userCredential) => {
+              if (userCredential.user.emailVerified) {
+                setStep('login');
+              } else {
+                sendEmailVerification(userCredential.user);
+                setStep('verify');
+              }
+            }}
+          />
+        )}
+        {step === 'verify' && (
+          <Verify
+            onEmailVerified={() => {
+              setStep('login');
+            }}
+          />
+        )}
+        {step === 'login' && (
+          <Login
+            onLogin={(sessionCookie, expiresIn) => {
+              setCookies('session', sessionCookie, {
+                maxAge: expiresIn,
+              });
+            }}
+          />
+        )}
       </Stack>
     </Box>
   );
