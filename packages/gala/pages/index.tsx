@@ -92,7 +92,7 @@ export default function ListPage() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary="GALA de l'Arbresle"
+                      primary={gala.name ? gala.name : 'GALA sans nom'}
                       secondary={`${gala.teamCount} équipes`}
                     />
                   </ListItemButton>

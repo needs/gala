@@ -20,6 +20,7 @@ import {
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import Head from 'next/head';
@@ -156,7 +157,8 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
   });
 
   const { mutateAsync: removeMember } = trpc.members.remove.useMutation();
-  const { mutateAsync: updateMemberRole } = trpc.members.updateRole.useMutation();
+  const { mutateAsync: updateMemberRole } =
+    trpc.members.updateRole.useMutation();
   const [inviteMemberDialogOpen, setInviteMemberDialogOpen] = useState(false);
 
   return (
@@ -239,25 +241,33 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                     })}`}
                   />
                   <Stack direction="row" gap={2} alignItems="center">
-                    <RoleSelector value={member.role} onChange={(role) => {
-                      updateMemberRole({
-                        uuid: galaUuid,
-                        email: member.email,
-                        role,
-                      }).then(() => {
-                        refetchMembers();
-                      });
-                    }} />
-                    <IconButton edge="end" onClick={() => {
-                      removeMember({
-                        uuid: galaUuid,
-                        email: member.email,
-                      }).then(() => {
-                        refetchMembers();
-                      });
-                    }}>
-                      <Delete />
-                    </IconButton>
+                    <RoleSelector
+                      value={member.role}
+                      onChange={(role) => {
+                        updateMemberRole({
+                          uuid: galaUuid,
+                          email: member.email,
+                          role,
+                        }).then(() => {
+                          refetchMembers();
+                        });
+                      }}
+                    />
+                    <Tooltip title="Double cliquez pour supprimer">
+                      <IconButton
+                        edge="end"
+                        onDoubleClick={() => {
+                          removeMember({
+                            uuid: galaUuid,
+                            email: member.email,
+                          }).then(() => {
+                            refetchMembers();
+                          });
+                        }}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
                   </Stack>
                 </ListItem>
               );

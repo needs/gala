@@ -34,7 +34,7 @@ const server = new Hocuspocus({
       },
       store: async ({ documentName, state, document }) => {
         const teamCount = document.getMap("teams").size;
-        const name = document.getMap("info").get("name") ?? "";
+        const name = document.getMap("info").get("galaName") ?? "";
 
         await prisma.gala.update({
           where: {

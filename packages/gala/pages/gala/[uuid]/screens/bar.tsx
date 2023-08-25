@@ -1,13 +1,10 @@
 import Image from 'next/image';
-import { useSyncedStore } from '@syncedstore/react';
-import { barDefault, store } from '../../../../lib/store';
+import { barDefault } from '../../../../lib/store';
 import { PageProps } from '../../../_app';
 import { GetServerSideProps } from 'next';
 
 export default function Bar() {
   const bar = barDefault;
-  const { extra } = useSyncedStore(store);
-  const antoinette = extra?.antoinette || false;
 
   const toEuro = (value: number) =>
     new Intl.NumberFormat('de-DE', {
@@ -47,9 +44,6 @@ export default function Bar() {
       </div>
       <div className="absolute bottom-2 right-[370px]">
         <Image src="/arrow.png" alt="arrow" width={350} height={350} />
-      </div>
-      <div className="absolute bottom-0 right-[740px] transition-all duration-1000" style={{ bottom: antoinette ? "0px" : "-100%"}}>
-        <Image src="/antoinette.png" alt="QR code" width={350} height={350} />
       </div>
     </div>
   );

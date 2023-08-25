@@ -83,11 +83,12 @@ export const appRouter = router({
 
   list: authedProcedure
     .input(z.null())
-    .output(z.array(z.object({ uuid: z.string().uuid(), teamCount: z.number() })))
+    .output(z.array(z.object({ uuid: z.string().uuid(), name: z.string(), teamCount: z.number() })))
     .query(async (opts) => {
       const galas = await prisma.gala.findMany({
         select: {
           uuid: true,
+          name: true,
           teamCount: true,
         },
         where: {

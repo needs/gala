@@ -11,6 +11,7 @@ import {
   OutlinedInput,
   Paper,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
@@ -190,8 +191,35 @@ export default function TeamsPage() {
       })
       .map(([teamKey, team]) => ({ teamKey, team }));
 
-    const ret = groupBy(filteredTeams, ({ team }) => team?.categoryKey);
-    return ret;
+    const teamsByCategory = groupBy(
+      filteredTeams,
+      ({ team }) => team?.categoryKey
+    );
+
+    // Add missing categories
+    if (searchQuery === '') {
+      switch (categoryFilter.type) {
+        case 'all':
+          for (const categoryKey of Object.keys(categories)) {
+            if (!(categoryKey in teamsByCategory)) {
+              teamsByCategory[categoryKey] = [];
+            }
+          }
+          break;
+        case 'none':
+          if (!('undefined' in teamsByCategory)) {
+            teamsByCategory['undefined'] = [];
+          }
+          break;
+        case 'category':
+          if (!(categoryFilter.categoryKey in teamsByCategory)) {
+            teamsByCategory[categoryFilter.categoryKey] = [];
+          }
+          break;
+      }
+    }
+
+    return teamsByCategory;
   })();
 
   const deleteCategory = (categoryKey: string) => {
@@ -246,7 +274,7 @@ export default function TeamsPage() {
           </Stack>
         </Stack>
 
-        {Object.entries(teamsByCategory).map(([categoryKey, teams]) => {
+        {Object.entries(teamsByCategory).map(([categoryKey, categoryTeams]) => {
           const category = categories[categoryKey];
 
           const icon =
@@ -280,23 +308,46 @@ export default function TeamsPage() {
                     {icon}
                     <Stack direction="column">
                       <Typography variant="body1">{name}</Typography>
-                      <Typography variant="caption">{`${teams.length} équipe(s)`}</Typography>
+                      <Typography variant="caption">
+                        {categoryTeams.length}
+                        {searchQuery !== '' &&
+                          ` / ${
+                            Object.values(teams).filter(
+                              (team) => team?.categoryKey === categoryKey
+                            ).length
+                          }`}
+                        {' équipe(s)'}
+                      </Typography>
                     </Stack>
                   </Stack>
                   <Stack direction="row" gap={1}>
                     {category !== undefined && (
                       <EditCategoryButton category={category} />
                     )}
-                    <IconButton
-                      onDoubleClick={() => deleteCategory(categoryKey)}
-                      sx={{ color: 'lightcoral' }}
-                      disabled={category === undefined || teams.length > 0}
-                    >
-                      <Delete />
-                    </IconButton>
+                    {category !== undefined && (
+                      <Tooltip
+                        title={
+                          categoryTeams.length === 0
+                            ? 'Doubler cliquez pour supprimer'
+                            : 'Enlevez toutes les équipes avant de pouvoir supprimer cette catégorie'
+                        }
+                      >
+                        <span>
+                          <IconButton
+                            onDoubleClick={() => deleteCategory(categoryKey)}
+                            sx={{ color: 'lightcoral' }}
+                            disabled={
+                              category === undefined || categoryTeams.length > 0
+                            }
+                          >
+                            <Delete />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    )}
                   </Stack>
                 </Stack>
-                {teams.map(
+                {categoryTeams.map(
                   ({ teamKey, team }) =>
                     team !== undefined && (
                       <Stack
@@ -337,12 +388,14 @@ export default function TeamsPage() {
                         <Stack direction="column" gap={2}>
                           <Stack direction="row" gap={1}>
                             <EditTeamButton team={team} />
-                            <IconButton
-                              onDoubleClick={() => deleteTeam(teamKey)}
-                              sx={{ color: 'lightcoral' }}
-                            >
-                              <Delete />
-                            </IconButton>
+                            <Tooltip title="Double cliquez pour supprimer">
+                              <IconButton
+                                onDoubleClick={() => deleteTeam(teamKey)}
+                                sx={{ color: 'lightcoral' }}
+                              >
+                                <Delete />
+                              </IconButton>
+                            </Tooltip>
                           </Stack>
                         </Stack>
                       </Stack>
