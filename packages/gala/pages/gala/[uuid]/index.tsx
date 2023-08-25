@@ -38,7 +38,7 @@ function extractNameFromEmail(email: string) {
   return email
     .split('@')[0]
     .replace(/[0-9]/g, '')
-    .split(/[.-_]+/)
+    .split(/[._]+/)
     .map(capitalizeFirstLetter)
     .join(' ');
 }
@@ -212,6 +212,8 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                 ? member.name
                 : extractNameFromEmail(member.email);
 
+              const joinedAt = new Date(member.joinedAt);
+
               return (
                 <ListItem key={member.email}>
                   <ListItemAvatar>
@@ -225,9 +227,14 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                   </ListItemAvatar>
                   <ListItemText
                     primary={name}
-                    secondary={`${member.email} - Ajouté le ${new Date(
-                      member.joinedAt
-                    ).toLocaleDateString('fr-FR')}`}
+                    secondary={`${
+                      member.email
+                    } - Ajouté le ${joinedAt.toLocaleDateString(
+                      'fr-FR'
+                    )} à ${joinedAt.toLocaleTimeString('fr-FR', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}`}
                   />
                   <Stack direction="row" gap={2} alignItems="center">
                     <RoleSelector value={member.role} onChange={() => ({})} />
