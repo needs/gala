@@ -84,8 +84,13 @@ export default function Categories() {
       <Head>
         <title>Catégories</title>
       </Head>
-      <Stack padding={2} gap={2}>
-        <Typography variant="h1">Catégories</Typography>
+      <Stack padding={4} gap={4}>
+        <Stack direction="row" gap={2} justifyContent="space-between">
+          <Typography variant="h6" component="h1">
+            Catégories
+          </Typography>
+          <AddCategoryButton />
+        </Stack>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableBody>
@@ -129,10 +134,9 @@ export default function Categories() {
             </TableBody>
           </Table>
         </TableContainer>
-        <AddCategoryButton />
       </Stack>
     </>
   );
 }
 
-export const getServerSideProps = withAuthGala("categories");
+export const getServerSideProps = withAuthGala('categories');

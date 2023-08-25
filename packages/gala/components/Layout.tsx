@@ -138,9 +138,7 @@ export default function Layout({
           {Object.entries(menu).map(([key, { label, icon, href }]) => (
             <ListItem key={label} disablePadding>
               <Link href={href} legacyBehavior>
-                <ListItemButton
-                  selected={key === layoutInfo.selected}
-                >
+                <ListItemButton selected={key === layoutInfo.selected}>
                   <ListItemIcon>{icon}</ListItemIcon>
                   <ListItemText primary={label} />
                 </ListItemButton>
@@ -163,7 +161,13 @@ export default function Layout({
       <CssBaseline />
       <AppBar
         position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundImage: 'url("/background.svg")',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
         <Toolbar>
           <IconButton
@@ -176,7 +180,7 @@ export default function Layout({
             <Menu />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {!info.galaName ? "GALA sans nom" : info.galaName}
+            {!info.galaName ? 'GALA sans nom' : info.galaName}
           </Typography>
         </Toolbar>
       </AppBar>
