@@ -142,6 +142,52 @@ export const appRouter = router({
         });
       }
       ),
+
+    add: authedProcedure
+      .input(z.object({ uuid: z.string().uuid(), email: z.string(), role: z.enum(["OWNER", "EDITOR", "READER"]) }))
+      .output(z.null())
+      .use(async (opts) => {
+        const { uuid } = opts.input;
+
+        const member = await prisma.galaUser.findUnique({
+          where: {
+            user_id_gala_uuid: {
+              user_id: opts.ctx.user.id,
+              gala_uuid: uuid,
+            }
+          },
+        });
+
+        if (member === null || member.role !== 'OWNER') {
+          throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+        }
+
+        return opts.next(opts);
+      })
+      .mutation(async (opts) => {
+        const { uuid, email, role } = opts.input;
+
+        const user = await prisma.user.upsert({
+          where: {
+            email: email
+          },
+          update: {},
+          create: {
+            email: email,
+          }
+        });
+
+        await prisma.galaUser.create({
+          data: {
+            user_id: user.id,
+            gala_uuid: uuid,
+            role: role,
+          }
+        });
+
+        return null;
+      }
+      ),
   })
 });
 
