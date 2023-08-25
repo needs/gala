@@ -46,11 +46,6 @@ export const menuAdmin = (uuid: string): Menu => ({
     label: 'Inscriptions',
     icon: <Group />,
   },
-  judges: {
-    href: `/gala/${uuid}/judges`,
-    label: 'Juges',
-    icon: <Gavel />,
-  },
   progress: {
     href: `/gala/${uuid}/progress`,
     label: 'Déroulement',

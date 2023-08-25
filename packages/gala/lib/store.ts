@@ -18,7 +18,6 @@ export type Store = {
   players: Record<string, Player>,
   teams: Record<string, Team>,
   categories: Record<string, Category>,
-  judges: Record<string, Judge>,
   progresses: Record<string, Progress>,
   extra: Extra,
   bar: Record<string, BarItem>,
@@ -48,7 +47,7 @@ export const barDefault = {
   }
 }
 
-export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, judges: {}, extra: {} as Extra, bar: {}, info: {} as Info});
+export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, extra: {} as Extra, bar: {}, info: {} as Info});
 
 export function initStore(uuid: string, token: string, onLoad: () => void, onUnload: () => void) {
   const doc = getYjsDoc(store);
