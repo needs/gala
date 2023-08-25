@@ -12,6 +12,7 @@ export type Progress = Partial<Record<ApparatusKey, string>>;
 export type Judge = { firstName: string, lastName: string };
 export type Extra = { antoinette: boolean };
 export type BarItem = Record<string, number[]>;
+export type Info = { galaName: string };
 
 export type Store = {
   players: Record<string, Player>,
@@ -21,6 +22,7 @@ export type Store = {
   progresses: Record<string, Progress>,
   extra: Extra,
   bar: Record<string, BarItem>,
+  info: Info,
 }
 
 export const barDefault = {
@@ -46,7 +48,7 @@ export const barDefault = {
   }
 }
 
-export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, judges: {}, extra: {} as Extra, bar: {} });
+export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, judges: {}, extra: {} as Extra, bar: {}, info: {} as Info});
 
 export function initStore(uuid: string, token: string, onLoad: () => void, onUnload: () => void) {
   const doc = getYjsDoc(store);

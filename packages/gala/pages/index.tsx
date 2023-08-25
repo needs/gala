@@ -64,7 +64,7 @@ export default function ListPage() {
             startIcon={<Add />}
             onClick={() => {
               create.mutateAsync(null).then((gala) => {
-                router.push(`/gala/${gala.uuid}/teams`);
+                router.push(`/gala/${gala.uuid}`);
               });
             }}
           >
@@ -83,22 +83,20 @@ export default function ListPage() {
           {galas !== undefined &&
             galas.length > 0 &&
             galas.map((gala) => (
-              <Link key={gala.uuid} href={`/gala/${gala.uuid}/teams`} legacyBehavior>
-              <ListItem disablePadding>
-                <ListItemButton
-
-                >
-                  <ListItemAvatar>
-                    <Avatar>
-                      <EmojiEvents />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="GALA de l'Arbresle"
-                    secondary={`${gala.teamCount} équipes`}
-                  />
-                </ListItemButton>
-              </ListItem>
+              <Link key={gala.uuid} href={`/gala/${gala.uuid}`} legacyBehavior>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <EmojiEvents />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary="GALA de l'Arbresle"
+                      secondary={`${gala.teamCount} équipes`}
+                    />
+                  </ListItemButton>
+                </ListItem>
               </Link>
             ))}
         </List>

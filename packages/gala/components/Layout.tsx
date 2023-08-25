@@ -12,6 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {
   Category,
+  EmojiEvents,
   FoodBank,
   Gavel,
   Group,
@@ -21,6 +22,8 @@ import {
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import Link from 'next/link';
+import { useSyncedStore } from '@syncedstore/react';
+import { store } from '../lib/store';
 
 const drawerWidth = 240;
 
@@ -33,6 +36,11 @@ type MenuItem = {
 type Menu = Record<string, MenuItem>;
 
 export const menuAdmin = (uuid: string): Menu => ({
+  info: {
+    href: `/gala/${uuid}`,
+    label: 'Général',
+    icon: <EmojiEvents />,
+  },
   teams: {
     href: `/gala/${uuid}/teams`,
     label: 'Équipes',
@@ -114,6 +122,7 @@ export default function Layout({
   layoutInfo?: LayoutInfo;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { info } = useSyncedStore(store);
 
   if (layoutInfo === undefined) {
     return <>{children}</>;
@@ -167,7 +176,7 @@ export default function Layout({
             <Menu />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            GALA de l&apos;Arbresle
+            {!info.galaName ? "GALA sans nom" : info.galaName}
           </Typography>
         </Toolbar>
       </AppBar>

@@ -76,6 +76,7 @@ export const appRouter = router({
       const gala = await prisma.gala.create({
         data: {
           data: Buffer.from(data),
+          name: "",
           teamCount: 0,
 
           users: {
@@ -91,6 +92,57 @@ export const appRouter = router({
         uuid: gala.uuid,
       };
     }),
+
+  members: router({
+    list: authedProcedure
+      .input(z.object({ uuid: z.string().uuid() }))
+      .output(z.array(z.object({ email: z.string(), name: z.string().optional(), role: z.enum(["OWNER", "EDITOR", "READER"]), joinedAt: z.date() })))
+      .use(async (opts) => {
+        const { uuid } = opts.input;
+
+        const member = await prisma.galaUser.findUnique({
+          where: {
+            user_id_gala_uuid: {
+              user_id: opts.ctx.user.id,
+              gala_uuid: uuid,
+            }
+          },
+        });
+
+        if (member === null) {
+          throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+        }
+
+        return opts.next(opts);
+      })
+      .query(async (opts) => {
+        const members = await prisma.galaUser.findMany({
+          select: {
+            user: {
+              select: {
+                email: true,
+                name: true,
+              }
+            },
+            role: true,
+            created_at: true,
+          },
+          where: {
+            gala_uuid: opts.input.uuid
+          }
+        });
+
+        return members.map((member) => {
+          return {
+            email: member.user.email,
+            role: member.role,
+            joinedAt: member.created_at,
+            name: member.user.name ?? undefined,
+          }
+        });
+      }
+      ),
+  })
 });
 
 export type AppRouter = typeof appRouter;
