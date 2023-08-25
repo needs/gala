@@ -155,6 +155,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
     uuid: galaUuid,
   });
 
+  const { mutateAsync: removeMember } = trpc.members.remove.useMutation();
   const [inviteMemberDialogOpen, setInviteMemberDialogOpen] = useState(false);
 
   return (
@@ -238,7 +239,14 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                   />
                   <Stack direction="row" gap={2} alignItems="center">
                     <RoleSelector value={member.role} onChange={() => ({})} />
-                    <IconButton edge="end">
+                    <IconButton edge="end" onClick={() => {
+                      removeMember({
+                        uuid: galaUuid,
+                        email: member.email,
+                      }).then(() => {
+                        refetchMembers();
+                      });
+                    }}>
                       <Delete />
                     </IconButton>
                   </Stack>

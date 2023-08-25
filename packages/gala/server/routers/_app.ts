@@ -6,7 +6,7 @@ import { prisma } from '../../lib/prisma';
 import { auth } from 'firebase-admin';
 import { isIdTokenValid } from '@gala/auth';
 
-const isAuthed = middleware((opts) => {
+const isAuthedMiddleware = middleware((opts) => {
   const { ctx } = opts;
 
   if (ctx.user === undefined) {
@@ -20,7 +20,42 @@ const isAuthed = middleware((opts) => {
   });
 });
 
-const authedProcedure = procedure.use(isAuthed);
+const authedProcedure = procedure.use(isAuthedMiddleware);
+
+const isMemberMiddleware = isAuthedMiddleware.unstable_pipe(async (opts) => {
+  const { ctx: { user }, input } = opts;
+
+  const { uuid } = z.object({ uuid: z.string().uuid() }).parse(input);
+
+  const member = await prisma.galaUser.findUnique({
+    where: {
+      user_id_gala_uuid: {
+        user_id: user.id,
+        gala_uuid: uuid,
+      }
+    },
+  });
+
+  if (member === null) {
+    throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+  }
+
+  return opts.next({
+    ctx: {
+      member,
+    },
+  });
+});
+
+const isOwnerMiddleware = isMemberMiddleware.unstable_pipe(async (opts) => {
+  const { ctx: { member } } = opts;
+
+  if (member.role !== 'OWNER') {
+    throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
+  }
+
+  return opts.next(opts);
+});
 
 export const appRouter = router({
   login: procedure
@@ -94,27 +129,10 @@ export const appRouter = router({
     }),
 
   members: router({
-    list: authedProcedure
+    list: procedure
       .input(z.object({ uuid: z.string().uuid() }))
       .output(z.array(z.object({ email: z.string(), name: z.string().optional(), role: z.enum(["OWNER", "EDITOR", "READER"]), joinedAt: z.date() })))
-      .use(async (opts) => {
-        const { uuid } = opts.input;
-
-        const member = await prisma.galaUser.findUnique({
-          where: {
-            user_id_gala_uuid: {
-              user_id: opts.ctx.user.id,
-              gala_uuid: uuid,
-            }
-          },
-        });
-
-        if (member === null) {
-          throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-        }
-
-        return opts.next(opts);
-      })
+      .use(isMemberMiddleware)
       .query(async (opts) => {
         const members = await prisma.galaUser.findMany({
           select: {
@@ -143,27 +161,10 @@ export const appRouter = router({
       }
       ),
 
-    add: authedProcedure
+    add: procedure
       .input(z.object({ uuid: z.string().uuid(), email: z.string(), role: z.enum(["OWNER", "EDITOR", "READER"]) }))
       .output(z.null())
-      .use(async (opts) => {
-        const { uuid } = opts.input;
-
-        const member = await prisma.galaUser.findUnique({
-          where: {
-            user_id_gala_uuid: {
-              user_id: opts.ctx.user.id,
-              gala_uuid: uuid,
-            }
-          },
-        });
-
-        if (member === null || member.role !== 'OWNER') {
-          throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-        }
-
-        return opts.next(opts);
-      })
+      .use(isOwnerMiddleware)
       .mutation(async (opts) => {
         const { uuid, email, role } = opts.input;
 
@@ -186,8 +187,35 @@ export const appRouter = router({
         });
 
         return null;
-      }
-      ),
+      }),
+
+    remove: procedure
+      .input(z.object({ uuid: z.string().uuid(), email: z.string() }))
+      .output(z.null())
+      .use(isOwnerMiddleware)
+      .mutation(async (opts) => {
+        const { uuid, email } = opts.input;
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: email
+          },
+          select: {
+            id: true
+          }
+        });
+
+        if (user !== null) {
+          await prisma.galaUser.deleteMany({
+            where: {
+              gala_uuid: uuid,
+              user_id: user.id,
+            }
+          });
+        }
+
+        return null;
+      }),
   })
 });
 
