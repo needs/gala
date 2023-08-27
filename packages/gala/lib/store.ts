@@ -28,7 +28,7 @@ export const barDefault: Record<string, BarCategory> = {
     name: "Boissons", order: 0, items: {
       "98e2cf28-6e18-4552-a688-aa79a46417bc": { name: "Bière", price: 2.5, order: 0 },
       "e087ec2a-66bd-4ff8-8047-27a54c8fa5c5": { name: 'Jus de pommes', price: 1.5, order: 1 },
-      "c34ba6de-164a-444f-aacf-c69dde2c2966": { name: 'Soda, (Fanta,Coca,Ice Tea,Oasis)', price: 1.5, order: 2 },
+      "c34ba6de-164a-444f-aacf-c69dde2c2966": { name: 'Soda (Fanta,Coca,Ice Tea,Oasis)', price: 1.5, order: 2 },
       "87bfc404-1cb3-438b-8c64-cff4c38277b1": { name: "Eau", price: 0.5, order: 3 },
       "e1b2f257-412b-4d72-84c1-f15b4b74de88": { name: 'Café, Thé', price: 1.0, order: 4 },
     }

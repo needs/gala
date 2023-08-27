@@ -16,6 +16,7 @@ import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { isEmpty, sortBy } from 'lodash';
+import SelectIconDialog from '../../../components/SelectIconDialog';
 
 function CurrencyField({
   value,
@@ -93,201 +94,214 @@ export default function BarPage() {
     }
   };
 
+  const [openSelectIconDialog, setOpenSelectIconDialog] = useState(false);
+
   return (
-    <Stack direction="column" padding={4} gap={4}>
-      <Stack
-        direction="row"
-        gap={2}
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        <Typography variant="h6" component="h1">
-          Buvette
-        </Typography>
-        <Stack direction="row" gap={2}>
-          {isEmpty(bar) && (
+    <>
+      <SelectIconDialog
+        open={openSelectIconDialog}
+        onClose={() => setOpenSelectIconDialog(false)}
+        icon="DiningOutlined"
+      />
+      <Stack direction="column" padding={4} gap={4}>
+        <Stack
+          direction="row"
+          gap={2}
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Typography variant="h6" component="h1">
+            Buvette
+          </Typography>
+          <Stack direction="row" gap={2}>
+            {isEmpty(bar) && (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  Object.assign(bar, barDefault);
+                }}
+              >
+                {"Buvette d'exemple"}
+              </Button>
+            )}
             <Button
-              variant="outlined"
+              variant="contained"
+              startIcon={<Add />}
               onClick={() => {
-                Object.assign(bar, barDefault);
+                bar[uuidv4()] = {
+                  name: '',
+                  items: {},
+                  order: Object.keys(bar).length,
+                };
               }}
             >
-              {"Buvette d'exemple"}
+              Catégorie
             </Button>
-          )}
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => {
-              bar[uuidv4()] = {
-                name: '',
-                items: {},
-                order: Object.keys(bar).length,
-              };
-            }}
-          >
-            Catégorie
-          </Button>
+          </Stack>
         </Stack>
-      </Stack>
-      {bar !== undefined &&
-        sortBy(
-          Object.entries(bar),
-          ([categoryKey, category]) => category?.order
-        ).map(
-          ([categoryKey, category], index) =>
-            category !== undefined && (
-              <Paper
-                key={categoryKey}
-                sx={{ overflow: 'hidden' }}
-                elevation={1}
-              >
-                <Stack direction="column" divider={<Divider />}>
-                  <Stack
-                    direction="row"
-                    gap={2}
-                    justifyContent="space-between"
-                    alignItems="center"
-                    padding={2}
-                    sx={{
-                      backgroundColor: '#f5f5f5',
-                    }}
-                  >
-                    <TextField
-                      variant="standard"
-                      value={category.name}
-                      onChange={(event) => {
-                        category.name = event.target.value;
+        {bar !== undefined &&
+          sortBy(
+            Object.entries(bar),
+            ([categoryKey, category]) => category?.order
+          ).map(
+            ([categoryKey, category], index) =>
+              category !== undefined && (
+                <Paper
+                  key={categoryKey}
+                  sx={{ overflow: 'hidden' }}
+                  elevation={1}
+                >
+                  <Stack direction="column" divider={<Divider />}>
+                    <Stack
+                      direction="row"
+                      gap={2}
+                      justifyContent="space-between"
+                      alignItems="center"
+                      padding={2}
+                      sx={{
+                        backgroundColor: '#f5f5f5',
                       }}
-                      label="Catégorie"
-                      sx={{ width: 500 }}
-                    />
-                    <Stack direction="row" gap={1} alignItems="center">
-                      <Button
-                        variant="outlined"
-                        startIcon={<Add />}
-                        onClick={() => {
-                          category.items[uuidv4()] = {
-                            name: '',
-                            price: 1.0,
-                            order: Object.keys(category.items).length,
-                          };
+                    >
+                      <Button onClick={() => setOpenSelectIconDialog(true)}>Icon</Button>
+                      <TextField
+                        variant="standard"
+                        value={category.name}
+                        onChange={(event) => {
+                          category.name = event.target.value;
                         }}
-                      >
-                        Article
-                      </Button>
-
-                      <IconButton
-                        onClick={() => {
-                          swapCategories(index, index + 1);
-                        }}
-                        disabled={index === Object.keys(bar).length - 1}
-                      >
-                        <ArrowDownward />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => {
-                          swapCategories(index, index - 1);
-                        }}
-                        disabled={index === 0}
-                      >
-                        <ArrowUpward />
-                      </IconButton>
-
-                      <Tooltip title="Doubler cliquez pour supprimer">
-                        <span>
-                          <IconButton
-                            onDoubleClick={() => {
-                              delete bar[categoryKey];
-                            }}
-                            sx={{ color: 'lightcoral' }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </Stack>
-                  </Stack>
-
-                  <Stack direction="column">
-                    {category.items !== undefined &&
-                      sortBy(
-                        Object.entries(category.items),
-                        ([itemKey, item]) => item?.order
-                      ).map(([itemKey, item], index) => (
-                        <Stack
-                          key={itemKey}
-                          direction="row"
-                          gap={2}
-                          padding={2}
-                          divider={<Divider orientation="vertical" flexItem />}
-                          sx={{
-                            '&:nth-of-type(odd)': {
-                              backgroundColor: (theme) =>
-                                theme.palette.grey[50],
-                            },
+                        label="Catégorie"
+                        sx={{ width: 500 }}
+                      />
+                      <Stack direction="row" gap={1} alignItems="center">
+                        <Button
+                          variant="outlined"
+                          startIcon={<Add />}
+                          onClick={() => {
+                            category.items[uuidv4()] = {
+                              name: '',
+                              price: 1.0,
+                              order: Object.keys(category.items).length,
+                            };
                           }}
                         >
-                          <Stack direction="row" gap={1}>
+                          Article
+                        </Button>
+
+                        <IconButton
+                          onClick={() => {
+                            swapCategories(index, index + 1);
+                          }}
+                          disabled={index === Object.keys(bar).length - 1}
+                        >
+                          <ArrowDownward />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => {
+                            swapCategories(index, index - 1);
+                          }}
+                          disabled={index === 0}
+                        >
+                          <ArrowUpward />
+                        </IconButton>
+
+                        <Tooltip title="Doubler cliquez pour supprimer">
+                          <span>
                             <IconButton
-                              onClick={() => {
-                                swapItems(category, index, index + 1);
+                              onDoubleClick={() => {
+                                delete bar[categoryKey];
                               }}
-                              disabled={
-                                index === Object.keys(category.items).length - 1
-                              }
+                              sx={{ color: 'lightcoral' }}
                             >
-                              <ArrowDownward />
+                              <Delete />
                             </IconButton>
-                            <IconButton
-                              onClick={() => {
-                                swapItems(category, index, index - 1);
-                              }}
-                              disabled={index === 0}
-                            >
-                              <ArrowUpward />
-                            </IconButton>
-                          </Stack>
-                          <Stack direction="row" gap={2} flexGrow={1}>
-                            <TextField
-                              value={item.name}
-                              onChange={(event) => {
-                                item.name = event.target.value;
-                              }}
-                              label="Nom"
-                              sx={{ width: 360 }}
-                              size="small"
-                            />
-                            <Stack direction="row" gap={2} flexGrow={1}>
-                              <CurrencyField
-                                key={index}
-                                value={item.price}
-                                onChange={(value) => {
-                                  item.price = value;
-                                }}
-                              />
-                            </Stack>
-                          </Stack>
-                          <Tooltip title="Doubler cliquez pour supprimer">
-                            <span>
+                          </span>
+                        </Tooltip>
+                      </Stack>
+                    </Stack>
+
+                    <Stack direction="column">
+                      {category.items !== undefined &&
+                        sortBy(
+                          Object.entries(category.items),
+                          ([itemKey, item]) => item?.order
+                        ).map(([itemKey, item], index) => (
+                          <Stack
+                            key={itemKey}
+                            direction="row"
+                            gap={2}
+                            padding={2}
+                            divider={
+                              <Divider orientation="vertical" flexItem />
+                            }
+                            sx={{
+                              '&:nth-of-type(odd)': {
+                                backgroundColor: (theme) =>
+                                  theme.palette.grey[50],
+                              },
+                            }}
+                          >
+                            <Stack direction="row" gap={1}>
                               <IconButton
-                                onDoubleClick={() => {
-                                  delete category.items[itemKey];
+                                onClick={() => {
+                                  swapItems(category, index, index + 1);
                                 }}
-                                sx={{ color: 'lightcoral' }}
+                                disabled={
+                                  index ===
+                                  Object.keys(category.items).length - 1
+                                }
                               >
-                                <Delete />
+                                <ArrowDownward />
                               </IconButton>
-                            </span>
-                          </Tooltip>
-                        </Stack>
-                      ))}
+                              <IconButton
+                                onClick={() => {
+                                  swapItems(category, index, index - 1);
+                                }}
+                                disabled={index === 0}
+                              >
+                                <ArrowUpward />
+                              </IconButton>
+                            </Stack>
+                            <Stack direction="row" gap={2} flexGrow={1}>
+                              <TextField
+                                value={item.name}
+                                onChange={(event) => {
+                                  item.name = event.target.value;
+                                }}
+                                label="Nom"
+                                sx={{ width: 360 }}
+                                size="small"
+                              />
+                              <Stack direction="row" gap={2} flexGrow={1}>
+                                <CurrencyField
+                                  key={index}
+                                  value={item.price}
+                                  onChange={(value) => {
+                                    item.price = value;
+                                  }}
+                                />
+                              </Stack>
+                            </Stack>
+                            <Tooltip title="Doubler cliquez pour supprimer">
+                              <span>
+                                <IconButton
+                                  onDoubleClick={() => {
+                                    delete category.items[itemKey];
+                                  }}
+                                  sx={{ color: 'lightcoral' }}
+                                >
+                                  <Delete />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </Stack>
+                        ))}
+                    </Stack>
                   </Stack>
-                </Stack>
-              </Paper>
-            )
-        )}
-    </Stack>
+                </Paper>
+              )
+          )}
+      </Stack>
+    </>
   );
 }
 
