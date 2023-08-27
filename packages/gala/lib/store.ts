@@ -36,7 +36,7 @@ export const barDefault = {
     'Saucisse+Frites': [5.0],
     'Sandwich (Fromage Brie)': [3.0]
   },
-  "Grignotage": {
+  "Dessert": {
     "Pomme": [0.5],
     "Sucette": [0.5],
     'Barre Kinder Country': [1.0],

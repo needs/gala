@@ -51,6 +51,11 @@ export const menuAdmin = (uuid: string): Menu => ({
     label: 'Déroulement',
     icon: <ViewDay />,
   },
+  bar: {
+    href: `/gala/${uuid}/bar`,
+    label: 'Buvette',
+    icon: <FoodBank />,
+  },
   'screens-1': {
     href: `/gala/${uuid}/screens/1`,
     label: 'Screen 1',
@@ -63,7 +68,7 @@ export const menuAdmin = (uuid: string): Menu => ({
   },
   'screens-bar': {
     href: `/gala/${uuid}/screens/bar`,
-    label: 'Buvette',
+    label: 'Buvette (bis)',
     icon: <FoodBank />,
   },
 });
