@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { sortBy } from 'lodash';
 
@@ -24,8 +24,20 @@ function CurrencyField({
   value: number;
   onChange: (value: number) => void;
 }) {
-  const [innerValue, setInnerValue] = useState(value.toString());
+  const [innerValue, setInnerValue] = useState("");
   const [error, setError] = useState(false);
+
+  const toEuro = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      useGrouping: false,
+    }).format(value)
+  }
+
+  useEffect(() => {
+    setInnerValue(toEuro(value));
+  }, [value]);
 
   return (
     <TextField
@@ -41,6 +53,7 @@ function CurrencyField({
         const newValue = Number(event.target.value);
 
         if (!isNaN(newValue)) {
+          setInnerValue(toEuro(newValue));
           onChange(newValue);
         }
       }}

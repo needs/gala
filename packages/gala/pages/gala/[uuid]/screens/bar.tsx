@@ -7,7 +7,7 @@ export default function Bar() {
   const bar = barDefault;
 
   const toEuro = (value: number) =>
-    new Intl.NumberFormat('de-DE', {
+    new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
     }).format(value);
