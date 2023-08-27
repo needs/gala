@@ -10,7 +10,8 @@ export type Team = { name: string, members: Record<string, boolean>, categoryKey
 export type Category = { name: string, gender: Gender, apparatuses: Record<string, { name: string, icon: string }> };
 export type Progress = Partial<Record<ApparatusKey, string>>;
 export type Judge = { firstName: string, lastName: string };
-export type BarItem = Record<string, number[]>;
+export type BarCategory = { name: string, items: BarItem[] };
+export type BarItem = { name: string, price: number };
 export type Info = { galaName: string };
 
 export type Store = {
@@ -18,34 +19,40 @@ export type Store = {
   teams: Record<string, Team>,
   categories: Record<string, Category>,
   progresses: Record<string, Progress>,
-  bar: Record<string, BarItem>,
+  bar: BarCategory[],
   info: Info,
 }
 
-export const barDefault = {
-  "Boissons": {
-    "Bière": [2.5],
-    'Jus de pommes': [1.5],
-    'Soda (Fanta,Coca,Ice Tea,Oasis)': [1.5],
-    "Eau": [0.5],
-    'Café | Thé': [1.0]
+export const barDefault: BarCategory[] = [
+  {
+    name: "Boissons", items: [
+      { name: "Bière", price: 2.5 },
+      { name: 'Jus de pommes', price: 1.5 },
+      { name: 'Soda, (Fanta,Coca,Ice Tea,Oasis)', price: 1.5 },
+      { name: "Eau", price: 0.5 },
+      { name: 'Café, Thé', price: 1.0 },
+    ]
   },
-  "Plats": {
-    'Hot-Dog': [3.0],
-    "Frites": [3.0],
-    'Saucisse+Frites': [5.0],
-    'Sandwich (Fromage Brie)': [3.0]
+  {
+    name: "Plats", items: [
+      { name: 'Hot-Dog', price: 3.0 },
+      { name: "Frites", price: 3.0 },
+      { name: 'Saucisse+Frites', price: 5.0 },
+      { name: 'Sandwich (Fromage Brie)', price: 3.0 },
+    ]
   },
-  "Dessert": {
-    "Pomme": [0.5],
-    "Sucette": [0.5],
-    'Barre Kinder Country': [1.0],
-    'Crêpe (Sucre)': [2.0],
-    'Crêpe (Nutella)': [2.5]
+  {
+    name: "Dessert", items: [
+      { name: "Pomme", price: 0.5 },
+      { name: "Sucette", price: 0.5 },
+      { name: 'Barre Kinder Country', price: 1.0 },
+      { name: 'Crêpe (Sucre)', price: 2.0 },
+      { name: 'Crêpe (Nutella)', price: 2.5 },
+    ]
   }
-}
+]
 
-export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, bar: {}, info: {} as Info});
+export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, bar: [], info: {} as Info });
 
 export function initStore(uuid: string, token: string, onLoad: () => void, onUnload: () => void) {
   const doc = getYjsDoc(store);
