@@ -16,7 +16,7 @@ import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { isEmpty, sortBy } from 'lodash';
-import SelectIconDialog from '../../../components/SelectIconDialog';
+import SelectIconButton from '../../../components/SelectIconButton';
 
 function CurrencyField({
   value,
@@ -94,15 +94,8 @@ export default function BarPage() {
     }
   };
 
-  const [openSelectIconDialog, setOpenSelectIconDialog] = useState(false);
-
   return (
     <>
-      <SelectIconDialog
-        open={openSelectIconDialog}
-        onClose={() => setOpenSelectIconDialog(false)}
-        icon="DiningOutlined"
-      />
       <Stack direction="column" padding={4} gap={4}>
         <Stack
           direction="row"
@@ -162,16 +155,21 @@ export default function BarPage() {
                         backgroundColor: '#f5f5f5',
                       }}
                     >
-                      <Button onClick={() => setOpenSelectIconDialog(true)}>Icon</Button>
-                      <TextField
-                        variant="standard"
-                        value={category.name}
-                        onChange={(event) => {
-                          category.name = event.target.value;
-                        }}
-                        label="Catégorie"
-                        sx={{ width: 500 }}
-                      />
+                      <Stack direction="row" gap={4}>
+                        <SelectIconButton
+                          icon={category.icon}
+                          onIcon={(icon) => (category.icon = icon)}
+                        />
+                        <TextField
+                          variant="standard"
+                          value={category.name}
+                          onChange={(event) => {
+                            category.name = event.target.value;
+                          }}
+                          label="Catégorie"
+                          sx={{ width: 500 }}
+                        />
+                      </Stack>
                       <Stack direction="row" gap={1} alignItems="center">
                         <Button
                           variant="outlined"

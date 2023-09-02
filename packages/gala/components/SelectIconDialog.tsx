@@ -4,15 +4,15 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  ImageList,
-  ImageListItem,
   TextField,
   Stack,
+  Box,
 } from '@mui/material';
 import * as Muicon from '@mui/icons-material';
 import { useState } from 'react';
+import Grid from '@mui/material/Unstable_Grid2';
 
-type Icon = keyof typeof Muicon;
+export type Icon = keyof typeof Muicon;
 
 const allIcons = Object.entries(Muicon).filter(([key]) =>
   key.includes('Outlined')
@@ -21,10 +21,12 @@ const allIcons = Object.entries(Muicon).filter(([key]) =>
 export default function SelectIconDialog({
   open,
   icon,
+  onChange,
   onClose,
 }: {
   open: boolean;
-  icon: Icon;
+  icon: Icon | undefined;
+  onChange: (icon: Icon) => void;
   onClose: () => void;
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,22 +48,37 @@ export default function SelectIconDialog({
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
           />
-          <ImageList sx={{ width: 500, height: 450 }} cols={10} rowHeight={32}>
-            {allIcons
-              .filter(([key]) =>
-                key.toLowerCase().includes(lowerCaseSearchQuery)
-              )
-              .map(([key, Icon]) => {
-                return (
-                  <ImageListItem key={key} sx={{
-                    cursor: 'pointer',
-                    backgroundColor: icon === key ? 'primary.main' : undefined,
-                  }}>
-                    <Icon />
-                  </ImageListItem>
-                );
-              })}
-          </ImageList>
+          <Box sx={{ width: 500, height: 450, overflowY: 'auto' }}>
+            <Grid container>
+              {allIcons
+                .filter(([key]) =>
+                  key.toLowerCase().includes(lowerCaseSearchQuery)
+                )
+                .map(([key, Icon]) => {
+                  return (
+                    <Grid
+                      xs={1}
+                      key={key}
+                      sx={{
+                        cursor: 'pointer',
+                        backgroundColor:
+                          icon === key ? 'primary.main' : undefined,
+                      }}
+
+                      onClick={() => {
+                        onChange(key as Icon);
+                      }}
+                    >
+                      <Icon
+                        sx={{
+                          m: 'auto',
+                        }}
+                      />
+                    </Grid>
+                  );
+                })}
+            </Grid>
+          </Box>
         </Stack>
       </DialogContent>
 

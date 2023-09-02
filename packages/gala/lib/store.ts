@@ -1,5 +1,6 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
 import { HocuspocusProvider } from "@hocuspocus/provider";
+import { Icon } from "../components/SelectIconDialog";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
@@ -10,7 +11,7 @@ export type Team = { name: string, members: Record<string, boolean>, categoryKey
 export type Category = { name: string, gender: Gender, apparatuses: Record<string, { name: string, icon: string }> };
 export type Progress = Partial<Record<ApparatusKey, string>>;
 export type Judge = { firstName: string, lastName: string };
-export type BarCategory = { name: string, items: Record<string, BarItem>, order: number };
+export type BarCategory = { name: string, items: Record<string, BarItem>, order: number, icon?: Icon };
 export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
 
