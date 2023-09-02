@@ -59,6 +59,7 @@
     "@hocuspocus/provider": "^2.4.0",
     "@hocuspocus/server": "^2.4.0",
     "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.142",
     "@mui/material": "^5.12.3",
     "@prisma/client": "^5.1.1",
     "@syncedstore/core": "^0.5.2",

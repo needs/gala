@@ -31,6 +31,12 @@ export default function EditPlayerButton({
         label={fullName(player)}
         variant="outlined"
         onDelete={onDelete}
+
+        sx={{
+          '& .MuiChip-deleteIcon': {
+            marginLeft: "auto"
+          }
+        }}
       />
     </>
   );
