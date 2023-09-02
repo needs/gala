@@ -11,12 +11,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {
-  Category,
   EmojiEvents,
+  EventNote,
   FoodBank,
-  Gavel,
   Group,
   Menu,
+  Schedule,
   Tv,
   ViewDay,
 } from '@mui/icons-material';
@@ -46,10 +46,15 @@ export const menuAdmin = (uuid: string): Menu => ({
     label: 'Inscriptions',
     icon: <Group />,
   },
+  timeline: {
+    href: `/gala/${uuid}/timeline`,
+    label: 'Échéancier',
+    icon: <EventNote />,
+  },
   progress: {
     href: `/gala/${uuid}/progress`,
     label: 'Déroulement',
-    icon: <ViewDay />,
+    icon: <Schedule />,
   },
   bar: {
     href: `/gala/${uuid}/bar`,
