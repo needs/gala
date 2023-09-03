@@ -15,10 +15,15 @@ export type BarCategory = { name: string, items: Record<string, BarItem>, order:
 export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
 
+export type Stage = { name: string, timeline: Record<string, TimelineRotation> };
+export type TimelineRotation = { order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus> };
+export type TimelineRotationApparatus = { teams: Record<string, boolean> };
+
 export type Store = {
   players: Record<string, Player>,
   teams: Record<string, Team>,
   categories: Record<string, Category>,
+  stages: Record<string, Stage>,
   progresses: Record<string, Progress>,
   bar: Record<string, BarCategory>,
   info: Info,
@@ -53,7 +58,7 @@ export const barDefault: Record<string, BarCategory> = {
   }
 };
 
-export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, bar: {}, info: {} as Info });
+export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, bar: {}, info: {} as Info, stages: {} });
 
 export function initStore(uuid: string, token: string, onLoad: () => void, onUnload: () => void) {
   const doc = getYjsDoc(store);
