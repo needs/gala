@@ -1,9 +1,9 @@
-import { Chip, Avatar } from "@mui/material";
-import { useState } from "react";
-import { Player } from "../lib/store";
-import { fullName } from "../lib/utils";
-import EditPlayerDialog from "./EditPlayerDialog";
-import GenderIcon from "./GenderIcon";
+import { Chip, Avatar } from '@mui/material';
+import { useState } from 'react';
+import { Player } from '../lib/store';
+import { fullName } from '../lib/utils';
+import EditPlayerDialog from './EditPlayerDialog';
+import GenderIcon from './GenderIcon';
 
 export default function EditPlayerButton({
   player,
@@ -27,15 +27,14 @@ export default function EditPlayerButton({
             <GenderIcon gender={player.gender} />
           </Avatar>
         }
-        onClick={() => setOpen(true)}
+        onClick={(event) => setOpen(true)}
         label={fullName(player)}
         variant="outlined"
         onDelete={onDelete}
-
         sx={{
           '& .MuiChip-deleteIcon': {
-            marginLeft: "auto"
-          }
+            marginLeft: 'auto',
+          },
         }}
       />
     </>

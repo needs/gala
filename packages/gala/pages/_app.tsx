@@ -6,6 +6,9 @@ import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
 import { CookiesProvider } from 'react-cookie';
 import { UserInfo } from '../lib/auth';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import fr from 'date-fns/locale/fr';
 
 export type PageProps = {
   galaUuid?: string;
@@ -20,12 +23,14 @@ type AppPropsWithProoperties = AppProps & {
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
     <CookiesProvider>
-      <StoreProvider galaUuid={pageProps.galaUuid}>
-        <Layout layoutInfo={pageProps.layoutInfo}>
-          <Component {...pageProps} />
-          <Analytics />
-        </Layout>
-      </StoreProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+        <StoreProvider galaUuid={pageProps.galaUuid}>
+          <Layout layoutInfo={pageProps.layoutInfo}>
+            <Component {...pageProps} />
+            <Analytics />
+          </Layout>
+        </StoreProvider>
+      </LocalizationProvider>
     </CookiesProvider>
   );
 }

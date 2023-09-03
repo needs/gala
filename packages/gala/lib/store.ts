@@ -16,7 +16,7 @@ export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
 
 export type Stage = { name: string, timeline: Record<string, TimelineRotation> };
-export type TimelineRotation = { order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus> };
+export type TimelineRotation = { order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus>, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
 export type Store = {
@@ -27,6 +27,24 @@ export type Store = {
   progresses: Record<string, Progress>,
   bar: Record<string, BarCategory>,
   info: Info,
+}
+
+export function getApparatusName(apparatusKey: ApparatusKey): string {
+  switch (apparatusKey) {
+    case "vault": return "Saut";
+    case "unevenBars": return "Barres";
+    case "beam": return "Poutre";
+    case "floor": return "Sol";
+  }
+}
+
+export function getApparatusIconPath(apparatusKey: ApparatusKey): string {
+  switch (apparatusKey) {
+    case "vault": return "/icons/apparatuses/vault.png";
+    case "unevenBars": return "/icons/apparatuses/unevenBars.png";
+    case "beam": return "/icons/apparatuses/beam.png";
+    case "floor": return "/icons/apparatuses/floor.png";
+  }
 }
 
 export const barDefault: Record<string, BarCategory> = {
