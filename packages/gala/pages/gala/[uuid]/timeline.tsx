@@ -4,9 +4,12 @@ import {
   ButtonBase,
   Divider,
   IconButton,
+  InputAdornment,
   Paper,
   Stack,
+  TextField,
   Typography,
+  duration,
 } from '@mui/material';
 import { withAuthGala } from '../../../lib/auth';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
@@ -29,7 +32,7 @@ import {
   Remove,
 } from '@mui/icons-material';
 import EditPlayerButton from '../../../components/EditPlayerButton';
-import { TimePicker } from '@mui/x-date-pickers';
+import { DatePicker, DateTimePicker, TimePicker } from '@mui/x-date-pickers';
 import {
   ApparatusKey,
   Team,
@@ -39,11 +42,20 @@ import {
 } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
-import { minutesToMilliseconds } from 'date-fns';
+import {
+  Duration,
+  addMinutes,
+  differenceInMinutes,
+  format,
+  getMinutes,
+  intervalToDuration,
+  minutesToMilliseconds,
+  startOfDay,
+} from 'date-fns';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import { useState } from 'react';
 import { addTeam, defaultTeam } from '../../../lib/team';
-import { sortBy } from 'lodash';
+import { difference, sortBy } from 'lodash';
 
 function TimelineAddTeamButton({
   teamsMap,
@@ -64,22 +76,19 @@ function TimelineAddTeamButton({
           onClose={() => setOpen(false)}
         />
       )}
-      <Box padding={1}>
-        <Button
-          variant="text"
-          startIcon={<Add />}
-          size="small"
-          fullWidth
-          onClick={() => {
-            const teamKey = addTeam(teams, defaultTeam);
-            teamsMap[teamKey] = true;
-            setTeamKey(teamKey);
-            setOpen(true);
-          }}
-        >
-          Équipe
-        </Button>
-      </Box>
+      <Button
+        variant="text"
+        startIcon={<Add />}
+        size="small"
+        onClick={() => {
+          const teamKey = addTeam(teams, defaultTeam);
+          teamsMap[teamKey] = true;
+          setTeamKey(teamKey);
+          setOpen(true);
+        }}
+      >
+        Équipe
+      </Button>
     </>
   );
 }
@@ -145,6 +154,7 @@ export default function TimelinePage() {
           stages[uuidv4()] = {
             name: 'Plateau 1',
             timeline: {},
+            timelineStartDate: new Date().toString(),
           };
         }}
       >
@@ -157,6 +167,9 @@ export default function TimelinePage() {
     Object.entries(stage.timeline),
     (entry) => entry[1].order
   );
+
+  let nextRotationDate = new Date(stage.timelineStartDate);
+  const startOfDayDate = startOfDay(new Date(0));
 
   return (
     <Stack direction="column" padding={4} gap={4}>
@@ -172,11 +185,7 @@ export default function TimelinePage() {
           </Typography>
         </Stack>
         <Stack direction="row" gap={2}>
-          <Button
-            variant="outlined"
-            startIcon={<Add />}
-            disabled
-          >
+          <Button variant="outlined" startIcon={<Add />} disabled>
             Pause
           </Button>
           <Button
@@ -220,27 +229,56 @@ export default function TimelinePage() {
         }}
       >
         <TimelineItem>
-          <TimelineOppositeContent color="textSecondary" minWidth="100px">
-            09h30
-          </TimelineOppositeContent>
+          <TimelineOppositeContent
+            color="textSecondary"
+            minWidth="80px"
+          ></TimelineOppositeContent>
           <TimelineSeparator>
             <TimelineDot />
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineContent sx={{ paddingTop: '0' }}>
-            <Typography variant="h6" component="h1">
-              Ouverture du gymnase
-            </Typography>
+            <Stack direction="column" gap={2} paddingBottom={4}>
+              <Typography variant="h6" component="h1">
+                Ouverture du gymnase
+              </Typography>
+              <DateTimePicker
+                label="Date"
+                sx={{
+                  minWidth: '400px',
+                }}
+                value={new Date(stage.timelineStartDate)}
+                onChange={(date) => {
+                  if (date !== null) {
+                    stage.timelineStartDate = date.toString();
+                  }
+                }}
+                format="EEEE d MMMM yyyy HH:mm"
+              />
+            </Stack>
           </TimelineContent>
         </TimelineItem>
 
-        {rotations.map(
-          ([rotationKey, rotation], order) =>
+        {rotations.map(([rotationKey, rotation], order) => {
+          const rotationDate = nextRotationDate;
+
+          nextRotationDate = addMinutes(
+            nextRotationDate,
+            rotation.durationInMinutes
+          );
+          const durationDate = addMinutes(
+            startOfDayDate,
+            rotation.durationInMinutes
+          );
+
+          return (
             rotation !== undefined && (
               <TimelineItem key={rotationKey}>
-                <TimelineOppositeContent color="textSecondary" minWidth="100px">
+                <TimelineOppositeContent color="textSecondary" minWidth="80px">
                   <Stack gap={2} alignItems="end">
-                    <Typography variant="body1">09h45</Typography>
+                    <Typography variant="body1">
+                      {format(rotationDate, 'HH:mm')}
+                    </Typography>
                     <IconButton
                       size="small"
                       disabled={order === 0}
@@ -286,22 +324,29 @@ export default function TimelinePage() {
                         <Typography variant="h6" component="h1">
                           Rotation {order + 1}
                         </Typography>
-                        <TimePicker
+                        <TextField
                           label="Durée"
-                          slotProps={{
-                            textField: {
-                              size: 'small',
-                            },
+                          inputProps={{
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*',
                           }}
-                          value={
-                            new Date(
-                              minutesToMilliseconds(rotation.durationInMinutes)
-                            )
-                          }
-                          onChange={(date) => {
-                            if (date !== null) {
-                              rotation.durationInMinutes = date.getMinutes();
-                            }
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                minutes
+                              </InputAdornment>
+                            ),
+                          }}
+                          size="small"
+                          value={rotation.durationInMinutes}
+                          onChange={(event) => {
+                            const duration = parseInt(event.target.value);
+                            rotation.durationInMinutes = isNaN(duration)
+                              ? 0
+                              : duration;
+                          }}
+                          sx={{
+                            maxWidth: '130px',
                           }}
                         />
                       </Stack>
@@ -332,28 +377,38 @@ export default function TimelinePage() {
                                 <Stack
                                   direction="row"
                                   gap={2}
-                                  alignItems="center"
-                                  justifyContent="center"
+                                  justifyContent="space-between"
                                   padding={2}
                                   sx={{
                                     backgroundColor: '#a5a5a511',
                                   }}
                                 >
-                                  <Image
-                                    src={getApparatusIconPath(
-                                      apparatuseKey as ApparatusKey
-                                    )}
-                                    alt={getApparatusName(
-                                      apparatuseKey as ApparatusKey
-                                    )}
-                                    width={24}
-                                    height={24}
+                                  <Stack
+                                    direction="row"
+                                    gap={2}
+                                    alignItems="center"
+                                    justifyContent="center"
+                                  >
+                                    <Image
+                                      src={getApparatusIconPath(
+                                        apparatuseKey as ApparatusKey
+                                      )}
+                                      alt={getApparatusName(
+                                        apparatuseKey as ApparatusKey
+                                      )}
+                                      width={24}
+                                      height={24}
+                                    />
+                                    <Typography variant="h6">
+                                      {getApparatusName(
+                                        apparatuseKey as ApparatusKey
+                                      )}
+                                    </Typography>
+                                  </Stack>
+
+                                  <TimelineAddTeamButton
+                                    teamsMap={apparatusTeams}
                                   />
-                                  <Typography variant="h6">
-                                    {getApparatusName(
-                                      apparatuseKey as ApparatusKey
-                                    )}
-                                  </Typography>
                                 </Stack>
 
                                 <Stack
@@ -378,10 +433,6 @@ export default function TimelinePage() {
                                       );
                                     }
                                   )}
-
-                                  <TimelineAddTeamButton
-                                    teamsMap={apparatusTeams}
-                                  />
                                 </Stack>
                               </Stack>
                             </Grid>
@@ -393,11 +444,12 @@ export default function TimelinePage() {
                 </TimelineContent>
               </TimelineItem>
             )
-        )}
+          );
+        })}
 
         <TimelineItem>
-          <TimelineOppositeContent color="textSecondary" minWidth="100px">
-            18h00
+          <TimelineOppositeContent color="textSecondary" minWidth="80px">
+            {format(nextRotationDate, 'HH:mm')}
           </TimelineOppositeContent>
           <TimelineSeparator>
             <TimelineDot />
