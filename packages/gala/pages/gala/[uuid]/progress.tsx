@@ -72,13 +72,11 @@ function ProgressContainer({
   children,
   onForward,
   onBackward,
-  onReset,
 }: {
   stageName: string;
   children?: ReactNode;
   onForward?: () => void;
   onBackward?: () => void;
-  onReset?: () => void;
 }) {
   return (
     <Stack gap={2}>
@@ -90,13 +88,6 @@ function ProgressContainer({
       >
         <Typography variant="h5">{stageName}</Typography>
         <Stack direction="row" gap={2}>
-          <Button
-            onDoubleClick={onReset}
-            disabled={onReset === undefined}
-            color="warning"
-          >
-            Remise à zéro
-          </Button>
           <Button
             onClick={onBackward}
             disabled={onBackward === undefined}
@@ -134,17 +125,14 @@ function ProgressStart({
 function ProgressEnd({
   stageName,
   onBackward,
-  onReset,
 }: {
   stageName: string;
   onBackward: () => void;
-  onReset: () => void;
 }) {
   return (
     <ProgressContainer
       stageName={stageName}
       onBackward={onBackward}
-      onReset={onReset}
     />
   );
 }
@@ -154,20 +142,17 @@ function ProgressRotation({
   rotation,
   onForward,
   onBackward,
-  onReset,
 }: {
   stageName: string;
   rotation: TimelineRotation;
   onForward: () => void;
   onBackward: () => void;
-  onReset: () => void;
 }) {
   return (
     <ProgressContainer
       stageName={stageName}
       onForward={onForward}
       onBackward={onBackward}
-      onReset={onReset}
     >
       <TimelineRotation_ rotation={rotation} readOnly={true} />
     </ProgressContainer>
@@ -178,19 +163,16 @@ function ProgressPause({
   stageName,
   onForward,
   onBackward,
-  onReset,
 }: {
   stageName: string;
   onForward: () => void;
   onBackward: () => void;
-  onReset: () => void;
 }) {
   return (
     <ProgressContainer
       stageName={stageName}
       onForward={onForward}
       onBackward={onBackward}
-      onReset={onReset}
     >
       <TimelinePause_ />
     </ProgressContainer>
@@ -320,10 +302,6 @@ export default function ProgressPage() {
           stage.progress = previousProgress;
         };
 
-        const onReset = () => {
-          stage.progress = undefined;
-        };
-
         switch (currentRotation.type) {
           case 'start':
             return (
@@ -339,7 +317,6 @@ export default function ProgressPage() {
                 key={stageKey}
                 stageName={stage.name}
                 onBackward={onBackward}
-                onReset={onReset}
               />
             );
           case 'rotation':
@@ -350,7 +327,6 @@ export default function ProgressPage() {
                 rotation={currentRotation.rotation}
                 onForward={onForward}
                 onBackward={onBackward}
-                onReset={onReset}
               />
             );
           case 'pause':
@@ -360,7 +336,6 @@ export default function ProgressPage() {
                 stageName={stage.name}
                 onForward={onForward}
                 onBackward={onBackward}
-                onReset={onReset}
               />
             );
         }
