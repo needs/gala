@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   ButtonBase,
   Divider,
@@ -9,7 +8,6 @@ import {
   Stack,
   TextField,
   Typography,
-  duration,
 } from '@mui/material';
 import { withAuthGala } from '../../../lib/auth';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
@@ -32,7 +30,7 @@ import {
   Remove,
 } from '@mui/icons-material';
 import EditPlayerButton from '../../../components/EditPlayerButton';
-import { DatePicker, DateTimePicker, TimePicker } from '@mui/x-date-pickers';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import {
   ApparatusKey,
   Team,
@@ -43,47 +41,37 @@ import {
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
 import {
-  Duration,
   addMinutes,
-  differenceInMinutes,
   format,
-  getMinutes,
-  intervalToDuration,
-  minutesToMilliseconds,
   startOfDay,
 } from 'date-fns';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import { useState } from 'react';
-import { addTeam, defaultTeam } from '../../../lib/team';
-import { difference, sortBy } from 'lodash';
+import { sortBy } from 'lodash';
+import SelectTeamDialog from '../../../components/SelectTeamDialog';
 
 function TimelineAddTeamButton({
   teamsMap,
 }: {
   teamsMap: Record<string, boolean>;
 }) {
-  const { teams } = useSyncedStore(store);
   const [open, setOpen] = useState(false);
-  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
-  const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
   return (
     <>
-      {team !== undefined && (
-        <EditTeamDialog
-          open={open}
-          team={team}
-          onClose={() => setOpen(false)}
-        />
-      )}
+      <SelectTeamDialog
+        open={open}
+        onSelect={(teamKey) => {
+          teamsMap[teamKey] = true;
+          setOpen(false);
+        }}
+        onClose={() => setOpen(false)}
+      />
       <Button
         variant="text"
         startIcon={<Add />}
         size="small"
         onClick={() => {
-          const teamKey = addTeam(teams, defaultTeam);
-          teamsMap[teamKey] = true;
-          setTeamKey(teamKey);
           setOpen(true);
         }}
       >
