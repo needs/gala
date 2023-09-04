@@ -10,7 +10,7 @@ export default function EditPlayerButton({
   onDelete,
 }: {
   player: Player;
-  onDelete: () => void;
+  onDelete?: () => void;
 }) {
   const [open, setOpen] = useState(false);
 

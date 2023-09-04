@@ -14,8 +14,9 @@ export type Judge = { firstName: string, lastName: string };
 export type BarCategory = { name: string, items: Record<string, BarItem>, order: number, icon?: Icon };
 export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
+export type StageProgress = { rotationIndex: number, apparatusIndex: number };
 
-export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string };
+export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string, progress?: StageProgress };
 export type TimelineRotation = { type: "rotation", order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus>, durationInMinutes: number };
 export type TimelinePause = { type: "pause", order: number, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };

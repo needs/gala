@@ -1,35 +1,25 @@
 import {
   Box,
   Button,
-  ButtonBase,
   Divider,
   IconButton,
   InputAdornment,
-  Paper,
   Stack,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import { withAuthGala } from '../../../lib/auth';
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import Image from 'next/image';
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Delete,
-  Remove,
 } from '@mui/icons-material';
-import EditPlayerButton from '../../../components/EditPlayerButton';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import {
-  ApparatusKey,
-  Team,
   TimelinePause,
   TimelineRotation,
-  getApparatusIconPath,
-  getApparatusName,
   store,
 } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
@@ -40,90 +30,11 @@ import {
   formatDuration,
   intervalToDuration,
 } from 'date-fns';
-import EditTeamDialog from '../../../components/EditTeamDialog';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { sortBy } from 'lodash';
-import SelectTeamDialog from '../../../components/SelectTeamDialog';
+import TimelineRotation_ from '../../../components/TimelineRotation';
+import TimelinePause_ from '../../../components/TimelinePause';
 import fr from 'date-fns/locale/fr';
-
-function TimelineAddTeamButton({
-  teamsMap,
-}: {
-  teamsMap: Record<string, boolean>;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <SelectTeamDialog
-        open={open}
-        onSelect={(teamKey) => {
-          teamsMap[teamKey] = true;
-          setOpen(false);
-        }}
-        onClose={() => setOpen(false)}
-      />
-      <Button
-        variant="text"
-        startIcon={<Add />}
-        size="small"
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        Équipe
-      </Button>
-    </>
-  );
-}
-
-function TimelineEditTeamButton({
-  team,
-  onRemove,
-}: {
-  team: Team;
-  onRemove: () => void;
-}) {
-  const { players } = useSyncedStore(store);
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <EditTeamDialog open={open} team={team} onClose={() => setOpen(false)} />
-      <ButtonBase onClick={() => setOpen(true)} component="div">
-        <Stack padding={2} gap={1} flexGrow={1}>
-          <Stack
-            direction="row"
-            gap={1}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Typography variant="body1">{team.name}</Typography>
-            <IconButton size="small" onClick={(event) => onRemove()}>
-              <Remove />
-            </IconButton>
-          </Stack>
-          {Object.keys(team.members).map((playerKey) => {
-            const player = players[playerKey];
-
-            return (
-              player !== undefined && (
-                <EditPlayerButton
-                  key={playerKey}
-                  player={player}
-                  onDelete={() => {
-                    delete team.members[playerKey];
-                    delete players[playerKey];
-                  }}
-                />
-              )
-            );
-          })}
-        </Stack>
-      </ButtonBase>
-    </>
-  );
-}
 
 function TimelineRotationContainer({
   children,
@@ -232,8 +143,6 @@ function TimelineRotationComponent({
   onMoveDown?: () => void;
   onDelete?: () => void;
 }) {
-  const { teams } = useSyncedStore(store);
-
   return (
     <TimelineRotationContainer
       rotation={rotation}
@@ -242,74 +151,7 @@ function TimelineRotationComponent({
       onMoveDown={onMoveDown}
       onDelete={onDelete}
     >
-      <Paper elevation={1} sx={{ overflow: 'hidden' }}>
-        <Grid container>
-          {Object.entries(rotation.apparatuses).map(
-            ([apparatuseKey, { teams: apparatusTeams }]) => (
-              <Grid
-                key={apparatuseKey}
-                xs
-                sx={{
-                  '&:nth-of-type(odd)': {
-                    backgroundColor: (theme) => theme.palette.grey[50],
-                  },
-                }}
-              >
-                <Stack alignItems="stretch" flexGrow={1}>
-                  <Stack
-                    direction="row"
-                    gap={2}
-                    justifyContent="space-between"
-                    padding={2}
-                    sx={{
-                      backgroundColor: '#a5a5a511',
-                    }}
-                  >
-                    <Stack
-                      direction="row"
-                      gap={2}
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <Image
-                        src={getApparatusIconPath(
-                          apparatuseKey as ApparatusKey
-                        )}
-                        alt={getApparatusName(apparatuseKey as ApparatusKey)}
-                        width={24}
-                        height={24}
-                      />
-                      <Typography variant="h6">
-                        {getApparatusName(apparatuseKey as ApparatusKey)}
-                      </Typography>
-                    </Stack>
-
-                    <TimelineAddTeamButton teamsMap={apparatusTeams} />
-                  </Stack>
-
-                  <Stack flexGrow={1} direction="column" divider={<Divider />}>
-                    {Object.keys(apparatusTeams).map((teamKey) => {
-                      const team = teams[teamKey];
-
-                      return (
-                        team !== undefined && (
-                          <TimelineEditTeamButton
-                            key={teamKey}
-                            team={team}
-                            onRemove={() => {
-                              delete apparatusTeams[teamKey];
-                            }}
-                          />
-                        )
-                      );
-                    })}
-                  </Stack>
-                </Stack>
-              </Grid>
-            )
-          )}
-        </Grid>
-      </Paper>
+      <TimelineRotation_ rotation={rotation} />
     </TimelineRotationContainer>
   );
 }
@@ -335,21 +177,7 @@ function TimelinePauseComponent({
       onMoveDown={onMoveDown}
       onDelete={onDelete}
     >
-      <Box
-        paddingY={2}
-        paddingX={4}
-        borderRadius={2}
-        sx={{
-          backgroundImage: 'url("/background-pause.svg")',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <Typography variant="h6" component="h2" color="ActiveBorder">
-          Pause
-        </Typography>
-      </Box>
+      <TimelinePause_ />
     </TimelineRotationContainer>
   );
 }

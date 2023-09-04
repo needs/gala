@@ -1,0 +1,171 @@
+import { Button, ButtonBase, Divider, IconButton, Paper, Stack, Typography } from '@mui/material';
+import { ApparatusKey, Team, TimelineRotation, getApparatusIconPath, getApparatusName, store } from '../lib/store';
+import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import { useSyncedStore } from '@syncedstore/react';
+import Image from 'next/image';
+import { useState } from 'react';
+import SelectTeamDialog from './SelectTeamDialog';
+import { Add, Remove } from '@mui/icons-material';
+import EditTeamDialog from './EditTeamDialog';
+import EditPlayerButton from './EditPlayerButton';
+
+function TimelineAddTeamButton({
+  teamsMap,
+}: {
+  teamsMap: Record<string, boolean>;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <SelectTeamDialog
+        open={open}
+        onSelect={(teamKey) => {
+          teamsMap[teamKey] = true;
+          setOpen(false);
+        }}
+        onClose={() => setOpen(false)}
+      />
+      <Button
+        variant="text"
+        startIcon={<Add />}
+        size="small"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        Équipe
+      </Button>
+    </>
+  );
+}
+
+function TimelineEditTeamButton({
+  team,
+  onRemove,
+  readOnly,
+}: {
+  team: Team;
+  onRemove: () => void;
+  readOnly?: boolean;
+}) {
+  const { players } = useSyncedStore(store);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <EditTeamDialog open={open} team={team} onClose={() => setOpen(false)} />
+      <ButtonBase onClick={readOnly ? undefined : () => setOpen(true)} component="div">
+        <Stack padding={2} gap={1} flexGrow={1}>
+          <Stack
+            direction="row"
+            gap={1}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="body1">{team.name}</Typography>
+            {!readOnly && <IconButton size="small" onClick={onRemove}>
+              <Remove />
+            </IconButton>}
+          </Stack>
+          {Object.keys(team.members).map((playerKey) => {
+            const player = players[playerKey];
+
+            return (
+              player !== undefined && (
+                <EditPlayerButton
+                  key={playerKey}
+                  player={player}
+                  onDelete={readOnly ? undefined : () => {
+                    delete team.members[playerKey];
+                    delete players[playerKey];
+                  }}
+                />
+              )
+            );
+          })}
+        </Stack>
+      </ButtonBase>
+    </>
+  );
+}
+
+export default function TimelineRotation({
+  rotation,
+  readOnly,
+}: {
+  rotation: TimelineRotation;
+  readOnly?: boolean;
+}) {
+  const { teams } = useSyncedStore(store);
+
+  return (
+    <Paper elevation={1}>
+      <Grid container>
+        {Object.entries(rotation.apparatuses).map(
+          ([apparatuseKey, { teams: apparatusTeams }]) => (
+            <Grid
+              key={apparatuseKey}
+              xs
+              sx={{
+                '&:nth-of-type(odd)': {
+                  backgroundColor: (theme) => theme.palette.grey[50],
+                },
+              }}
+            >
+              <Stack alignItems="stretch" flexGrow={1}>
+                <Stack
+                  direction="row"
+                  gap={2}
+                  justifyContent="space-between"
+                  padding={2}
+                  sx={{
+                    backgroundColor: '#a5a5a511',
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    gap={2}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Image
+                      src={getApparatusIconPath(apparatuseKey as ApparatusKey)}
+                      alt={getApparatusName(apparatuseKey as ApparatusKey)}
+                      width={24}
+                      height={24}
+                    />
+                    <Typography variant="h6">
+                      {getApparatusName(apparatuseKey as ApparatusKey)}
+                    </Typography>
+                  </Stack>
+
+                  {!readOnly && <TimelineAddTeamButton teamsMap={apparatusTeams} />}
+                </Stack>
+
+                <Stack flexGrow={1} direction="column" divider={<Divider />}>
+                  {Object.keys(apparatusTeams).map((teamKey) => {
+                    const team = teams[teamKey];
+
+                    return (
+                      team !== undefined && (
+                        <TimelineEditTeamButton
+                          key={teamKey}
+                          team={team}
+                          onRemove={() => {
+                            delete apparatusTeams[teamKey];
+                          }}
+                          readOnly={readOnly}
+                        />
+                      )
+                    );
+                  })}
+                </Stack>
+              </Stack>
+            </Grid>
+          )
+        )}
+      </Grid>
+    </Paper>
+  );
+}
