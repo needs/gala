@@ -3,30 +3,26 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
   DialogActions,
   Button,
   Stack,
-  ListItem,
   List,
   ListItemAvatar,
-  Avatar,
   ListItemText,
   ListItemButton,
-  FilledInput,
   FormControl,
   InputLabel,
   InputAdornment,
   IconButton,
+  Input,
 } from '@mui/material';
 import { useState } from 'react';
-import CategorySelector, { CategorySelectorValue } from './CategorySelector';
-import { Team, store } from '../lib/store';
+import { CategorySelectorValue } from './CategorySelector';
+import { store } from '../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import GenderAvatar from './GenderAvatar';
-import { Filter, FilterList } from '@mui/icons-material';
+import { FilterList } from '@mui/icons-material';
 import SelectCategoryMenu from './SelectCategoryMenu';
-import { set } from 'lodash';
 
 export default function SelectTeamDialog({
   open,
@@ -88,9 +84,9 @@ export default function SelectTeamDialog({
       <DialogContent>
         <Stack direction="column" spacing={2}>
           <Stack direction="column" gap={2} alignItems="center">
-            <FormControl fullWidth variant="filled">
+            <FormControl fullWidth variant="standard">
               <InputLabel>Recherche</InputLabel>
-              <FilledInput
+              <Input
                 autoFocus
                 margin="dense"
                 type="text"
