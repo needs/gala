@@ -34,11 +34,17 @@ import {
 } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
-import { addMinutes, format } from 'date-fns';
+import {
+  addMinutes,
+  format,
+  formatDuration,
+  intervalToDuration,
+} from 'date-fns';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import { ReactNode, useState } from 'react';
 import { sortBy } from 'lodash';
 import SelectTeamDialog from '../../../components/SelectTeamDialog';
+import fr from 'date-fns/locale/fr';
 
 function TimelineAddTeamButton({
   teamsMap,
@@ -520,9 +526,23 @@ export default function TimelinePage() {
         }
       })}
 
-      <Typography variant="h6" component="h1">
-        {format(nextRotationDate, 'HH:mm')} - Fin de la compétition
-      </Typography>
+      <Stack gap={2}>
+        <Typography variant="h6" component="h1">
+          {format(nextRotationDate, 'HH:mm')} - Fin de la compétition
+        </Typography>
+        <Typography variant="body1">
+          Durée totale de la compétition :{' '}
+          {formatDuration(
+            intervalToDuration({
+              start: new Date(stage.timelineStartDate),
+              end: nextRotationDate,
+            }),
+            {
+              locale: fr,
+            }
+          )}
+        </Typography>
+      </Stack>
     </Stack>
   );
 }
