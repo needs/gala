@@ -89,7 +89,7 @@ function formatRotationTime(startDate?: Date, endDate?: Date) {
     );
 
     if (now > startDate) {
-      return `Commencé il y a ${remainingTime}`;
+      return `Aurait dû commencer il y a ${remainingTime}`;
     } else {
       return `Commence dans ${remainingTime}`;
     }
