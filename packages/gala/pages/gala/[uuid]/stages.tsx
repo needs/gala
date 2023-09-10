@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
-import { keyBy } from 'lodash';
+import { keyBy, sum } from 'lodash';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
 import { withAuthGala } from '../../../lib/auth';
@@ -173,9 +173,24 @@ export default function StagesPage() {
                         width={32}
                         height={32}
                       />
-                      <Typography variant="h6" component="h1">
-                        {getApparatusName(apparatusKey as ApparatusKey)}
-                      </Typography>
+                      <Stack direction="column" gap={0}>
+                        <Typography variant="h6" component="h1">
+                          {getApparatusName(apparatusKey as ApparatusKey)}
+                        </Typography>
+                        <Typography variant="caption">
+                          {sum(
+                            Object.values(stage.timeline ?? {}).map(
+                              (rotation) =>
+                                rotation.type === 'rotation' &&
+                                Object.keys(
+                                  rotation.apparatuses[
+                                    apparatusKey as ApparatusKey
+                                  ].teams
+                                ).length
+                            )
+                          )} équipes
+                        </Typography>
+                      </Stack>
                     </Stack>
                     <Stack direction="row" gap={2}>
                       <IconButton
