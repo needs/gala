@@ -17,8 +17,10 @@ import {
   Group,
   Menu,
   Schedule,
+  SportsBar,
   Tv,
   ViewDay,
+  Villa,
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import Link from 'next/link';
@@ -46,6 +48,11 @@ export const menuAdmin = (uuid: string): Menu => ({
     label: 'Inscriptions',
     icon: <Group />,
   },
+  stages: {
+    href: `/gala/${uuid}/stages`,
+    label: 'Plateaux',
+    icon: <Villa />,
+  },
   timeline: {
     href: `/gala/${uuid}/timeline`,
     label: 'Échéancier',
@@ -59,7 +66,7 @@ export const menuAdmin = (uuid: string): Menu => ({
   bar: {
     href: `/gala/${uuid}/bar`,
     label: 'Buvette',
-    icon: <FoodBank />,
+    icon: <SportsBar />,
   },
   'screens-1': {
     href: `/gala/${uuid}/screens/1`,

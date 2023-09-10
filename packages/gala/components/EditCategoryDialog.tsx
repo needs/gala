@@ -6,7 +6,6 @@ import {
   TextField,
   DialogActions,
   Button,
-  Select,
   FormLabel,
   Stack,
 } from '@mui/material';

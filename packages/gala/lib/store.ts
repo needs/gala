@@ -4,7 +4,8 @@ import { Icon } from "../components/SelectIconDialog";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
-export type ApparatusKey = "vault" | "unevenBars" | "beam" | "floor";
+export const allApparatuses = ["vault", "unevenBars", "beam", "floor"] as const;
+export type ApparatusKey = (typeof allApparatuses)[number];
 
 export type Player = { firstName: string, lastName: string, gender: Gender };
 export type Team = { name: string, members: Record<string, boolean>, categoryKey: string | undefined };
@@ -16,7 +17,7 @@ export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
 export type StageProgress = { rotationIndex: number, apparatusIndex: number };
 
-export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string, progress?: StageProgress };
+export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string, progress?: StageProgress, apparatuses?: Partial<Record<ApparatusKey, boolean>> };
 export type TimelineRotation = { type: "rotation", order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus>, durationInMinutes: number };
 export type TimelinePause = { type: "pause", order: number, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
