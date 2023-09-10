@@ -300,7 +300,7 @@ export default function TimelinePage() {
 
         nextRotationDate = addMinutes(
           nextRotationDate,
-          rotation.durationInMinutes
+          rotation.durationInMinutes || 0
         );
 
         const onMoveUp = () => {
