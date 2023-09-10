@@ -14,6 +14,7 @@ import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
 import { withAuthGala } from '../../../lib/auth';
 import {
   ApparatusKey,
+  allApparatuses,
   getApparatusIconPath,
   getApparatusName,
   store,
@@ -21,8 +22,10 @@ import {
 import { useEffect, useState } from 'react';
 
 function AddApparatusButton({
+  apparatuses,
   onAdd,
 }: {
+  apparatuses: ApparatusKey[];
   onAdd: (apparatus: ApparatusKey) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -30,6 +33,7 @@ function AddApparatusButton({
   return (
     <>
       <SelectApparatusDialog
+        apparatuses={apparatuses}
         open={open}
         onClose={() => setOpen(false)}
         onSelect={(apparatus) => {
@@ -41,6 +45,7 @@ function AddApparatusButton({
         variant="outlined"
         startIcon={<Add />}
         onClick={() => setOpen(true)}
+        disabled={apparatuses.length === 0}
       >
         Agrès
       </Button>
@@ -129,6 +134,11 @@ export default function StagesPage() {
                 />
                 <Stack direction="row" gap={2}>
                   <AddApparatusButton
+                    apparatuses={allApparatuses.filter(
+                      (apparatus) =>
+                        stage.apparatuses === undefined ||
+                        !(apparatus in stage.apparatuses)
+                    )}
                     onAdd={(apparatus) => {
                       if (stage.apparatuses === undefined) {
                         stage.apparatuses = {};
@@ -150,17 +160,22 @@ export default function StagesPage() {
 
               {Object.entries(stage.apparatuses ?? {}).map(
                 ([apparatusKey, apparatus]) => (
-                  <Stack key={apparatusKey} direction="row" gap={2} justifyContent="space-between">
+                  <Stack
+                    key={apparatusKey}
+                    direction="row"
+                    gap={2}
+                    justifyContent="space-between"
+                  >
                     <Stack direction="row" gap={2} alignItems="center">
-                    <Image
-                      src={getApparatusIconPath(apparatusKey as ApparatusKey)}
-                      alt={getApparatusName(apparatusKey as ApparatusKey)}
-                      width={32}
-                      height={32}
-                    />
-                    <Typography variant="h6" component="h1">
-                      {getApparatusName(apparatusKey as ApparatusKey)}
-                    </Typography>
+                      <Image
+                        src={getApparatusIconPath(apparatusKey as ApparatusKey)}
+                        alt={getApparatusName(apparatusKey as ApparatusKey)}
+                        width={32}
+                        height={32}
+                      />
+                      <Typography variant="h6" component="h1">
+                        {getApparatusName(apparatusKey as ApparatusKey)}
+                      </Typography>
                     </Stack>
                     <Stack direction="row" gap={2}>
                       <IconButton

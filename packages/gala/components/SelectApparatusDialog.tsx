@@ -19,10 +19,12 @@ import {
 import Image from 'next/image';
 
 export default function SelectApparatusDialog({
+  apparatuses,
   open,
   onSelect,
   onClose,
 }: {
+  apparatuses: ApparatusKey[];
   open: boolean;
   onSelect: (apparatus: ApparatusKey) => void;
   onClose: () => void;
@@ -42,7 +44,7 @@ export default function SelectApparatusDialog({
             dense
             disablePadding
           >
-            {allApparatuses.map((apparatuseKey) => {
+            {apparatuses.map((apparatuseKey) => {
               return (
                 <ListItemButton
                   key={apparatuseKey}
