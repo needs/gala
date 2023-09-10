@@ -4,7 +4,7 @@ import { Icon } from "../components/SelectIconDialog";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
-export const allApparatuses = ["vault", "unevenBars", "beam", "floor"] as const;
+export const allApparatuses = ["vault", "unevenBars", "beam", "floor", "highBar", "parallelBars", "rings", "pommelHorse"] as const;
 export type ApparatusKey = (typeof allApparatuses)[number];
 
 export type Player = { firstName: string, lastName: string, gender: Gender };
@@ -35,9 +35,13 @@ export type Store = {
 export function getApparatusName(apparatusKey: ApparatusKey): string {
   switch (apparatusKey) {
     case "vault": return "Saut";
-    case "unevenBars": return "Barres";
+    case "unevenBars": return "Barres asymétriques";
     case "beam": return "Poutre";
     case "floor": return "Sol";
+    case "highBar": return "Barre fixe";
+    case "parallelBars": return "Barres parallèles";
+    case "rings": return "Anneaux";
+    case "pommelHorse": return "Cheval d'arçon";
   }
 }
 
@@ -47,6 +51,10 @@ export function getApparatusIconPath(apparatusKey: ApparatusKey): string {
     case "unevenBars": return "/icons/apparatuses/unevenBars.png";
     case "beam": return "/icons/apparatuses/beam.png";
     case "floor": return "/icons/apparatuses/floor.png";
+    case "highBar": return "/icons/apparatuses/highBar.png";
+    case "parallelBars": return "/icons/apparatuses/parallelBars.png";
+    case "rings": return "/icons/apparatuses/rings.png";
+    case "pommelHorse": return "/icons/apparatuses/pommelHorse.png";
   }
 }
 
