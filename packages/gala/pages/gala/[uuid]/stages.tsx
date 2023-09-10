@@ -70,15 +70,7 @@ export default function StagesPage() {
   }, [stages]);
 
   const addStage = () => {
-    const stagesByName = keyBy(Object.values(stages), (stage) => stage?.name);
-
-    let index = 1;
-    let name = `Plateau ${index}`;
-
-    while (name in stagesByName) {
-      index += 1;
-      name = `Plateau ${index}`;
-    }
+    const name = `Plateau ${Object.keys(stages).length + 1}`;
 
     stages[uuidv4()] = {
       name,
