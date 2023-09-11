@@ -80,13 +80,19 @@ export default function StagesPage() {
     }
   }, [stages]);
 
-  const addStage = () => {
+  const addStage = (apparatuses: ApparatusKey[]) => {
     const name = `Plateau ${Object.keys(stages).length + 1}`;
 
     stages[uuidv4()] = {
       name,
       timeline: {},
       timelineStartDate: new Date().toString(),
+      apparatuses: Object.fromEntries(
+        apparatuses.map((apparatusKey, index) => [
+          apparatusKey,
+          index
+        ])
+      ),
     };
   };
 
@@ -106,14 +112,14 @@ export default function StagesPage() {
             variant="contained"
             color="secondary"
             startIcon={<Add />}
-            onClick={() => addStage()}
+            onClick={() => addStage(['vault', 'floor', 'unevenBars', 'beam'])}
           >
             Plateau Femme
           </Button>
           <Button
             variant="contained"
             startIcon={<Add />}
-            onClick={() => addStage()}
+            onClick={() => addStage(['vault', 'floor', 'rings', 'pommelHorse', 'highBar', 'parallelBars'])}
           >
             Plateau Homme
           </Button>

@@ -1,9 +1,13 @@
 import {
-  Box,
+  Alert,
   Button,
   Divider,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Tooltip,
@@ -14,7 +18,6 @@ import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import {
   ApparatusKey,
-  Stage,
   TimelinePause,
   TimelineRotation,
   stageApparatuses,
@@ -28,7 +31,7 @@ import {
   formatDuration,
   intervalToDuration,
 } from 'date-fns';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { sortBy } from 'lodash';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
@@ -185,34 +188,50 @@ function TimelinePauseComponent({
 export default function TimelinePage() {
   const { stages } = useSyncedStore(store);
 
-  const stage = Object.values(stages)[0];
+  const [selectedStageKey, setSelectedStageKey] = useState<string | undefined>(
+    Object.keys(stages).at(0)
+  );
 
-  if (stage === undefined) {
+  if (selectedStageKey === undefined) {
     return (
-      <Button
-        variant="contained"
-        onClick={() => {
-          stages[uuidv4()] = {
-            name: 'Plateau 1',
-            timeline: {},
-            timelineStartDate: new Date().toString(),
-            apparatuses: {},
-          };
-        }}
+      <Alert severity="info" sx={{ margin: 4 }}>
+        {`Aucun plateau n'a été créé pour cette compétition`}
+      </Alert>
+    );
+  }
+
+  const selectedStage = stages[selectedStageKey];
+
+  if (selectedStage === undefined) {
+    return (
+      <Alert
+        severity="warning"
+        sx={{ margin: 4 }}
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            onClick={() => {
+              setSelectedStageKey(Object.keys(stages).at(0));
+            }}
+          >
+            Précédent
+          </Button>
+        }
       >
-        Ajouter un plateau
-      </Button>
+        {`Le plateau sélectionné n'existe plus`}
+      </Alert>
     );
   }
 
   const rotations = sortBy(
-    Object.entries(stage.timeline),
+    Object.entries(selectedStage.timeline),
     (entry) => entry[1].order
   );
 
-  const apparatuses = stageApparatuses(stage);
+  const apparatuses = stageApparatuses(selectedStage);
 
-  let nextRotationDate = new Date(stage.timelineStartDate);
+  let nextRotationDate = new Date(selectedStage.timelineStartDate);
 
   return (
     <Stack direction="column" padding={4} gap={4}>
@@ -223,20 +242,37 @@ export default function TimelinePage() {
         justifyContent="space-between"
       >
         <Stack direction="row" gap={2}>
-          <Typography variant="h6" component="h1">
-            Échéancier
-          </Typography>
+          <FormControl sx={{ width: 300 }}>
+            <InputLabel>Plateau</InputLabel>
+            <Select
+              value={selectedStageKey}
+              label="Plateau"
+              onChange={(event) => {
+                setSelectedStageKey(event.target.value);
+              }}
+              placeholder="Selectionner un plateau"
+            >
+              {Object.entries(stages).map(
+                ([stageKey, stage]) =>
+                  stage !== undefined && (
+                    <MenuItem key={stageKey} value={stageKey}>
+                      {stage.name}
+                    </MenuItem>
+                  )
+              )}
+            </Select>
+          </FormControl>
         </Stack>
         <Stack direction="row" gap={2}>
           <Button
             variant="outlined"
             startIcon={<Add />}
             onClick={() => {
-              Object.values(stage.timeline).forEach((rotation) => {
+              Object.values(selectedStage.timeline).forEach((rotation) => {
                 rotation.order += 1;
               });
 
-              stage.timeline[uuidv4()] = {
+              selectedStage.timeline[uuidv4()] = {
                 type: 'pause',
                 order: 0,
                 durationInMinutes: 30,
@@ -248,11 +284,11 @@ export default function TimelinePage() {
           <Button
             variant="contained"
             onClick={() => {
-              Object.values(stage.timeline).forEach((rotation) => {
+              Object.values(selectedStage.timeline).forEach((rotation) => {
                 rotation.order += 1;
               });
 
-              stage.timeline[uuidv4()] = {
+              selectedStage.timeline[uuidv4()] = {
                 type: 'rotation',
                 apparatuses: {},
                 order: 0,
@@ -275,10 +311,10 @@ export default function TimelinePage() {
           sx={{
             minWidth: '400px',
           }}
-          value={new Date(stage.timelineStartDate)}
+          value={new Date(selectedStage.timelineStartDate)}
           onChange={(date) => {
             if (date !== null) {
-              stage.timelineStartDate = date.toString();
+              selectedStage.timelineStartDate = date.toString();
             }
           }}
           format="EEEE d MMMM yyyy HH:mm"
@@ -304,13 +340,16 @@ export default function TimelinePage() {
         };
 
         const onDelete = () => {
-          delete stage.timeline[rotationKey];
+          delete selectedStage.timeline[rotationKey];
         };
 
         if (rotation.type === 'rotation') {
           const isEmpty = apparatuses.every((apparatusKey) => {
             const apparatus = rotation.apparatuses[apparatusKey];
-            return apparatus === undefined || Object.keys(apparatus.teams).length === 0;
+            return (
+              apparatus === undefined ||
+              Object.keys(apparatus.teams).length === 0
+            );
           });
 
           return (
@@ -321,7 +360,7 @@ export default function TimelinePage() {
               date={rotationDate}
               onMoveUp={order === 0 ? undefined : onMoveUp}
               onMoveDown={
-                order === Object.keys(stage.timeline).length - 1
+                order === Object.keys(selectedStage.timeline).length - 1
                   ? undefined
                   : onMoveDown
               }
@@ -336,7 +375,7 @@ export default function TimelinePage() {
               date={rotationDate}
               onMoveUp={order === 0 ? undefined : onMoveUp}
               onMoveDown={
-                order === Object.keys(stage.timeline).length - 1
+                order === Object.keys(selectedStage.timeline).length - 1
                   ? undefined
                   : onMoveDown
               }
@@ -354,7 +393,7 @@ export default function TimelinePage() {
           Durée totale de la compétition :{' '}
           {formatDuration(
             intervalToDuration({
-              start: new Date(stage.timelineStartDate),
+              start: new Date(selectedStage.timelineStartDate),
               end: nextRotationDate,
             }),
             {

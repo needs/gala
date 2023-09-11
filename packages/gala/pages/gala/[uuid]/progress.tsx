@@ -37,10 +37,12 @@ function formatRotationTime(startDate?: Date, endDate?: Date) {
       }
     );
 
-    if (now > startDate) {
+    if (now > startDate && remainingTime !== '') {
       return `Aurait dû commencer il y a ${remainingTime}`;
-    } else {
+    } else if (remainingTime !== '') {
       return `Commence dans ${remainingTime}`;
+    } else {
+      return `Commence maintenant`;
     }
   } else if (startDate === undefined && endDate !== undefined) {
     return `Échéancier terminé`;
