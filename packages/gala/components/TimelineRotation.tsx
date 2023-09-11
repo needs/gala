@@ -25,9 +25,9 @@ import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
 
 function TimelineAddTeamButton({
-  teamsMap,
+  onAdd,
 }: {
-  teamsMap: Record<string, boolean>;
+  onAdd: (teamKey: string) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -36,8 +36,8 @@ function TimelineAddTeamButton({
       <SelectTeamDialog
         open={open}
         onSelect={(teamKey) => {
-          teamsMap[teamKey] = true;
           setOpen(false);
+          onAdd(teamKey);
         }}
         onClose={() => setOpen(false)}
       />
@@ -170,7 +170,17 @@ export default function TimelineRotation({
                   </Stack>
 
                   {!readOnly && (
-                    <TimelineAddTeamButton teamsMap={apparatusTeams} />
+                    <TimelineAddTeamButton onAdd={(teamKey) => {
+                      const apparatus = rotation.apparatuses[apparatuseKey];
+
+                      if (apparatus === undefined) {
+                        rotation.apparatuses[apparatuseKey] = {
+                          teams: { [teamKey]: true },
+                        };
+                      } else {
+                        apparatus.teams[teamKey] = true;
+                      }
+                    }} />
                   )}
                 </Stack>
 

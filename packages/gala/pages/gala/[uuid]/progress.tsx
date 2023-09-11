@@ -3,14 +3,13 @@ import { useSyncedStore } from '@syncedstore/react';
 import {
   ApparatusKey,
   Stage,
-  StageProgress,
   TimelinePause,
   TimelineRotation,
   TimelineRotationApparatus,
   stageApparatuses,
+  stageRotations,
   store,
 } from '../../../lib/store';
-import { sortBy, sum } from 'lodash';
 import { withAuthGala } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
@@ -23,57 +22,6 @@ import {
   intervalToDuration,
 } from 'date-fns';
 import fr from 'date-fns/locale/fr';
-
-function rotationLastApparatusIndex(
-  rotation: TimelineRotation | TimelinePause
-): number {
-  switch (rotation.type) {
-    case 'pause':
-      return 0;
-    case 'rotation':
-      return Object.keys(rotation.apparatuses).length - 1;
-  }
-}
-
-function getNextProgress(
-  currentRotation: TimelineRotation | TimelinePause | undefined,
-  progress: StageProgress
-) {
-  if (
-    currentRotation === undefined ||
-    rotationLastApparatusIndex(currentRotation) === progress.apparatusIndex
-  ) {
-    return {
-      rotationIndex: progress.rotationIndex + 1,
-      apparatusIndex: 0,
-    };
-  } else {
-    return {
-      rotationIndex: progress.rotationIndex,
-      apparatusIndex: progress.apparatusIndex + 1,
-    };
-  }
-}
-
-function getPreviousProgress(
-  previousRotation: TimelineRotation | TimelinePause | undefined,
-  progress: StageProgress
-) {
-  if (progress.apparatusIndex === 0) {
-    if (previousRotation === undefined) {
-      return undefined;
-    }
-    return {
-      rotationIndex: progress.rotationIndex - 1,
-      apparatusIndex: rotationLastApparatusIndex(previousRotation),
-    };
-  } else {
-    return {
-      rotationIndex: progress.rotationIndex,
-      apparatusIndex: progress.apparatusIndex - 1,
-    };
-  }
-}
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
   if (startDate === undefined && endDate === undefined) {
@@ -216,7 +164,11 @@ function ProgressRotation({
       onForward={onForward}
       onBackward={onBackward}
     >
-      <TimelineRotation_ apparatuses={apparatuses} rotation={rotation} readOnly={true} />
+      <TimelineRotation_
+        apparatuses={apparatuses}
+        rotation={rotation}
+        readOnly={true}
+      />
     </ProgressContainer>
   );
 }
@@ -267,119 +219,85 @@ type CurrentRotationInfo = {
   startDate: Date | undefined;
   endDate: Date | undefined;
   currentRotation: CurrentRotation;
-  nextProgress: StageProgress | undefined;
-  previousProgress: StageProgress | undefined;
+};
+
+function mod(n: number, m: number) {
+  "use strict";
+  return ((n % m) + m) % m;
 };
 
 function getCurrentRotation(stage: Stage): CurrentRotationInfo {
   const progress = stage.progress;
+  const rotations = stageRotations(stage);
+  const apparatuses = stageApparatuses(stage);
 
-  const timelineStartDate = new Date(stage.timelineStartDate);
+  let tmpProgress = 0;
+  let startDate = new Date(stage.timelineStartDate);
 
-  if (progress === undefined || progress.rotationIndex < 0) {
+  if (progress === undefined || progress < 0) {
     return {
-      startDate: timelineStartDate,
+      startDate,
       endDate: undefined,
-      previousProgress: undefined,
-      nextProgress: {
-        rotationIndex: 0,
-        apparatusIndex: 0,
-      },
       currentRotation: {
         type: 'start',
       },
     };
   }
 
-  const rotations = sortBy(
-    Object.values(stage.timeline),
-    (rotation) => rotation.order
-  );
+  for (const rotation of rotations) {
+    const endDate = addMinutes(startDate, rotation.durationInMinutes);
 
-  const previousRotation =
-    progress.rotationIndex === 0
-      ? undefined
-      : rotations.at(progress.rotationIndex - 1);
+    if (rotation.type === 'pause') {
+      tmpProgress += 1;
 
-  const previousProgress = getPreviousProgress(previousRotation, progress);
-
-  if (progress.rotationIndex >= rotations.length) {
-    const previousRotation =
-      progress.rotationIndex === 0
-        ? undefined
-        : rotations[progress.rotationIndex - 1];
-
-    const previousProgress = getPreviousProgress(previousRotation, progress);
-    const endDate = addMinutes(
-      timelineStartDate,
-      sum(
-        Object.values(stage.timeline).map(
-          (rotation) => rotation.durationInMinutes
-        )
-      )
-    );
-
-    return {
-      startDate: undefined,
-      endDate,
-      previousProgress,
-      nextProgress: undefined,
-      currentRotation: {
-        type: 'end',
-      },
-    };
-  }
-
-  const currentRotation = rotations[progress.rotationIndex];
-
-  const startDate = addMinutes(
-    timelineStartDate,
-    sum(
-      Object.values(stage.timeline)
-        .slice(0, progress.rotationIndex)
-        .map((rotation) => rotation.durationInMinutes)
-    )
-  );
-  const endDate = addMinutes(startDate, currentRotation.durationInMinutes);
-
-  const nextProgress = getNextProgress(currentRotation, progress);
-
-  switch (currentRotation.type) {
-    case 'pause':
-      return {
-        startDate,
-        endDate,
-        previousProgress,
-        nextProgress,
-        currentRotation: {
-          type: 'pause',
-          rotation: currentRotation,
-        },
-      };
-    case 'rotation':
-      const apparatuses = Object.entries(currentRotation.apparatuses);
-
-      return {
-        startDate,
-        endDate,
-        previousProgress,
-        nextProgress,
-        currentRotation: {
-          type: 'rotation',
-          rotation: {
-            type: 'rotation',
-            apparatuses: Object.fromEntries(
-              apparatuses.map(([apparatusKey], index) => [
-                apparatusKey,
-                apparatuses.at(index - progress.apparatusIndex)?.at(1),
-              ])
-            ) as Record<ApparatusKey, TimelineRotationApparatus>,
-            order: currentRotation.order,
-            durationInMinutes: currentRotation.durationInMinutes,
+      if (progress < tmpProgress) {
+        return {
+          startDate,
+          endDate,
+          currentRotation: {
+            type: 'pause',
+            rotation,
           },
-        },
-      };
+        };
+      }
+    } else if (rotation.type === 'rotation') {
+      tmpProgress += apparatuses.length;
+      console.log(JSON.parse(JSON.stringify(rotation)));
+
+      if (progress < tmpProgress) {
+        const offset = progress - tmpProgress + apparatuses.length;
+
+        return {
+          startDate,
+          endDate,
+          currentRotation: {
+            type: 'rotation',
+            rotation: {
+              type: 'rotation',
+              apparatuses: Object.fromEntries(
+                apparatuses.map((apparatusKey, index) => [
+                  apparatusKey,
+                  rotation.apparatuses[apparatuses[mod(index - offset, apparatuses.length)]],
+                ])
+              ) as Record<ApparatusKey, TimelineRotationApparatus>,
+              order: rotation.order,
+              durationInMinutes: rotation.durationInMinutes,
+            },
+          },
+        };
+      }
+    }
+
+    startDate = endDate;
   }
+
+  return {
+    startDate: undefined,
+    endDate: startDate,
+    currentRotation: {
+      type: 'end',
+    },
+  };
 }
 
 export default function ProgressPage() {
@@ -392,20 +310,23 @@ export default function ProgressPage() {
           return null;
         }
 
-        const {
-          currentRotation,
-          nextProgress,
-          previousProgress,
-          startDate,
-          endDate,
-        } = getCurrentRotation(stage);
+        const { currentRotation, startDate, endDate } =
+          getCurrentRotation(stage);
 
         const onForward = () => {
-          stage.progress = nextProgress;
+          if (stage.progress === undefined) {
+            stage.progress = 0;
+          } else {
+            stage.progress += 1;
+          }
         };
 
         const onBackward = () => {
-          stage.progress = previousProgress;
+          if (stage.progress === 0) {
+            stage.progress = undefined;
+          } else if (stage.progress !== undefined) {
+            stage.progress -= 1;
+          }
         };
 
         const apparatuses = stageApparatuses(stage);
