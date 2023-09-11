@@ -84,6 +84,30 @@ export default function StagesPage() {
     };
   };
 
+  const teamsCountsPerApparatus = Object.values(stages).reduce(
+    (teamsCountsPerApparatus, stage) => {
+      if (stage !== undefined && stage.apparatuses !== undefined) {
+        for (const apparatus of Object.keys(stage.apparatuses) as ApparatusKey[]) {
+          if (teamsCountsPerApparatus[apparatus] === undefined) {
+            teamsCountsPerApparatus[apparatus] = 0;
+          }
+
+          teamsCountsPerApparatus[apparatus] += sum(
+            Object.values(stage.timeline ?? {}).map(
+              (rotation) =>
+                rotation.type === 'rotation' &&
+                apparatus in rotation.apparatuses &&
+                Object.keys(rotation.apparatuses[apparatus].teams).length
+            )
+          );
+        }
+      }
+
+      return teamsCountsPerApparatus;
+    },
+    {} as Record<ApparatusKey, number>
+  );
+
   return (
     <Stack gap={4} padding={4}>
       <Stack
@@ -178,17 +202,7 @@ export default function StagesPage() {
                           {getApparatusName(apparatusKey as ApparatusKey)}
                         </Typography>
                         <Typography variant="caption">
-                          {sum(
-                            Object.values(stage.timeline ?? {}).map(
-                              (rotation) =>
-                                rotation.type === 'rotation' &&
-                                Object.keys(
-                                  rotation.apparatuses[
-                                    apparatusKey as ApparatusKey
-                                  ].teams
-                                ).length
-                            )
-                          )} équipes
+                          {teamsCountsPerApparatus[apparatusKey as ApparatusKey]} équipes
                         </Typography>
                       </Stack>
                     </Stack>
