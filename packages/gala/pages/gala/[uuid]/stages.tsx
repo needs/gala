@@ -1,4 +1,10 @@
-import { Add, Delete, Remove } from '@mui/icons-material';
+import {
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  Delete,
+  Remove,
+} from '@mui/icons-material';
 import {
   Button,
   IconButton,
@@ -8,7 +14,7 @@ import {
 } from '@mui/material';
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
-import { keyBy, sum } from 'lodash';
+import { keyBy, sortBy, sum } from 'lodash';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
 import { withAuthGala } from '../../../lib/auth';
@@ -87,7 +93,9 @@ export default function StagesPage() {
   const teamsCountsPerApparatus = Object.values(stages).reduce(
     (teamsCountsPerApparatus, stage) => {
       if (stage !== undefined && stage.apparatuses !== undefined) {
-        for (const apparatus of Object.keys(stage.apparatuses) as ApparatusKey[]) {
+        for (const apparatus of Object.keys(
+          stage.apparatuses
+        ) as ApparatusKey[]) {
           if (teamsCountsPerApparatus[apparatus] === undefined) {
             teamsCountsPerApparatus[apparatus] = 0;
           }
@@ -138,9 +146,15 @@ export default function StagesPage() {
         </Stack>
       </Stack>
 
-      {Object.entries(stages).map(
-        ([stageKey, stage]) =>
-          stage !== undefined && (
+      {Object.entries(stages).map(([stageKey, stage]) => {
+        if (stage !== undefined) {
+          const apparatuses = sortBy(Object.entries(stage.apparatuses ?? {}), [
+            ([apparatusKey, apparatusOrder]) => apparatusOrder,
+          ]).map(
+            ([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey
+          );
+
+          return (
             <Stack key={stageKey} direction="column" gap={2}>
               <Stack
                 direction="row"
@@ -168,7 +182,9 @@ export default function StagesPage() {
                         stage.apparatuses = {};
                       }
 
-                      stage.apparatuses[apparatus] = true;
+                      stage.apparatuses[apparatus] = Object.keys(
+                        stage.apparatuses
+                      ).length;
                     }}
                   />
 
@@ -182,49 +198,78 @@ export default function StagesPage() {
                 </Stack>
               </Stack>
 
-              {Object.entries(stage.apparatuses ?? {}).map(
-                ([apparatusKey, apparatus]) => (
-                  <Stack
-                    key={apparatusKey}
-                    direction="row"
-                    gap={2}
-                    justifyContent="space-between"
-                  >
-                    <Stack direction="row" gap={2} alignItems="center">
-                      <Image
-                        src={getApparatusIconPath(apparatusKey as ApparatusKey)}
-                        alt={getApparatusName(apparatusKey as ApparatusKey)}
-                        width={32}
-                        height={32}
-                      />
-                      <Stack direction="column" gap={0}>
-                        <Typography variant="h6" component="h1">
-                          {getApparatusName(apparatusKey as ApparatusKey)}
-                        </Typography>
-                        <Typography variant="caption">
-                          {teamsCountsPerApparatus[apparatusKey as ApparatusKey]} équipes
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                    <Stack direction="row" gap={2}>
-                      <IconButton
-                        onClick={() => {
-                          if (stage.apparatuses !== undefined) {
-                            delete stage.apparatuses[
-                              apparatusKey as ApparatusKey
-                            ];
-                          }
-                        }}
-                      >
-                        <Remove />
-                      </IconButton>
+              {apparatuses.map((apparatusKey, apparatusOrder) => (
+                <Stack
+                  key={apparatusKey}
+                  direction="row"
+                  gap={2}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack direction="row" gap={2} alignItems="center">
+                    <Image
+                      src={getApparatusIconPath(apparatusKey as ApparatusKey)}
+                      alt={getApparatusName(apparatusKey as ApparatusKey)}
+                      width={32}
+                      height={32}
+                    />
+                    <Stack direction="column" gap={0}>
+                      <Typography variant="h6" component="h1">
+                        {getApparatusName(apparatusKey as ApparatusKey)}
+                      </Typography>
+                      <Typography variant="caption">
+                        {teamsCountsPerApparatus[apparatusKey as ApparatusKey]}{' '}
+                        équipes
+                      </Typography>
                     </Stack>
                   </Stack>
-                )
-              )}
+                  <Stack direction="row" gap={2}>
+                    <IconButton
+                      onClick={() => {
+                        if (stage.apparatuses !== undefined) {
+                          const prevApparatusKey =
+                            apparatuses[apparatusOrder - 1];
+
+                          stage.apparatuses[prevApparatusKey] = apparatusOrder;
+                          stage.apparatuses[apparatusKey] = apparatusOrder - 1;
+                        }
+                      }}
+                      disabled={apparatusOrder === 0}
+                    >
+                      <ArrowUpward />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        if (stage.apparatuses !== undefined) {
+                          const nextApparatusKey =
+                            apparatuses[apparatusOrder + 1];
+
+                          stage.apparatuses[nextApparatusKey] = apparatusOrder;
+                          stage.apparatuses[apparatusKey] = apparatusOrder + 1;
+                        }
+                      }}
+                      disabled={apparatusOrder === apparatuses.length - 1}
+                    >
+                      <ArrowDownward />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        if (stage.apparatuses !== undefined) {
+                          delete stage.apparatuses[
+                            apparatusKey as ApparatusKey
+                          ];
+                        }
+                      }}
+                    >
+                      <Remove />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+              ))}
             </Stack>
-          )
-      )}
+          );
+        }
+      })}
     </Stack>
   );
 }
