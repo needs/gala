@@ -1,10 +1,9 @@
 import { Avatar, Box, Chip, Divider, Stack, Typography } from '@mui/material';
-import { apparatuses } from '../../../lib/apparatus';
 import { fullName } from '../../../lib/utils';
 import Image from 'next/image';
 import GenderIcon from '../../../components/GenderIcon';
 import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, Progress, store } from '../../../lib/store';
+import { ApparatusKey, Progress, getApparatusIconPath, getApparatusName, store } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
 
@@ -18,13 +17,12 @@ function Apparatus({
   const { teams, players } = useSyncedStore(store);
 
   const team = teams[teamKey];
-  const apparatus = apparatuses[apparatusKey];
 
   return (
     <Stack direction="column" gap={2} alignItems="center">
       <Stack direction="row" gap={2} alignItems="center">
-        <Image src={apparatus.iconPath} alt="Vault" width={24} height={24} />
-        <Typography variant="h5">{apparatus.name}</Typography>
+        <Image src={getApparatusIconPath(apparatusKey)} alt="Vault" width={24} height={24} />
+        <Typography variant="h5">{getApparatusName(apparatusKey)}</Typography>
       </Stack>
       {team === undefined ? (
         <Typography color="gray">Aucune équipe</Typography>

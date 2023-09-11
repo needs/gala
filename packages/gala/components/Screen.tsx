@@ -1,21 +1,18 @@
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import { Apparatus, apparatuses } from '../lib/apparatus';
 import { fullName } from '../lib/utils';
 import GenderAvatar from '../components/GenderAvatar';
 import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, store } from '../lib/store';
+import { ApparatusKey, allApparatuses, getApparatusIconPath, getApparatusName, store } from '../lib/store';
 
 function Apparatus({
   apparatusKey,
-  apparatus,
   stageKey,
 }: {
   apparatusKey: ApparatusKey;
-  apparatus: Apparatus;
   stageKey: 'stage1' | 'stage2';
 }) {
-  const width = `${(1 / Object.entries(apparatuses).length) * 100}%`;
+  const width = `${(1 / allApparatuses.length) * 100}%`;
 
   const { teams, progresses, players } = useSyncedStore(store);
 
@@ -36,8 +33,8 @@ function Apparatus({
       minWidth={width}
       maxWidth={width}
     >
-      <Image src={apparatus.iconPath} alt="Vault" width={96} height={96} />
-      <Typography variant="h1">{apparatus.name}</Typography>
+      <Image src={getApparatusIconPath(apparatusKey)} alt="Vault" width={96} height={96} />
+      <Typography variant="h1">{getApparatusName(apparatusKey)}</Typography>
       {team !== undefined && (
         <>
           <Typography variant="h4" paddingY={3} paddingX={1}>
@@ -87,8 +84,8 @@ export default function Screen({ stageName, stageKey}: { stageName: string, stag
         justifyContent="center"
         divider={<Divider orientation="vertical" />}
       >
-        {Object.entries(apparatuses).map(([apparatusKey, apparatus]) => (
-          <Apparatus stageKey={stageKey} key={apparatusKey} apparatusKey={apparatusKey as ApparatusKey} apparatus={apparatus} />
+        {allApparatuses.map((apparatusKey) => (
+          <Apparatus stageKey={stageKey} key={apparatusKey} apparatusKey={apparatusKey} />
         ))}
       </Stack>
     </Stack>
