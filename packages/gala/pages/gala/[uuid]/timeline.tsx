@@ -10,16 +10,14 @@ import {
   Typography,
 } from '@mui/material';
 import { withAuthGala } from '../../../lib/auth';
-import {
-  Add,
-  ArrowDownward,
-  ArrowUpward,
-  Delete,
-} from '@mui/icons-material';
+import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import {
+  ApparatusKey,
+  Stage,
   TimelinePause,
   TimelineRotation,
+  stageApparatuses,
   store,
 } from '../../../lib/store';
 import { useSyncedStore } from '@syncedstore/react';
@@ -131,12 +129,14 @@ function TimelineRotationContainer({
 }
 
 function TimelineRotationComponent({
+  apparatuses,
   rotation,
   date,
   onMoveUp,
   onMoveDown,
   onDelete,
 }: {
+  apparatuses: ApparatusKey[];
   rotation: TimelineRotation;
   date: Date;
   onMoveUp?: () => void;
@@ -151,7 +151,7 @@ function TimelineRotationComponent({
       onMoveDown={onMoveDown}
       onDelete={onDelete}
     >
-      <TimelineRotation_ rotation={rotation} />
+      <TimelineRotation_ apparatuses={apparatuses} rotation={rotation} />
     </TimelineRotationContainer>
   );
 }
@@ -196,6 +196,7 @@ export default function TimelinePage() {
             name: 'Plateau 1',
             timeline: {},
             timelineStartDate: new Date().toString(),
+            apparatuses: {},
           };
         }}
       >
@@ -208,6 +209,8 @@ export default function TimelinePage() {
     Object.entries(stage.timeline),
     (entry) => entry[1].order
   );
+
+  const apparatuses = stageApparatuses(stage);
 
   let nextRotationDate = new Date(stage.timelineStartDate);
 
@@ -251,20 +254,7 @@ export default function TimelinePage() {
 
               stage.timeline[uuidv4()] = {
                 type: 'rotation',
-                apparatuses: {
-                  vault: {
-                    teams: {},
-                  },
-                  unevenBars: {
-                    teams: {},
-                  },
-                  beam: {
-                    teams: {},
-                  },
-                  floor: {
-                    teams: {},
-                  },
-                },
+                apparatuses: {},
                 order: 0,
                 durationInMinutes: 60,
               };
@@ -318,13 +308,15 @@ export default function TimelinePage() {
         };
 
         if (rotation.type === 'rotation') {
-          const isEmpty = Object.values(rotation.apparatuses).every(
-            (apparatus) => Object.keys(apparatus.teams).length === 0
-          );
+          const isEmpty = apparatuses.every((apparatusKey) => {
+            const apparatus = rotation.apparatuses[apparatusKey];
+            return apparatus === undefined || Object.keys(apparatus.teams).length === 0;
+          });
 
           return (
             <TimelineRotationComponent
               key={rotationKey}
+              apparatuses={apparatuses}
               rotation={rotation}
               date={rotationDate}
               onMoveUp={order === 0 ? undefined : onMoveUp}

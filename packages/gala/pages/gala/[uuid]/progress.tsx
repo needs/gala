@@ -7,6 +7,7 @@ import {
   TimelinePause,
   TimelineRotation,
   TimelineRotationApparatus,
+  stageApparatuses,
   store,
 } from '../../../lib/store';
 import { sortBy, sum } from 'lodash';
@@ -191,6 +192,7 @@ function ProgressEnd({
 }
 
 function ProgressRotation({
+  apparatuses,
   stageName,
   startDate,
   endDate,
@@ -198,6 +200,7 @@ function ProgressRotation({
   onForward,
   onBackward,
 }: {
+  apparatuses: ApparatusKey[];
   stageName: string;
   startDate?: Date;
   endDate?: Date;
@@ -213,7 +216,7 @@ function ProgressRotation({
       onForward={onForward}
       onBackward={onBackward}
     >
-      <TimelineRotation_ rotation={rotation} readOnly={true} />
+      <TimelineRotation_ apparatuses={apparatuses} rotation={rotation} readOnly={true} />
     </ProgressContainer>
   );
 }
@@ -405,6 +408,8 @@ export default function ProgressPage() {
           stage.progress = previousProgress;
         };
 
+        const apparatuses = stageApparatuses(stage);
+
         switch (currentRotation.type) {
           case 'start':
             return (
@@ -427,6 +432,7 @@ export default function ProgressPage() {
           case 'rotation':
             return (
               <ProgressRotation
+                apparatuses={apparatuses}
                 key={stageKey}
                 startDate={startDate}
                 endDate={endDate}

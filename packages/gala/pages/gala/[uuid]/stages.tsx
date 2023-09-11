@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
-import { keyBy, sortBy, sum } from 'lodash';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
 import { withAuthGala } from '../../../lib/auth';
@@ -23,6 +22,7 @@ import {
   allApparatuses,
   getApparatusIconPath,
   getApparatusName,
+  stageApparatuses,
   store,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
@@ -90,32 +90,6 @@ export default function StagesPage() {
     };
   };
 
-  const teamsCountsPerApparatus = Object.values(stages).reduce(
-    (teamsCountsPerApparatus, stage) => {
-      if (stage !== undefined && stage.apparatuses !== undefined) {
-        for (const apparatus of Object.keys(
-          stage.apparatuses
-        ) as ApparatusKey[]) {
-          if (teamsCountsPerApparatus[apparatus] === undefined) {
-            teamsCountsPerApparatus[apparatus] = 0;
-          }
-
-          teamsCountsPerApparatus[apparatus] += sum(
-            Object.values(stage.timeline ?? {}).map(
-              (rotation) =>
-                rotation.type === 'rotation' &&
-                apparatus in rotation.apparatuses &&
-                Object.keys(rotation.apparatuses[apparatus].teams).length
-            )
-          );
-        }
-      }
-
-      return teamsCountsPerApparatus;
-    },
-    {} as Record<ApparatusKey, number>
-  );
-
   return (
     <Stack gap={4} padding={4}>
       <Stack
@@ -148,11 +122,23 @@ export default function StagesPage() {
 
       {Object.entries(stages).map(([stageKey, stage]) => {
         if (stage !== undefined) {
-          const apparatuses = sortBy(Object.entries(stage.apparatuses ?? {}), [
-            ([apparatusKey, apparatusOrder]) => apparatusOrder,
-          ]).map(
-            ([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey
-          );
+          const apparatuses = stageApparatuses(stage);
+
+          const teamsCountPerApparatus: Partial<Record<ApparatusKey, number>> =
+            {};
+
+          for (const rotation of Object.values(stage.timeline)) {
+            if (rotation.type === 'rotation') {
+              for (const [apparatusKey, apparatus] of Object.entries(
+                rotation.apparatuses
+              )) {
+                const count =
+                  teamsCountPerApparatus[apparatusKey as ApparatusKey] ?? 0;
+                teamsCountPerApparatus[apparatusKey as ApparatusKey] =
+                  count + Object.keys(apparatus.teams).length;
+              }
+            }
+          }
 
           return (
             <Stack key={stageKey} direction="column" gap={2}>
@@ -185,6 +171,11 @@ export default function StagesPage() {
                       stage.apparatuses[apparatus] = Object.keys(
                         stage.apparatuses
                       ).length;
+
+                      console.log(
+                        'stage.apparatuses',
+                        JSON.parse(JSON.stringify(stage.apparatuses))
+                      );
                     }}
                   />
 
@@ -218,7 +209,7 @@ export default function StagesPage() {
                         {getApparatusName(apparatusKey as ApparatusKey)}
                       </Typography>
                       <Typography variant="caption">
-                        {teamsCountsPerApparatus[apparatusKey as ApparatusKey]}{' '}
+                        {teamsCountPerApparatus[apparatusKey as ApparatusKey]}{' '}
                         équipes
                       </Typography>
                     </Stack>
@@ -258,6 +249,15 @@ export default function StagesPage() {
                           delete stage.apparatuses[
                             apparatusKey as ApparatusKey
                           ];
+
+                          for (const [apparatusKey, order] of Object.entries(
+                            stage.apparatuses
+                          )) {
+                            if (order > apparatusOrder) {
+                              stage.apparatuses[apparatusKey as ApparatusKey] =
+                                order - 1;
+                            }
+                          }
                         }
                       }}
                     >

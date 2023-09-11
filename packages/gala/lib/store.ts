@@ -1,6 +1,7 @@
 import { syncedStore, getYjsDoc } from "@syncedstore/core";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Icon } from "../components/SelectIconDialog";
+import { sortBy } from "lodash";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
@@ -17,8 +18,8 @@ export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
 export type StageProgress = { rotationIndex: number, apparatusIndex: number };
 
-export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string, progress?: StageProgress, apparatuses?: Partial<Record<ApparatusKey, number>> };
-export type TimelineRotation = { type: "rotation", order: number, apparatuses: Record<ApparatusKey, TimelineRotationApparatus>, durationInMinutes: number };
+export type Stage = { name: string, timeline: Record<string, TimelineRotation | TimelinePause>, timelineStartDate: string, progress?: StageProgress, apparatuses: Partial<Record<ApparatusKey, number>> };
+export type TimelineRotation = { type: "rotation", order: number, apparatuses: Partial<Record<ApparatusKey, TimelineRotationApparatus>>, durationInMinutes: number };
 export type TimelinePause = { type: "pause", order: number, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
@@ -56,6 +57,14 @@ export function getApparatusIconPath(apparatusKey: ApparatusKey): string {
     case "rings": return "/icons/apparatuses/rings.png";
     case "pommelHorse": return "/icons/apparatuses/pommelHorse.png";
   }
+}
+
+export function stageApparatuses(stage: Stage): ApparatusKey[] {
+  return sortBy(Object.entries(stage.apparatuses), [
+    ([apparatusKey, apparatusOrder]) => apparatusOrder,
+  ]).map(
+    ([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey
+  );
 }
 
 export const barDefault: Record<string, BarCategory> = {

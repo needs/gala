@@ -1,5 +1,20 @@
-import { Button, ButtonBase, Divider, IconButton, Paper, Stack, Typography } from '@mui/material';
-import { ApparatusKey, Team, TimelineRotation, getApparatusIconPath, getApparatusName, store } from '../lib/store';
+import {
+  Button,
+  ButtonBase,
+  Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
+import {
+  ApparatusKey,
+  Team,
+  TimelineRotation,
+  getApparatusIconPath,
+  getApparatusName,
+  store,
+} from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { useSyncedStore } from '@syncedstore/react';
 import Image from 'next/image';
@@ -55,7 +70,10 @@ function TimelineEditTeamButton({
   return (
     <>
       <EditTeamDialog open={open} team={team} onClose={() => setOpen(false)} />
-      <ButtonBase onClick={readOnly ? undefined : () => setOpen(true)} component="div">
+      <ButtonBase
+        onClick={readOnly ? undefined : () => setOpen(true)}
+        component="div"
+      >
         <Stack padding={2} gap={1} flexGrow={1}>
           <Stack
             direction="row"
@@ -64,9 +82,11 @@ function TimelineEditTeamButton({
             justifyContent="space-between"
           >
             <Typography variant="body1">{team.name}</Typography>
-            {!readOnly && <IconButton size="small" onClick={onRemove}>
-              <Remove />
-            </IconButton>}
+            {!readOnly && (
+              <IconButton size="small" onClick={onRemove}>
+                <Remove />
+              </IconButton>
+            )}
           </Stack>
           {Object.keys(team.members).map((playerKey) => {
             const player = players[playerKey];
@@ -76,10 +96,14 @@ function TimelineEditTeamButton({
                 <EditPlayerButton
                   key={playerKey}
                   player={player}
-                  onDelete={readOnly ? undefined : () => {
-                    delete team.members[playerKey];
-                    delete players[playerKey];
-                  }}
+                  onDelete={
+                    readOnly
+                      ? undefined
+                      : () => {
+                          delete team.members[playerKey];
+                          delete players[playerKey];
+                        }
+                  }
                 />
               )
             );
@@ -91,9 +115,11 @@ function TimelineEditTeamButton({
 }
 
 export default function TimelineRotation({
+  apparatuses,
   rotation,
   readOnly,
 }: {
+  apparatuses: ApparatusKey[];
   rotation: TimelineRotation;
   readOnly?: boolean;
 }) {
@@ -102,8 +128,11 @@ export default function TimelineRotation({
   return (
     <Paper elevation={1}>
       <Grid container>
-        {Object.entries(rotation.apparatuses).map(
-          ([apparatuseKey, { teams: apparatusTeams }]) => (
+        {apparatuses.map((apparatuseKey) => {
+          const apparatus = rotation.apparatuses[apparatuseKey];
+          const apparatusTeams = apparatus === undefined ? {} : apparatus.teams;
+
+          return (
             <Grid
               key={apparatuseKey}
               xs
@@ -130,17 +159,19 @@ export default function TimelineRotation({
                     justifyContent="center"
                   >
                     <Image
-                      src={getApparatusIconPath(apparatuseKey as ApparatusKey)}
-                      alt={getApparatusName(apparatuseKey as ApparatusKey)}
+                      src={getApparatusIconPath(apparatuseKey)}
+                      alt={getApparatusName(apparatuseKey)}
                       width={24}
                       height={24}
                     />
                     <Typography variant="h6">
-                      {getApparatusName(apparatuseKey as ApparatusKey)}
+                      {getApparatusName(apparatuseKey)}
                     </Typography>
                   </Stack>
 
-                  {!readOnly && <TimelineAddTeamButton teamsMap={apparatusTeams} />}
+                  {!readOnly && (
+                    <TimelineAddTeamButton teamsMap={apparatusTeams} />
+                  )}
                 </Stack>
 
                 <Stack flexGrow={1} direction="column" divider={<Divider />}>
@@ -163,8 +194,8 @@ export default function TimelineRotation({
                 </Stack>
               </Stack>
             </Grid>
-          )
-        )}
+          );
+        })}
       </Grid>
     </Paper>
   );
