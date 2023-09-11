@@ -171,11 +171,6 @@ export default function StagesPage() {
                       stage.apparatuses[apparatus] = Object.keys(
                         stage.apparatuses
                       ).length;
-
-                      console.log(
-                        'stage.apparatuses',
-                        JSON.parse(JSON.stringify(stage.apparatuses))
-                      );
                     }}
                   />
 
@@ -209,7 +204,7 @@ export default function StagesPage() {
                         {getApparatusName(apparatusKey as ApparatusKey)}
                       </Typography>
                       <Typography variant="caption">
-                        {teamsCountPerApparatus[apparatusKey as ApparatusKey]}{' '}
+                        {teamsCountPerApparatus[apparatusKey as ApparatusKey] ?? 0}{' '}
                         équipes
                       </Typography>
                     </Stack>
