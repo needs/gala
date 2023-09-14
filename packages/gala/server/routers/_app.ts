@@ -114,8 +114,6 @@ export const appRouter = router({
         }
       });
 
-      console.log("name", opts.input.name);
-
       return null;
     }),
 
