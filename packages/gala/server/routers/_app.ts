@@ -88,7 +88,7 @@ export const appRouter = router({
       name: z.string().optional(),
       created_at: z.date(),
       is_admin: z.boolean(),
-     }))
+    }))
     .query((opts) => {
       const { email, name, created_at, is_admin } = opts.ctx.user;
       return {
@@ -97,6 +97,26 @@ export const appRouter = router({
         created_at,
         is_admin,
       };
+    }),
+
+  updateUser: authedProcedure
+    .input(z.object({
+      name: z.string().optional(),
+    }))
+    .output(z.null())
+    .mutation(async (opts) => {
+      await prisma.user.update({
+        where: {
+          id: opts.ctx.user.id,
+        },
+        data: {
+          name: opts.input.name ?? undefined,
+        }
+      });
+
+      console.log("name", opts.input.name);
+
+      return null;
     }),
 
   list: authedProcedure
