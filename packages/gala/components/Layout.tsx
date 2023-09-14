@@ -29,8 +29,9 @@ import {
   Avatar,
   Divider,
   IconButton,
-  Menu,
-  MenuItem,
+  Menu as MenuList,
+  MenuItem as MenuListItem,
+  Stack,
   Tooltip,
 } from '@mui/material';
 import Link from 'next/link';
@@ -44,84 +45,91 @@ import { trpc } from '../utils/trpc';
 
 const drawerWidth = 240;
 
-type MenuItem = {
+type MenuListItem = {
   href: string;
   label: string;
   icon: React.ReactNode;
 };
 
-type Menu = Record<string, MenuItem>;
+type MenuList = Record<string, MenuListItem>;
+type Menu = MenuList[];
 
-export const menuAdmin = (uuid: string): Menu => ({
-  info: {
-    href: `/gala/${uuid}`,
-    label: 'Général',
-    icon: <EmojiEvents />,
+export const menuAdmin = (uuid: string): Menu => [
+  {
+    info: {
+      href: `/gala/${uuid}`,
+      label: 'Général',
+      icon: <EmojiEvents />,
+    },
+    teams: {
+      href: `/gala/${uuid}/registrations`,
+      label: 'Inscriptions',
+      icon: <Group />,
+    },
+    stages: {
+      href: `/gala/${uuid}/stages`,
+      label: 'Plateaux',
+      icon: <Villa />,
+    },
+    timeline: {
+      href: `/gala/${uuid}/timeline`,
+      label: 'Échéancier',
+      icon: <EventNote />,
+    },
+    progress: {
+      href: `/gala/${uuid}/progress`,
+      label: 'Déroulement',
+      icon: <Schedule />,
+    },
   },
-  teams: {
-    href: `/gala/${uuid}/registrations`,
-    label: 'Inscriptions',
-    icon: <Group />,
+  {
+    bar: {
+      href: `/gala/${uuid}/bar`,
+      label: 'Buvette',
+      icon: <SportsBar />,
+    },
+    'screens-1': {
+      href: `/gala/${uuid}/screens/1`,
+      label: 'Screen 1',
+      icon: <Tv />,
+    },
+    'screens-2': {
+      href: `/gala/${uuid}/screens/2`,
+      label: 'Screen 2',
+      icon: <Tv />,
+    },
+    'screens-bar': {
+      href: `/gala/${uuid}/screens/bar`,
+      label: 'Buvette (bis)',
+      icon: <FoodBank />,
+    },
   },
-  stages: {
-    href: `/gala/${uuid}/stages`,
-    label: 'Plateaux',
-    icon: <Villa />,
-  },
-  timeline: {
-    href: `/gala/${uuid}/timeline`,
-    label: 'Échéancier',
-    icon: <EventNote />,
-  },
-  progress: {
-    href: `/gala/${uuid}/progress`,
-    label: 'Déroulement',
-    icon: <Schedule />,
-  },
-  bar: {
-    href: `/gala/${uuid}/bar`,
-    label: 'Buvette',
-    icon: <SportsBar />,
-  },
-  'screens-1': {
-    href: `/gala/${uuid}/screens/1`,
-    label: 'Screen 1',
-    icon: <Tv />,
-  },
-  'screens-2': {
-    href: `/gala/${uuid}/screens/2`,
-    label: 'Screen 2',
-    icon: <Tv />,
-  },
-  'screens-bar': {
-    href: `/gala/${uuid}/screens/bar`,
-    label: 'Buvette (bis)',
-    icon: <FoodBank />,
-  },
-});
+];
 
-export const menuVisitor = (uuid: string): Menu => ({
-  home: {
-    href: `/public/${uuid}`,
-    label: 'Plateaux',
-    icon: <ViewDay />,
+export const menuVisitor = (uuid: string): Menu => [
+  {
+    home: {
+      href: `/public/${uuid}`,
+      label: 'Plateaux',
+      icon: <ViewDay />,
+    },
+    bar: {
+      href: `/public/${uuid}/bar`,
+      label: 'Buvette',
+      icon: <FoodBank />,
+    },
   },
-  bar: {
-    href: `/public/${uuid}/bar`,
-    label: 'Buvette',
-    icon: <FoodBank />,
-  },
-});
+];
 
 type LayoutInfoAdmin = {
   menu: 'admin';
-  selected: keyof ReturnType<typeof menuAdmin>;
+  selected: keyof ReturnType<typeof menuAdmin>[number];
   uuid: string;
 };
 
 type LayoutInfoVisitor = {
   menu: 'visitor';
-  selected: keyof ReturnType<typeof menuVisitor>;
+  selected: keyof ReturnType<typeof menuVisitor>[number];
   uuid: string;
 };
 
@@ -173,7 +181,7 @@ function AccountMenu() {
           </IconButton>
         </Tooltip>
       </Box>
-      <Menu
+      <MenuList
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
@@ -209,16 +217,16 @@ function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuListItem onClick={handleClose}>
           <Avatar /> Profil
-        </MenuItem>
+        </MenuListItem>
         <Link href={'/'} legacyBehavior>
-          <MenuItem onClick={handleClose}>
+          <MenuListItem onClick={handleClose}>
             <Avatar /> GALAs
-          </MenuItem>
+          </MenuListItem>
         </Link>
         <Divider />
-        <MenuItem
+        <MenuListItem
           onClick={() => {
             removeCookies('session');
             signOut(auth).then(() => {
@@ -230,8 +238,8 @@ function AccountMenu() {
             <Logout fontSize="small" />
           </ListItemIcon>
           Déconnexion
-        </MenuItem>
-      </Menu>
+        </MenuListItem>
+      </MenuList>
     </>
   );
 }
@@ -255,20 +263,22 @@ export default function Layout({
   const drawer = (
     <>
       <Toolbar />
-      <Box sx={{ overflow: 'auto' }}>
-        <List>
-          {Object.entries(menu).map(([key, { label, icon, href }]) => (
-            <ListItem key={label} disablePadding>
-              <Link href={href} legacyBehavior>
-                <ListItemButton selected={key === layoutInfo.selected}>
-                  <ListItemIcon>{icon}</ListItemIcon>
-                  <ListItemText primary={label} />
-                </ListItemButton>
-              </Link>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
+      <Stack sx={{ overflow: 'auto' }} divider={<Divider />}>
+        {menu.map((menuList, index) => (
+          <List key={index}>
+            {Object.entries(menuList).map(([key, { label, icon, href }]) => (
+              <ListItem key={label} disablePadding>
+                <Link href={href} legacyBehavior>
+                  <ListItemButton selected={key === layoutInfo.selected}>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={label} />
+                  </ListItemButton>
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+        ))}
+      </Stack>
     </>
   );
 
