@@ -217,10 +217,12 @@ function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
+        <Link href="/account" legacyBehavior>
         <MenuListItem onClick={handleClose}>
           <Avatar /> Profil
         </MenuListItem>
-        <Link href={'/'} legacyBehavior>
+        </Link>
+        <Link href="/" legacyBehavior>
           <MenuListItem onClick={handleClose}>
             <Avatar /> GALAs
           </MenuListItem>

@@ -110,7 +110,7 @@ export const appRouter = router({
           id: opts.ctx.user.id,
         },
         data: {
-          name: opts.input.name ?? undefined,
+          name: opts.input.name || null,
         }
       });
 
