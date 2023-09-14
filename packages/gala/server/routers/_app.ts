@@ -81,6 +81,24 @@ export const appRouter = router({
       }
     }),
 
+  user: authedProcedure
+    .input(z.null())
+    .output(z.object({
+      email: z.string(),
+      name: z.string().optional(),
+      created_at: z.date(),
+      is_admin: z.boolean(),
+     }))
+    .query((opts) => {
+      const { email, name, created_at, is_admin } = opts.ctx.user;
+      return {
+        email,
+        name: name ?? undefined,
+        created_at,
+        is_admin,
+      };
+    }),
+
   list: authedProcedure
     .input(z.null())
     .output(z.array(z.object({ uuid: z.string().uuid(), name: z.string(), teamCount: z.number() })))

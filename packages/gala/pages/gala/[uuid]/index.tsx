@@ -30,19 +30,7 @@ import { withAuthGala } from '../../../lib/auth';
 import { trpc } from '../../../utils/trpc';
 import { Role } from '@prisma/client';
 import { Delete, Email } from '@mui/icons-material';
-
-function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function extractNameFromEmail(email: string) {
-  return email
-    .split('@')[0]
-    .replace(/[0-9]/g, '')
-    .split(/[._]+/)
-    .map(capitalizeFirstLetter)
-    .join(' ');
-}
+import { avatarUrl, getUserName } from '../../../lib/avatar';
 
 const RoleSelector = ({
   value,
@@ -212,22 +200,13 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
         {members !== undefined && (
           <List sx={{ width: '100%' }} disablePadding>
             {Object.entries(members ?? {}).map(([memberKey, member]) => {
-              const name = member.name
-                ? member.name
-                : extractNameFromEmail(member.email);
-
+              const name = getUserName(member.email, member.name);
               const joinedAt = new Date(member.joinedAt);
 
               return (
                 <ListItem key={member.email}>
                   <ListItemAvatar>
-                    <Avatar
-                      src={`https://ui-avatars.com/api/?${new URLSearchParams({
-                        name,
-                        format: 'svg',
-                        background: 'random',
-                      }).toString()}`}
-                    ></Avatar>
+                    <Avatar src={avatarUrl(name)} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={name}

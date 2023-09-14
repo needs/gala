@@ -15,7 +15,8 @@ import {
   EventNote,
   FoodBank,
   Group,
-  Menu,
+  Logout,
+  Menu as MenuIcon,
   Redo,
   Schedule,
   SportsBar,
@@ -24,9 +25,22 @@ import {
   ViewDay,
   Villa,
 } from '@mui/icons-material';
-import { Button, ButtonGroup, Chip, IconButton, Tooltip } from '@mui/material';
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from '@mui/material';
 import Link from 'next/link';
 import { undoManager, useGala } from '../lib/store';
+import { avatarUrl, getUserName } from '../lib/avatar';
+import { signOut } from 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { useRouter } from 'next/router';
+import { useCookies } from 'react-cookie';
+import { trpc } from '../utils/trpc';
 
 const drawerWidth = 240;
 
@@ -122,6 +136,106 @@ function getMenu(layoutInfo: LayoutInfo): Menu {
   }
 }
 
+function AccountMenu() {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const router = useRouter();
+  const [cookies, setCookies, removeCookies] = useCookies(['session']);
+
+  const { data: user } = trpc.user.useQuery(null);
+
+  if (user === undefined) {
+    return null;
+  }
+
+  const name = getUserName(user.email, user.name);
+
+  return (
+    <>
+      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+        <Tooltip title="Mon compte">
+          <IconButton
+            onClick={handleClick}
+            size="small"
+            sx={{ ml: 2 }}
+            aria-controls={open ? 'account-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+          >
+            <Avatar sx={{ width: 32, height: 32 }} src={avatarUrl(name)} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Menu
+        anchorEl={anchorEl}
+        id="account-menu"
+        open={open}
+        onClose={handleClose}
+        onClick={handleClose}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            overflow: 'visible',
+            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+            width: 200,
+            mt: 1.5,
+            '& .MuiAvatar-root': {
+              width: 32,
+              height: 32,
+              ml: -0.5,
+              mr: 1,
+            },
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: 'background.paper',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+            },
+          },
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <MenuItem onClick={handleClose}>
+          <Avatar /> Profil
+        </MenuItem>
+        <Link href={'/'} legacyBehavior>
+          <MenuItem onClick={handleClose}>
+            <Avatar /> GALAs
+          </MenuItem>
+        </Link>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            removeCookies('session');
+            signOut(auth).then(() => {
+              router.push('/login');
+            });
+          }}
+        >
+          <ListItemIcon>
+            <Logout fontSize="small" />
+          </ListItemIcon>
+          Déconnexion
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
+
 export default function Layout({
   children,
   layoutInfo,
@@ -185,7 +299,7 @@ export default function Layout({
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
-            <Menu />
+            <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {!info.galaName ? 'GALA sans nom' : info.galaName}
@@ -212,6 +326,7 @@ export default function Layout({
               <Redo />
             </IconButton>
           </Tooltip>
+          <AccountMenu />
         </Toolbar>
       </AppBar>
       <Box
