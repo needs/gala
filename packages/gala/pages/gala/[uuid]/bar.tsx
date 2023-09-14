@@ -1,6 +1,5 @@
-import { useSyncedStore } from '@syncedstore/react';
 import { withAuthGala } from '../../../lib/auth';
-import { BarCategory, barDefault, store } from '../../../lib/store';
+import { BarCategory, barDefault, useGala } from '../../../lib/store';
 import {
   Button,
   Divider,
@@ -72,7 +71,7 @@ function CurrencyField({
 }
 
 export default function BarPage() {
-  const { bar } = useSyncedStore(store);
+  const { bar } = useGala();
 
   const swapCategories = (index1: number, index2: number) => {
     for (const category of Object.values(bar)) {

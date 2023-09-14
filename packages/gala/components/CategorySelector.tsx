@@ -8,8 +8,7 @@ import {
   ListItemAvatar,
 } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { useSyncedStore } from '@syncedstore/react';
-import { store } from '../lib/store';
+import { useGala } from '../lib/store';
 import { z } from "zod";
 
 const categorySelectorValueSchema = z.union([
@@ -48,7 +47,7 @@ export default function CategorySelector({
   allowAll?: boolean;
   allowNone?: boolean;
 }) {
-  const { categories } = useSyncedStore(store);
+  const { categories } = useGala();
 
   return (
     <FormControl size="small" fullWidth>

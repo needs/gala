@@ -24,8 +24,8 @@ import {
   Typography,
 } from '@mui/material';
 import Head from 'next/head';
-import { store } from '../../../lib/store';
-import { useSyncedStore } from '@syncedstore/react';
+import { useGala } from '../../../lib/store';
+
 import { withAuthGala } from '../../../lib/auth';
 import { trpc } from '../../../utils/trpc';
 import { Role } from '@prisma/client';
@@ -145,7 +145,7 @@ const InviteMemberDialog = ({
 };
 
 export default function Index({ galaUuid }: { galaUuid: string }) {
-  const { info } = useSyncedStore(store);
+  const { info } = useGala();
 
   const {
     data: members,

@@ -13,8 +13,7 @@ import CategorySelector, { categoryKeyToCategorySelectorValue } from './Category
 import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import AddPlayerButton from './AddPlayerButton';
-import { Team, store } from '../lib/store';
-import { useSyncedStore } from '@syncedstore/react';
+import { Team, useGala } from '../lib/store';
 
 export default function EditTeamDialog({
   open,
@@ -25,7 +24,7 @@ export default function EditTeamDialog({
   team: Team;
   onClose: () => void;
 }) {
-  const { players, categories } = useSyncedStore(store);
+  const { players, categories } = useGala();
 
   const importFromClipboard = useCallback(() => {
     navigator.clipboard.readText().then((text) => {

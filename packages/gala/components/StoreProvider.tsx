@@ -1,7 +1,8 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { initStore } from '../lib/store';
+import { Gala, initStore, store } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
+import { useSyncedStore } from '@syncedstore/react';
 
 const StoreProvider = ({
   children,
@@ -17,7 +18,6 @@ const StoreProvider = ({
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined' && galaUuid !== undefined && sessionCookie !== undefined) {
-
         return initStore(
           galaUuid,
           sessionCookie,

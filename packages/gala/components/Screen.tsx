@@ -2,8 +2,7 @@ import { Box, Divider, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { fullName } from '../lib/utils';
 import GenderAvatar from '../components/GenderAvatar';
-import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, allApparatuses, getApparatusIconPath, getApparatusName, store } from '../lib/store';
+import { ApparatusKey, allApparatuses, getApparatusIconPath, getApparatusName, useGala } from '../lib/store';
 
 function Apparatus({
   apparatusKey,
@@ -14,7 +13,7 @@ function Apparatus({
 }) {
   const width = `${(1 / allApparatuses.length) * 100}%`;
 
-  const { teams, progresses, players } = useSyncedStore(store);
+  const { teams, progresses, players } = useGala();
 
   const progress = progresses[stageKey];
 

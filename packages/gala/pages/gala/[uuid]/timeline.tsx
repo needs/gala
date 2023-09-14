@@ -21,9 +21,8 @@ import {
   TimelinePause,
   TimelineRotation,
   stageApparatuses,
-  store,
+  useGala,
 } from '../../../lib/store';
-import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
 import {
   addMinutes,
@@ -186,7 +185,7 @@ function TimelinePauseComponent({
 }
 
 export default function TimelinePage() {
-  const { stages } = useSyncedStore(store);
+  const { stages } = useGala();
 
   const [selectedStageKey, setSelectedStageKey] = useState<string | undefined>(
     Object.keys(stages).at(0)

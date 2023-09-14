@@ -16,16 +16,17 @@ import {
   FoodBank,
   Group,
   Menu,
+  Redo,
   Schedule,
   SportsBar,
   Tv,
+  Undo,
   ViewDay,
   Villa,
 } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { Button, ButtonGroup, Chip, IconButton } from '@mui/material';
 import Link from 'next/link';
-import { useSyncedStore } from '@syncedstore/react';
-import { store } from '../lib/store';
+import { undoManager, useGala } from '../lib/store';
 
 const drawerWidth = 240;
 
@@ -129,7 +130,7 @@ export default function Layout({
   layoutInfo?: LayoutInfo;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { info } = useSyncedStore(store);
+  const { info } = useGala();
 
   if (layoutInfo === undefined) {
     return <>{children}</>;
@@ -186,9 +187,15 @@ export default function Layout({
           >
             <Menu />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {!info.galaName ? 'GALA sans nom' : info.galaName}
           </Typography>
+          <IconButton color="inherit" onClick={() => {
+            undoManager.undo();
+          }}><Undo /></IconButton>
+          <IconButton color="inherit" onClick={() => {
+            undoManager.redo();
+          }}><Redo /></IconButton>
         </Toolbar>
       </AppBar>
       <Box

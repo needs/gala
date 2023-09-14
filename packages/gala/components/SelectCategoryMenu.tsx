@@ -1,7 +1,6 @@
 import { ListItemText, MenuItem, ListItemAvatar, Menu } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { useSyncedStore } from '@syncedstore/react';
-import { store } from '../lib/store';
+import { useGala } from '../lib/store';
 import { CategorySelectorValue } from './CategorySelector';
 
 export default function SelectCategoryMenu({
@@ -17,7 +16,7 @@ export default function SelectCategoryMenu({
   allowNone?: boolean;
   allowAll?: boolean;
 }) {
-  const { categories } = useSyncedStore(store);
+  const { categories } = useGala();
 
   return (
     <Menu

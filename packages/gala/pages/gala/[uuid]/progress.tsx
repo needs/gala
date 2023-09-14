@@ -1,5 +1,4 @@
-import { Button, Stack, Typography } from '@mui/material';
-import { useSyncedStore } from '@syncedstore/react';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import {
   ApparatusKey,
   Stage,
@@ -8,7 +7,7 @@ import {
   TimelineRotationApparatus,
   stageApparatuses,
   stageRotations,
-  store,
+  useGala,
 } from '../../../lib/store';
 import { withAuthGala } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
@@ -22,6 +21,7 @@ import {
   intervalToDuration,
 } from 'date-fns';
 import fr from 'date-fns/locale/fr';
+import { isEmpty } from 'lodash';
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
   if (startDate === undefined && endDate === undefined) {
@@ -371,7 +371,15 @@ function getCurrentRotation(stage: Stage): CurrentRotationInfo {
 }
 
 export default function ProgressPage() {
-  const { stages } = useSyncedStore(store);
+  const { stages } = useGala();
+
+  if (isEmpty(stages)) {
+    return (
+      <Alert severity="info" sx={{ margin: 4 }}>
+        {`Aucun plateau n'a été créé pour cette compétition`}
+      </Alert>
+    );
+  }
 
   return (
     <Stack direction="column" padding={4} gap={4}>

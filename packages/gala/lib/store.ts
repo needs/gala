@@ -2,6 +2,8 @@ import { syncedStore, getYjsDoc } from "@syncedstore/core";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Icon } from "../components/SelectIconDialog";
 import { sortBy } from "lodash";
+import { useSyncedStore } from "@syncedstore/react";
+import { UndoManager } from "yjs";
 
 export const genders = ["man", "woman", "mixed"] as const;
 export type Gender = (typeof genders)[number];
@@ -22,7 +24,7 @@ export type TimelineRotation = { type: "rotation", order: number, apparatuses: P
 export type TimelinePause = { type: "pause", order: number, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
-export type Store = {
+export type Gala = {
   players: Record<string, Player>,
   teams: Record<string, Team>,
   categories: Record<string, Category>,
@@ -101,15 +103,16 @@ export const barDefault: Record<string, BarCategory> = {
   }
 };
 
-export const store = syncedStore<Store>({ players: {}, teams: {}, categories: {}, progresses: {}, bar: {}, info: {} as Info, stages: {} });
+export const store = syncedStore<{ gala: Gala }>({ gala: {} as Gala });
+export const undoManager = new UndoManager(getYjsDoc(store).getMap("gala"));
 
 export function initStore(uuid: string, token: string, onLoad: () => void, onUnload: () => void) {
-  const doc = getYjsDoc(store);
+  const document = getYjsDoc(store);
 
   const provider = new HocuspocusProvider({
     url: "ws://127.0.0.1:1234",
     name: uuid,
-    document: doc,
+    document: document,
     token,
     onSynced: () => {
       onLoad();
@@ -120,4 +123,26 @@ export function initStore(uuid: string, token: string, onLoad: () => void, onUnl
     onUnload();
     provider.destroy();
   }
+}
+
+const defaultGala: Gala = {
+  players: {},
+  teams: {},
+  progresses: {},
+  bar: {},
+  categories: {},
+  info: {
+    galaName: '',
+  },
+  stages: {},
+}
+
+export function useGala(): Gala {
+  const { gala } = useSyncedStore(store);
+
+  const missingEntries = Object.fromEntries(
+    Object.entries(defaultGala).filter(([key]) => !(key in gala))
+  );
+
+  return Object.assign(gala, missingEntries) as Gala;
 }

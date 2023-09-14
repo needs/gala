@@ -2,8 +2,7 @@ import { Avatar, Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import { fullName } from '../../../lib/utils';
 import Image from 'next/image';
 import GenderIcon from '../../../components/GenderIcon';
-import { useSyncedStore } from '@syncedstore/react';
-import { ApparatusKey, Progress, getApparatusIconPath, getApparatusName, store } from '../../../lib/store';
+import { ApparatusKey, Progress, getApparatusIconPath, getApparatusName, useGala } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
 
@@ -14,7 +13,7 @@ function Apparatus({
   apparatusKey: ApparatusKey;
   teamKey: string;
 }) {
-  const { teams, players } = useSyncedStore(store);
+  const { teams, players } = useGala();
 
   const team = teams[teamKey];
 
@@ -102,7 +101,7 @@ function Stage({
 }
 
 export default function Index() {
-  const { progresses } = useSyncedStore(store);
+  const { progresses } = useGala();
 
   return (
     <Stack gap={10}>

@@ -13,10 +13,9 @@ import {
   TimelineRotation,
   getApparatusIconPath,
   getApparatusName,
-  store,
+  useGala,
 } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import { useSyncedStore } from '@syncedstore/react';
 import Image from 'next/image';
 import { useState } from 'react';
 import SelectTeamDialog from './SelectTeamDialog';
@@ -64,7 +63,7 @@ function TimelineEditTeamButton({
   onRemove: () => void;
   readOnly?: boolean;
 }) {
-  const { players } = useSyncedStore(store);
+  const { players } = useGala();
   const [open, setOpen] = useState(false);
 
   return (
@@ -123,7 +122,7 @@ export default function TimelineRotation({
   rotation: TimelineRotation;
   readOnly?: boolean;
 }) {
-  const { teams } = useSyncedStore(store);
+  const { teams } = useGala();
 
   return (
     <Paper elevation={1}>

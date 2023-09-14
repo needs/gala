@@ -12,7 +12,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useSyncedStore } from '@syncedstore/react';
 import { uuidv4 } from 'lib0/random';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
@@ -23,7 +22,7 @@ import {
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
-  store,
+  useGala,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
 
@@ -60,7 +59,7 @@ function AddApparatusButton({
 }
 
 export default function StagesPage() {
-  const { stages } = useSyncedStore(store);
+  const { stages } = useGala();
 
   useEffect(() => {
     for (const stage of Object.values(stages)) {

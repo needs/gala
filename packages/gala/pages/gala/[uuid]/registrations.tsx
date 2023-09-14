@@ -1,4 +1,4 @@
-import { Category, Team, store } from '../../../lib/store';
+import { Category, Team, useGala } from '../../../lib/store';
 import {
   Avatar,
   Box,
@@ -27,7 +27,6 @@ import CategorySelector, {
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
-import { useSyncedStore } from '@syncedstore/react';
 import { withAuthGala } from '../../../lib/auth';
 import EditCategoryDialog from '../../../components/EditCategoryDialog';
 
@@ -56,7 +55,7 @@ function AddTeamButton({
   defaultCategoryKey: string | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const { teams } = useSyncedStore(store);
+  const { teams } = useGala();
   const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
   const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
@@ -89,7 +88,7 @@ function AddTeamButton({
 
 function AddCategoryButton() {
   const [open, setOpen] = useState(false);
-  const { categories } = useSyncedStore(store);
+  const { categories } = useGala();
   const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
   const category =
     categoryKey !== undefined ? categories[categoryKey] : undefined;
@@ -141,7 +140,7 @@ function EditCategoryButton({ category }: { category: Category }) {
 }
 
 export default function TeamsPage() {
-  const { teams, players, categories } = useSyncedStore(store);
+  const { teams, players, categories } = useGala();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({
