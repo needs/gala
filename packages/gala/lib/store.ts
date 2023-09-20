@@ -26,7 +26,7 @@ export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
 export type ScreenBar = { type: "bar" };
 export type ScreenProgress = { type: "progress", stageKey: string };
-export type Screen = (ScreenBar | ScreenProgress) & { name: string }
+export type Screen = (ScreenBar | ScreenProgress) & { name: string, shortUrlId: string | undefined }
 export const screenTypes: Screen["type"][] = ["bar", "progress"];
 
 export type Gala = {

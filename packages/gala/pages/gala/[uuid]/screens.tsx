@@ -5,13 +5,21 @@ import {
   Screen,
   getDefaultScreen,
 } from '../../../lib/store';
-import { Stack, Typography } from '@mui/material';
-import { Add, SportsBar } from '@mui/icons-material';
+import {
+  Chip,
+  Stack,
+  Typography,
+} from '@mui/material';
+import {
+  Add,
+  SportsBar,
+} from '@mui/icons-material';
 import { nanoid } from 'nanoid';
 import TvFrame from '../../../components/TvFrame';
 import EditScreenDialog from '../../../components/EditScreenDialog';
 import { useState } from 'react';
 import { boxed } from '@syncedstore/core';
+import { v4 as uuidv4 } from 'uuid';
 
 function EditScreenButton({
   screen,
@@ -35,12 +43,7 @@ function EditScreenButton({
       />
       <TvFrame height={200} width={300}>
         <Stack
-          direction="row"
-          gap={2}
-          alignItems="center"
-          justifyContent="center"
           height="100%"
-          bgcolor="white"
           sx={{
             backgroundImage: 'url("/tv-background.svg")',
             backgroundRepeat: 'no-repeat',
@@ -48,15 +51,54 @@ function EditScreenButton({
             backgroundPosition: 'center',
             cursor: 'pointer',
           }}
-          onClick={() => setOpen(true)}
+          padding={1}
         >
-          <SportsBar fontSize="large" />
-          <Stack direction="column">
-            <Typography variant="body1">{screen.name || 'Sans nom'}</Typography>
-            <Typography variant="caption">
-              {getScreenName(screen.type)}
-            </Typography>
+          <Chip
+            label="Activé"
+            variant="outlined"
+            color="success"
+            size="small"
+            sx={{
+              '& .MuiChip-label': {
+                marginX: 'auto',
+              },
+              marginLeft: "auto",
+            }}
+          />
+
+          <Stack
+            direction="row"
+            gap={2}
+            alignItems="center"
+            justifyContent="center"
+            onClick={() => setOpen(true)}
+            flexGrow="1"
+          >
+            <SportsBar fontSize="large" />
+            <Stack direction="column">
+              <Typography variant="body1">
+                {screen.name || 'Sans nom'}
+              </Typography>
+              <Typography variant="caption">
+                {getScreenName(screen.type)}
+              </Typography>
+            </Stack>
           </Stack>
+          <Chip
+            label={`galagym.fr/${screen.shortUrlId}`}
+            size="small"
+            sx={{
+              '& .MuiChip-label': {
+                marginX: 'auto',
+              },
+              width: '100%',
+            }}
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `https://galagym.fr/${screen.shortUrlId}`
+              );
+            }}
+          />
         </Stack>
       </TvFrame>
     </>
@@ -71,6 +113,7 @@ function CreateScreenButton({
   const [open, setOpen] = useState(false);
   const [screen, setScreen] = useState<Screen>({
     name: 'Nouvel écran',
+    shortUrlId: undefined,
     ...getDefaultScreen('bar'),
   });
 
@@ -102,6 +145,7 @@ function CreateScreenButton({
         onClick={() => {
           setScreen({
             name: 'Nouvel écran',
+            shortUrlId: undefined,
             ...getDefaultScreen('bar'),
           });
           setOpen(true);
@@ -136,7 +180,7 @@ export default function ScreensPage() {
       ))}
       <CreateScreenButton
         onCreate={(screen) => {
-          screens[nanoid()] = boxed(screen);
+          screens[uuidv4()] = boxed(screen);
         }}
       />
     </Stack>
