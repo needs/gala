@@ -5,15 +5,8 @@ import {
   Screen,
   getDefaultScreen,
 } from '../../../lib/store';
-import {
-  Chip,
-  Stack,
-  Typography,
-} from '@mui/material';
-import {
-  Add,
-  SportsBar,
-} from '@mui/icons-material';
+import { Chip, Snackbar, Stack, Typography } from '@mui/material';
+import { Add, SportsBar } from '@mui/icons-material';
 import { nanoid } from 'nanoid';
 import TvFrame from '../../../components/TvFrame';
 import EditScreenDialog from '../../../components/EditScreenDialog';
@@ -28,17 +21,24 @@ function EditScreenButton({
   screen: Screen;
   onChange: (screen: Screen) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   return (
     <>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        message="URL copiée... Collez là dans le navigateur de votre affichage"
+      />
       <EditScreenDialog
         screen={screen}
-        open={open}
-        onCancel={() => setOpen(false)}
+        open={openDialog}
+        onCancel={() => setOpenDialog(false)}
         onValidate={(screen) => {
           onChange(screen);
-          setOpen(false);
+          setOpenDialog(false);
         }}
       />
       <TvFrame height={200} width={300}>
@@ -62,7 +62,7 @@ function EditScreenButton({
               '& .MuiChip-label': {
                 marginX: 'auto',
               },
-              marginLeft: "auto",
+              marginLeft: 'auto',
             }}
           />
 
@@ -71,7 +71,7 @@ function EditScreenButton({
             gap={2}
             alignItems="center"
             justifyContent="center"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenDialog(true)}
             flexGrow="1"
           >
             <SportsBar fontSize="large" />
@@ -97,6 +97,7 @@ function EditScreenButton({
               navigator.clipboard.writeText(
                 `https://galagym.fr/${screen.shortUrlId}`
               );
+              setOpenSnackbar(true);
             }}
           />
         </Stack>
