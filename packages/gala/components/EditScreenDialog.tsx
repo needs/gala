@@ -19,7 +19,7 @@ import { Schedule, SportsBar } from '@mui/icons-material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 
-function getScreenIcon(screenType: Screen['type'], size: 'small' | 'medium' | 'large') {
+export function getScreenIcon(screenType: Screen['type'], size: 'small' | 'medium' | 'large') {
   switch (screenType) {
     case 'bar':
       return <SportsBar fontSize={size}/>;

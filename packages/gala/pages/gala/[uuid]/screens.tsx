@@ -9,7 +9,7 @@ import { Chip, Snackbar, Stack, Typography } from '@mui/material';
 import { Add, SportsBar } from '@mui/icons-material';
 import { nanoid } from 'nanoid';
 import TvFrame from '../../../components/TvFrame';
-import EditScreenDialog from '../../../components/EditScreenDialog';
+import EditScreenDialog, { getScreenIcon } from '../../../components/EditScreenDialog';
 import { useState } from 'react';
 import { boxed } from '@syncedstore/core';
 import { v4 as uuidv4 } from 'uuid';
@@ -74,7 +74,7 @@ function EditScreenButton({
             onClick={() => setOpenDialog(true)}
             flexGrow="1"
           >
-            <SportsBar fontSize="large" />
+            {getScreenIcon(screen.type, 'large')}
             <Stack direction="column">
               <Typography variant="body1">
                 {screen.name || 'Sans nom'}
