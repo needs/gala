@@ -1,5 +1,10 @@
 import { withAuthGala } from '../../../lib/auth';
-import { getScreenName, useGala, Screen } from '../../../lib/store';
+import {
+  getScreenName,
+  useGala,
+  Screen,
+  getDefaultScreen,
+} from '../../../lib/store';
 import { Stack, Typography } from '@mui/material';
 import { Add, SportsBar } from '@mui/icons-material';
 import { nanoid } from 'nanoid';
@@ -58,6 +63,59 @@ function EditScreenButton({
   );
 }
 
+function CreateScreenButton({
+  onCreate,
+}: {
+  onCreate: (screen: Screen) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [screen, setScreen] = useState<Screen>({
+    name: 'Nouvel écran',
+    ...getDefaultScreen('bar'),
+  });
+
+  return (
+    <>
+      <EditScreenDialog
+        screen={screen}
+        open={open}
+        onCancel={() => setOpen(false)}
+        onValidate={(screen) => {
+          onCreate(screen);
+          setOpen(false);
+        }}
+      />
+      <Stack
+        height={200}
+        width={300}
+        sx={{
+          borderRadius: 2,
+          borderStyle: 'dashed',
+          borderWidth: 4,
+          borderColor: 'grey.300',
+          bgcolor: 'grey.100',
+          color: 'grey.600',
+          cursor: 'pointer',
+        }}
+        justifyContent="center"
+        alignItems="center"
+        onClick={() => {
+          setScreen({
+            name: 'Nouvel écran',
+            ...getDefaultScreen('bar'),
+          });
+          setOpen(true);
+        }}
+      >
+        <Add fontSize="large" />
+        <Typography variant="h5" component="span">
+          Ajouter un écran
+        </Typography>
+      </Stack>
+    </>
+  );
+}
+
 export default function ScreensPage() {
   const { screens } = useGala();
 
@@ -76,32 +134,11 @@ export default function ScreensPage() {
           onChange={(screen) => (screens[screenKey] = boxed(screen))}
         />
       ))}
-      <Stack
-        height={200}
-        width={300}
-        sx={{
-          borderRadius: 2,
-          borderStyle: 'dashed',
-          borderWidth: 4,
-          borderColor: 'grey.300',
-          bgcolor: 'grey.100',
-          color: 'grey.600',
-          cursor: 'pointer',
+      <CreateScreenButton
+        onCreate={(screen) => {
+          screens[nanoid()] = boxed(screen);
         }}
-        justifyContent="center"
-        alignItems="center"
-        onClick={() => {
-          screens[nanoid()] = boxed({
-            type: 'bar',
-            name: 'Nouvel écran',
-          });
-        }}
-      >
-        <Add fontSize="large" />
-        <Typography variant="h5" component="span">
-          Ajouter un écran
-        </Typography>
-      </Stack>
+      />
     </Stack>
   );
 }
