@@ -65,9 +65,6 @@ export default function EditTeamDialog({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier une équipe</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          Les modifications seront appliquées seulement une fois validées.
-        </DialogContentText>
         <Stack direction="column" spacing={2}>
           <TextField
             autoFocus

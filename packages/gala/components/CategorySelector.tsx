@@ -51,10 +51,8 @@ export default function CategorySelector({
 
   return (
     <FormControl size="small" fullWidth>
-      <InputLabel id="demo-simple-select-label">Catégorie</InputLabel>
+      <InputLabel>Catégorie</InputLabel>
       <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
         value={JSON.stringify(value)}
         label="Catégorie"
         renderValue={(valueString) => {

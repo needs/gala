@@ -25,9 +25,6 @@ export default function EditCategoryDialog({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier une catégorie</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          Les modifications seront appliquées seulement une fois validées.
-        </DialogContentText>
         <Stack direction="column" spacing={2}>
           <TextField
             autoFocus

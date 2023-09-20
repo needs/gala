@@ -1,4 +1,4 @@
-import { syncedStore, getYjsDoc } from "@syncedstore/core";
+import { syncedStore, getYjsDoc, Box } from "@syncedstore/core";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { Icon } from "../components/SelectIconDialog";
 import { sortBy } from "lodash";
@@ -27,6 +27,7 @@ export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 export type ScreenBar = { type: "bar" };
 export type ScreenProgress = { type: "progress", stageKey: string };
 export type Screen = (ScreenBar | ScreenProgress) & { name: string }
+export const screenTypes: Screen["type"][] = ["bar", "progress"];
 
 export type Gala = {
   players: Record<string, Player>,
@@ -35,7 +36,7 @@ export type Gala = {
   stages: Record<string, Stage>,
   progresses: Record<string, Progress>,
   bar: Record<string, BarCategory>,
-  screens: Record<string, Screen>,
+  screens: Record<string, Box<Screen>>,
   info: Info,
 }
 
@@ -77,6 +78,25 @@ export function stageRotations(stage: Stage): (TimelineRotation | TimelinePause)
   return sortBy(Object.values(stage.timeline),
     (rotation) => rotation.order,
   )
+}
+
+export function getScreenName(screenType: Screen["type"]): string {
+  switch (screenType) {
+    case "bar": return "Buvette";
+    case "progress": return "Progression";
+  }
+}
+
+export function getDefaultScreen(screenType: Screen["type"]): ScreenBar | ScreenProgress {
+  switch (screenType) {
+    case "bar": return {
+      type: "bar",
+    };
+    case "progress": return {
+      type: "progress",
+      stageKey: "",
+    };
+  }
 }
 
 export const barDefault: Record<string, BarCategory> = {

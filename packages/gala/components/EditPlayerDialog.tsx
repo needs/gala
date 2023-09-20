@@ -25,9 +25,6 @@ export default function EditPlayerDialog({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Modifier un joueur</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          Les modifications seront appliquées seulement une fois validées.
-        </DialogContentText>
         <Stack direction="column" spacing={2}>
           <TextField
             autoFocus
