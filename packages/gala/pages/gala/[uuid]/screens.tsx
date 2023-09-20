@@ -30,7 +30,7 @@ function EditScreenButton({
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
-        message="URL copiée... Collez là dans le navigateur de votre affichage"
+        message="URL copiée... Collez là dans un navigateur internet (Chrome, Firefox...)"
       />
       <EditScreenDialog
         screen={screen}
