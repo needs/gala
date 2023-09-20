@@ -1,0 +1,30 @@
+.tv-frame-monitor {
+	background: #444444;
+	position: relative;
+	border-top: 3px solid #888;
+	padding: 6px 6px 10px 6px;
+	border-radius: 10px;
+	border-bottom-left-radius: 50% 2%;
+	border-bottom-right-radius: 50% 2%;
+}
+
+.tv-frame-monitor:after {
+	content: '';
+	display: block;
+	position: absolute;
+	bottom: 5px;
+	left: 36%;
+	height: .5%;
+	width: 28%;
+	background: #ddd;
+	border-radius: 50%;
+}
+
+.tv-frame-monitor-screen {
+	position: relative;
+  background-color: #fff;
+	background-size: cover;
+	background-position: top center;
+	overflow: hidden;
+	border-radius: 3px;
+}

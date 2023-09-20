@@ -9,6 +9,7 @@ import { UserInfo } from '../lib/auth';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import fr from 'date-fns/locale/fr';
+import "../components/TvFrame.css"
 
 export type PageProps = {
   galaUuid?: string;

@@ -88,20 +88,10 @@ export const menuAdmin = (uuid: string): Menu => [
       label: 'Buvette',
       icon: <SportsBar />,
     },
-    'screens-1': {
-      href: `/gala/${uuid}/screens/1`,
-      label: 'Screen 1',
+    screens: {
+      href: `/gala/${uuid}/screens`,
+      label: 'Écrans',
       icon: <Tv />,
-    },
-    'screens-2': {
-      href: `/gala/${uuid}/screens/2`,
-      label: 'Screen 2',
-      icon: <Tv />,
-    },
-    'screens-bar': {
-      href: `/gala/${uuid}/screens/bar`,
-      label: 'Buvette (bis)',
-      icon: <FoodBank />,
     },
   },
 ];

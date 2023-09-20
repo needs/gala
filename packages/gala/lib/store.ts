@@ -24,6 +24,10 @@ export type TimelineRotation = { type: "rotation", order: number, apparatuses: P
 export type TimelinePause = { type: "pause", order: number, durationInMinutes: number };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
+export type ScreenBar = { type: "bar" };
+export type ScreenProgress = { type: "progress", stageKey: string };
+export type Screen = (ScreenBar | ScreenProgress) & { name: string }
+
 export type Gala = {
   players: Record<string, Player>,
   teams: Record<string, Team>,
@@ -31,6 +35,7 @@ export type Gala = {
   stages: Record<string, Stage>,
   progresses: Record<string, Progress>,
   bar: Record<string, BarCategory>,
+  screens: Record<string, Screen>,
   info: Info,
 }
 
@@ -134,6 +139,7 @@ const defaultGala: Gala = {
   info: {
     galaName: '',
   },
+  screens: {},
   stages: {},
 }
 
