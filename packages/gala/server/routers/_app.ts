@@ -5,6 +5,7 @@ import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
 import { auth } from 'firebase-admin';
 import { isIdTokenValid } from '@gala/auth';
+import { nanoid } from 'nanoid';
 
 const isAuthedMiddleware = middleware((opts) => {
   const { ctx } = opts;
@@ -164,6 +165,25 @@ export const appRouter = router({
         uuid: gala.uuid,
       };
     }),
+
+  toShortId: procedure
+    .input(z.object({ uuid: z.string().uuid(), screenUuid: z.string().uuid() }))
+    .output(z.string())
+    .use(isMemberMiddleware)
+    .mutation(async (opts) => {
+      const shortId = nanoid(8);
+
+      await prisma.screenShortId.create({
+        data: {
+          short_id: shortId,
+          gala_uuid: opts.input.uuid,
+          screen_uuid: opts.input.screenUuid,
+        }
+      });
+
+      return shortId;
+    }
+    ),
 
   members: router({
     list: procedure

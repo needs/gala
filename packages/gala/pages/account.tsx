@@ -8,13 +8,11 @@ import {
   Typography,
 } from '@mui/material';
 import { trpc } from '../utils/trpc';
-import { useRouter } from 'next/router';
 import { withAuth } from '../lib/auth';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function AccountPage() {
-  const router = useRouter();
   const updateUser = trpc.updateUser.useMutation();
   const { data: user, refetch: refetchUser } = trpc.user.useQuery(null);
   const [userName, setUserName] = useState('');

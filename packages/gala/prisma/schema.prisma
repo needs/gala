@@ -31,15 +31,26 @@ model GalaUser {
   user_id    Int
   gala       Gala     @relation(fields: [gala_uuid], references: [uuid])
   gala_uuid  String
+
   @@id([user_id, gala_uuid])
 }
 
 model Gala {
-  uuid       String     @id @default(uuid())
-  name       String
-  teamCount  Int
-  data       Bytes
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  users      GalaUser[]
+  uuid             String          @id @default(uuid())
+  name             String
+  teamCount        Int
+  data             Bytes
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+  users            GalaUser[]
+  screen_short_ids ScreenShortId[]
+}
+
+model ScreenShortId {
+  short_id    String   @id
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  gala        Gala     @relation(fields: [gala_uuid], references: [uuid])
+  gala_uuid   String
+  screen_uuid String
 }

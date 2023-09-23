@@ -13,6 +13,7 @@ import EditScreenDialog, { getScreenIcon } from '../../../components/EditScreenD
 import { useState } from 'react';
 import { boxed } from '@syncedstore/core';
 import { v4 as uuidv4 } from 'uuid';
+import { trpc } from '../../../utils/trpc';
 
 function EditScreenButton({
   screen,
@@ -85,7 +86,7 @@ function EditScreenButton({
             </Stack>
           </Stack>
           <Chip
-            label={`galagym.fr/${screen.shortUrlId}`}
+            label={`${location.host}/${screen.shortUrlId}`}
             size="small"
             sx={{
               '& .MuiChip-label': {
@@ -95,7 +96,7 @@ function EditScreenButton({
             }}
             onClick={() => {
               navigator.clipboard.writeText(
-                `https://galagym.fr/${screen.shortUrlId}`
+                `${location.origin}/${screen.shortUrlId}`
               );
               setOpenSnackbar(true);
             }}
@@ -161,8 +162,9 @@ function CreateScreenButton({
   );
 }
 
-export default function ScreensPage() {
+export default function ScreensPage({ galaUuid }: { galaUuid: string }) {
   const { screens } = useGala();
+  const toShortId = trpc.toShortId.useMutation();
 
   return (
     <Stack
@@ -180,8 +182,14 @@ export default function ScreensPage() {
         />
       ))}
       <CreateScreenButton
-        onCreate={(screen) => {
-          screens[uuidv4()] = boxed(screen);
+        onCreate={async (screen) => {
+          const screenUuid = uuidv4();
+          const shortId = await toShortId.mutateAsync({ uuid: galaUuid, screenUuid })
+
+          screens[screenUuid] = boxed({
+            ...screen,
+            shortUrlId: shortId
+          });
         }}
       />
     </Stack>
