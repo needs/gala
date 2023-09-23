@@ -14,7 +14,6 @@ export type Player = { firstName: string, lastName: string, gender: Gender };
 export type Team = { name: string, members: Record<string, boolean>, categoryKey: string | undefined };
 export type Category = { name: string, gender: Gender, apparatuses: Record<string, { name: string, icon: string }> };
 export type Progress = Partial<Record<ApparatusKey, string>>;
-export type Judge = { firstName: string, lastName: string };
 export type BarCategory = { name: string, items: Record<string, BarItem>, order: number, icon?: Icon };
 export type BarItem = { name: string, price: number, order: number };
 export type Info = { galaName: string };
