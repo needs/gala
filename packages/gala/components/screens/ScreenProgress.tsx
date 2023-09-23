@@ -42,7 +42,6 @@ function Rotation({
 }) {
   const { teams, players, categories } = useGala();
 
-  // Horizontally scroll the apparatuses every 5 seconds
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -59,7 +58,6 @@ function Rotation({
   }, [refs.current.length, setScrollIndex]);
 
   useEffect(() => {
-    console.log(scrollIndex, refs.current.length)
     refs.current[scrollIndex % refs.current.length]?.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
