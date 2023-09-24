@@ -161,7 +161,7 @@ function Form({
     >
       <Stack gap={2}>
         <Typography>
-          Authentifiez vous ou créez un compte pour retrouver vos GALA de
+          Authentifiez vous ou créez un compte pour retrouver vos compétitions de
           gymnastique.
         </Typography>
         {errorMessage !== undefined && (

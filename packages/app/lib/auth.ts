@@ -37,8 +37,8 @@ export const withAuth: (option: {
     }
 
     if (checkMembership === true) {
-      const galaUuid = context.query.uuid as string;
-      const role = await getRole(galaUuid, user);
+      const competitionUuid = context.query.uuid as string;
+      const role = await getRole(competitionUuid, user);
 
       if (role === undefined) {
         return redirectToHome;
@@ -59,20 +59,20 @@ export const withAuth: (option: {
   };
 };
 
-export const withAuthGala = (selected: string) =>
+export const withAuthCompetition = (selected: string) =>
   withAuth({
     checkMembership: true,
     callback: async (context) => {
-      const galaUuid = context.query.uuid as string;
+      const competitionUuid = context.query.uuid as string;
 
       return {
         props: {
-          galaUuid,
+          competitionUuid: competitionUuid,
 
           layoutInfo: {
             menu: 'admin',
             selected,
-            uuid: galaUuid,
+            uuid: competitionUuid,
           },
         },
       };

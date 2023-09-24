@@ -6,7 +6,7 @@ import {
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
-  useGala,
+  useCompetition,
 } from '../../lib/store';
 import { getCurrentRotation } from '../../lib/progress';
 import Image from 'next/image';
@@ -40,7 +40,7 @@ function Rotation({
   rotation: TimelineRotation;
   apparatuses: ApparatusKey[];
 }) {
-  const { teams, players, categories } = useGala();
+  const { teams, players, categories } = useCompetition();
 
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
@@ -173,7 +173,7 @@ function Pause() {
 }
 
 export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
-  const { stages } = useGala();
+  const { stages } = useCompetition();
 
   const stage =
     stages[screen.stageKey] !== undefined

@@ -24,9 +24,9 @@ import {
   Typography,
 } from '@mui/material';
 import Head from 'next/head';
-import { useGala } from '../../../lib/store';
+import { useCompetition } from '../../../lib/store';
 
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import { trpc } from '../../../utils/trpc';
 import { Role } from '@prisma/client';
 import { Delete, Email } from '@mui/icons-material';
@@ -59,12 +59,12 @@ const RoleSelector = ({
 
 const InviteMemberDialog = ({
   open,
-  galaUuid,
+  competitionUuid,
   onClose,
   onInvited,
 }: {
   open: boolean;
-  galaUuid: string;
+  competitionUuid: string;
   onClose: () => void;
   onInvited: () => void;
 }) => {
@@ -85,7 +85,7 @@ const InviteMemberDialog = ({
       <DialogContent>
         <DialogContentText>
           {
-            "Un email sera envoyé à l'adresse indiquée pour inviter la personne à rejoindre le GALA."
+            "Un email sera envoyé à l'adresse indiquée pour inviter la personne à rejoindre la compétition."
           }
         </DialogContentText>
         <Stack direction="column" gap={2}>
@@ -117,7 +117,7 @@ const InviteMemberDialog = ({
           startIcon={<Email />}
           onClick={() => {
             addMember({
-              uuid: galaUuid,
+              uuid: competitionUuid,
               email,
               role,
             }).then(() => {
@@ -132,8 +132,8 @@ const InviteMemberDialog = ({
   );
 };
 
-export default function Index({ galaUuid }: { galaUuid: string }) {
-  const { info } = useGala();
+export default function Index({ competitionUuid }: { competitionUuid: string }) {
+  const { info } = useCompetition();
 
   const {
     data: members,
@@ -141,7 +141,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
     isError: isMembersError,
     refetch: refetchMembers,
   } = trpc.members.list.useQuery({
-    uuid: galaUuid,
+    uuid: competitionUuid,
   });
 
   const { mutateAsync: removeMember } = trpc.members.remove.useMutation();
@@ -155,7 +155,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
         <title>Général</title>
       </Head>
       <InviteMemberDialog
-        galaUuid={galaUuid}
+        competitionUuid={competitionUuid}
         open={inviteMemberDialogOpen}
         onClose={() => {
           setInviteMemberDialogOpen(false);
@@ -171,9 +171,9 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
         </Typography>
         <TextField
           label="Nom de la compétition"
-          value={info.galaName}
+          value={info.name}
           onChange={(e) => {
-            info.galaName = e.target.value;
+            info.name = e.target.value;
           }}
         />
         <Stack direction="row" gap={2} justifyContent="space-between">
@@ -224,7 +224,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                       value={member.role}
                       onChange={(role) => {
                         updateMemberRole({
-                          uuid: galaUuid,
+                          uuid: competitionUuid,
                           email: member.email,
                           role,
                         }).then(() => {
@@ -237,7 +237,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
                         edge="end"
                         onDoubleClick={() => {
                           removeMember({
-                            uuid: galaUuid,
+                            uuid: competitionUuid,
                             email: member.email,
                           }).then(() => {
                             refetchMembers();
@@ -258,4 +258,4 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
   );
 }
 
-export const getServerSideProps = withAuthGala('info');
+export const getServerSideProps = withAuthCompetition('info');

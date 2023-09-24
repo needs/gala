@@ -15,14 +15,14 @@ import {
 import { uuidv4 } from 'lib0/random';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import {
   ApparatusKey,
   allApparatuses,
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
-  useGala,
+  useCompetition,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
 
@@ -59,7 +59,7 @@ function AddApparatusButton({
 }
 
 export default function StagesPage() {
-  const { stages } = useGala();
+  const { stages } = useCompetition();
 
   useEffect(() => {
     for (const stage of Object.values(stages)) {
@@ -281,4 +281,4 @@ export default function StagesPage() {
   );
 }
 
-export const getServerSideProps = withAuthGala('stages');
+export const getServerSideProps = withAuthCompetition('stages');

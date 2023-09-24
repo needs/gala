@@ -1,11 +1,11 @@
-import { useGala } from '../../../../lib/store';
+import { useCompetition } from '../../../../lib/store';
 import { GetServerSideProps } from 'next';
 import ScreenBar from '../../../../components/screens/ScreenBar';
 import ScreenProgress from '../../../../components/screens/ScreenProgress';
 import ScreenInvalid from '../../../../components/screens/ScreenInvalid';
 
 export default function ScreenPage({ screenUuid }: { screenUuid: string }) {
-  const { screens } = useGala();
+  const { screens } = useCompetition();
 
   if (typeof screens[screenUuid] === 'undefined') {
     return <ScreenInvalid />;
@@ -24,10 +24,10 @@ export default function ScreenPage({ screenUuid }: { screenUuid: string }) {
 }
 
 export const getServerSideProps = (async (context) => {
-  const galaUuid = context.query.uuid;
+  const competitionUuid = context.query.uuid;
   const screenUuid = context.query.screenUuid;
 
-  if (typeof galaUuid !== 'string' || typeof screenUuid !== 'string') {
+  if (typeof competitionUuid !== 'string' || typeof screenUuid !== 'string') {
     return {
       notFound: true,
     };
@@ -35,7 +35,7 @@ export const getServerSideProps = (async (context) => {
 
   return {
     props: {
-      galaUuid,
+      competitionUuid,
       screenUuid,
     },
   };

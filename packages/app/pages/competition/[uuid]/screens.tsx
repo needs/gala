@@ -1,7 +1,7 @@
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import {
   getScreenName,
-  useGala,
+  useCompetition,
   Screen,
   getDefaultScreen,
 } from '../../../lib/store';
@@ -164,8 +164,8 @@ function CreateScreenButton({
   );
 }
 
-export default function ScreensPage({ galaUuid }: { galaUuid: string }) {
-  const { screens } = useGala();
+export default function ScreensPage({ competitionUuid }: { competitionUuid: string }) {
+  const { screens } = useCompetition();
   const toShortId = trpc.toShortId.useMutation();
 
   return (
@@ -187,7 +187,7 @@ export default function ScreensPage({ galaUuid }: { galaUuid: string }) {
         onCreate={async (screen) => {
           const screenUuid = uuidv4();
           const shortId = await toShortId.mutateAsync({
-            uuid: galaUuid,
+            uuid: competitionUuid,
             screenUuid,
           });
 
@@ -201,4 +201,4 @@ export default function ScreensPage({ galaUuid }: { galaUuid: string }) {
   );
 }
 
-export const getServerSideProps = withAuthGala('screens');
+export const getServerSideProps = withAuthCompetition('screens');

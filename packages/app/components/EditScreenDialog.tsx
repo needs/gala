@@ -21,7 +21,7 @@ import {
   getDefaultScreen,
   getScreenName,
   screenTypes,
-  useGala,
+  useCompetition,
 } from '../lib/store';
 import { Schedule, SportsBar } from '@mui/icons-material';
 import { cloneDeep } from 'lodash';
@@ -46,7 +46,7 @@ function EditScreenProgress({
   screen: ScreenProgress;
   setScreen: (screen: ScreenProgress) => void;
 }) {
-  const { stages } = useGala();
+  const { stages } = useCompetition();
 
   return (
     <FormControl sx={{ width: 300 }} variant="standard">

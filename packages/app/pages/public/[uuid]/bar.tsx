@@ -40,15 +40,15 @@ export default function Bar() {
 export const getServerSideProps: GetServerSideProps<PageProps> = async (
   context
 ) => {
-  const galaUuid = context.query.uuid as string;
+  const competitionUuid = context.query.uuid as string;
   return {
     props: {
-      galaUuid,
+      competitionUuid: competitionUuid,
 
       layoutInfo: {
         menu: 'visitor',
         selected: 'bar',
-        uuid: galaUuid,
+        uuid: competitionUuid,
       },
     },
   };

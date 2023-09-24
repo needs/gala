@@ -53,15 +53,15 @@ export const getRole = async (uuid: string, user: User | undefined) => {
     return "OWNER";
   }
 
-  const galaUser = await prisma.galaUser.findFirst({
+  const competitionUser = await prisma.competitionUser.findFirst({
     where: {
       user_id: user.id,
-      gala_uuid: uuid
+      competition_uuid: uuid
     },
     select: {
       role: true
     }
   });
 
-  return galaUser?.role;
+  return competitionUser?.role;
 }

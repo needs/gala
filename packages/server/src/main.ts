@@ -20,23 +20,23 @@ const server = new Hocuspocus({
   extensions: [
     new Database({
       fetch: async ({ documentName }) => {
-        const gala = await prisma.gala.findUnique({
+        const competition = await prisma.competition.findUnique({
           where: {
             uuid: documentName
           },
         });
 
-        if (gala === null) {
+        if (competition === null) {
           return new Uint8Array();
         }
 
-        return Uint8Array.from(gala.data);
+        return Uint8Array.from(competition.data);
       },
       store: async ({ documentName, state, document }) => {
         const teamCount = document.getMap("teams").size;
-        const name = document.getMap("info").get("galaName") ?? "";
+        const name = document.getMap("info").get("name") ?? "";
 
-        await prisma.gala.update({
+        await prisma.competition.update({
           where: {
             uuid: documentName
           },

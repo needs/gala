@@ -8,7 +8,7 @@ import {
   ListItemAvatar,
 } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { useGala } from '../lib/store';
+import { useCompetition } from '../lib/store';
 import { z } from 'zod';
 
 const categorySelectorValueSchema = z.union([
@@ -47,7 +47,7 @@ export default function CategorySelector({
   allowAll?: boolean;
   allowNone?: boolean;
 }) {
-  const { categories } = useGala();
+  const { categories } = useCompetition();
 
   return (
     <FormControl size="small" fullWidth>

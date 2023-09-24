@@ -1,4 +1,4 @@
-import { Category, Team, useGala } from '../../../lib/store';
+import { Category, Team, useCompetition } from '../../../lib/store';
 import {
   Avatar,
   Box,
@@ -27,7 +27,7 @@ import CategorySelector, {
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
 import { addTeam, defaultTeam } from '../../../lib/team';
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import EditCategoryDialog from '../../../components/EditCategoryDialog';
 
 function EditTeamButton({ team }: { team: Team }) {
@@ -55,7 +55,7 @@ function AddTeamButton({
   defaultCategoryKey: string | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const { teams } = useGala();
+  const { teams } = useCompetition();
   const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
   const team = teamKey !== undefined ? teams[teamKey] : undefined;
 
@@ -88,7 +88,7 @@ function AddTeamButton({
 
 function AddCategoryButton() {
   const [open, setOpen] = useState(false);
-  const { categories } = useGala();
+  const { categories } = useCompetition();
   const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
   const category =
     categoryKey !== undefined ? categories[categoryKey] : undefined;
@@ -140,7 +140,7 @@ function EditCategoryButton({ category }: { category: Category }) {
 }
 
 export default function TeamsPage() {
-  const { teams, players, categories } = useGala();
+  const { teams, players, categories } = useCompetition();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({
@@ -415,4 +415,4 @@ export default function TeamsPage() {
   );
 }
 
-export const getServerSideProps = withAuthGala('teams');
+export const getServerSideProps = withAuthCompetition('teams');

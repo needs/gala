@@ -7,7 +7,7 @@ import {
   Progress,
   getApparatusIconPath,
   getApparatusName,
-  useGala,
+  useCompetition,
 } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
@@ -19,7 +19,7 @@ function Apparatus({
   apparatusKey: ApparatusKey;
   teamKey: string;
 }) {
-  const { teams, players } = useGala();
+  const { teams, players } = useCompetition();
 
   const team = teams[teamKey];
 
@@ -112,7 +112,7 @@ function Stage({
 }
 
 export default function Index() {
-  const { progresses } = useGala();
+  const { progresses } = useCompetition();
 
   return (
     <Stack gap={10}>
@@ -129,15 +129,15 @@ export default function Index() {
 export const getServerSideProps: GetServerSideProps<PageProps> = async (
   context
 ) => {
-  const galaUuid = context.query.uuid as string;
+  const competitionUuid = context.query.uuid as string;
   return {
     props: {
-      galaUuid,
+      competitionUuid: competitionUuid,
 
       layoutInfo: {
         menu: 'visitor',
         selected: 'home',
-        uuid: galaUuid,
+        uuid: competitionUuid,
       },
     },
   };

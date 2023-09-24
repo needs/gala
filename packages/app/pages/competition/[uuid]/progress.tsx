@@ -3,9 +3,9 @@ import {
   ApparatusKey,
   TimelineRotation,
   stageApparatuses,
-  useGala,
+  useCompetition,
 } from '../../../lib/store';
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
@@ -236,7 +236,7 @@ function ProgressPause({
 }
 
 export default function ProgressPage() {
-  const { stages } = useGala();
+  const { stages } = useCompetition();
 
   if (isEmpty(stages)) {
     return (
@@ -336,4 +336,4 @@ export default function ProgressPage() {
   );
 }
 
-export const getServerSideProps = withAuthGala('progress');
+export const getServerSideProps = withAuthCompetition('progress');

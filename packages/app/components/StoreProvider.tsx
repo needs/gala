@@ -1,15 +1,15 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Gala, initStore, store } from '../lib/store';
+import { Competition, initStore, store } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
 import { useSyncedStore } from '@syncedstore/react';
 
 const StoreProvider = ({
   children,
-  galaUuid,
+  competitionUuid,
 }: {
   children: ReactNode;
-  galaUuid?: string;
+  competitionUuid?: string;
 }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
   const [cookies] = useCookies(['session']);
@@ -19,11 +19,11 @@ const StoreProvider = ({
     const init = async () => {
       if (
         typeof window !== 'undefined' &&
-        galaUuid !== undefined &&
+        competitionUuid !== undefined &&
         sessionCookie !== undefined
       ) {
         return initStore(
-          galaUuid,
+          competitionUuid,
           sessionCookie,
           () => setStoreLoaded(true),
           () => setStoreLoaded(false)
@@ -31,9 +31,9 @@ const StoreProvider = ({
       }
     };
     init();
-  }, [galaUuid, sessionCookie]);
+  }, [competitionUuid, sessionCookie]);
 
-  if (galaUuid !== undefined && !storeLoaded) {
+  if (competitionUuid !== undefined && !storeLoaded) {
     return (
       <Box
         display="flex"

@@ -18,7 +18,7 @@ export const getServerSideProps = (async (context) => {
 
   return {
     redirect: {
-      destination: `gala/${screenShortId.gala_uuid}/screen/${screenShortId.screen_uuid}`,
+      destination: `competition/${screenShortId.competition_uuid}/screen/${screenShortId.screen_uuid}`,
       permanent: false,
     },
   };

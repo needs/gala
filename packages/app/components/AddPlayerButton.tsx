@@ -3,10 +3,10 @@ import { IconButton } from '@mui/material';
 import { useState } from 'react';
 import EditPlayerDialog from './EditPlayerDialog';
 import { addPlayer, defaultPlayer } from '../lib/player';
-import { Team, useGala } from '../lib/store';
+import { Team, useCompetition } from '../lib/store';
 
 export default function AddPlayerButton({ team }: { team?: Team }) {
-  const { players } = useGala();
+  const { players } = useCompetition();
   const [playerKey, setPlayerKey] = useState<string | undefined>(undefined);
   const [open, setOpen] = useState(false);
   const player = playerKey !== undefined ? players[playerKey] : undefined;

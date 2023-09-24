@@ -13,7 +13,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { withAuthGala } from '../../../lib/auth';
+import { withAuthCompetition } from '../../../lib/auth';
 import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import {
@@ -21,7 +21,7 @@ import {
   TimelinePause,
   TimelineRotation,
   stageApparatuses,
-  useGala,
+  useCompetition,
 } from '../../../lib/store';
 import { uuidv4 } from 'lib0/random';
 import {
@@ -185,7 +185,7 @@ function TimelinePauseComponent({
 }
 
 export default function TimelinePage() {
-  const { stages } = useGala();
+  const { stages } = useCompetition();
 
   const [selectedStageKey, setSelectedStageKey] = useState<string | undefined>(
     Object.keys(stages).at(0)
@@ -405,4 +405,4 @@ export default function TimelinePage() {
   );
 }
 
-export const getServerSideProps = withAuthGala('timeline');
+export const getServerSideProps = withAuthCompetition('timeline');

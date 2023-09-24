@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { CategorySelectorValue } from './CategorySelector';
-import { useGala } from '../lib/store';
+import { useCompetition } from '../lib/store';
 import GenderAvatar from './GenderAvatar';
 import { FilterList } from '@mui/icons-material';
 import SelectCategoryMenu from './SelectCategoryMenu';
@@ -32,7 +32,7 @@ export default function SelectTeamDialog({
   onSelect: (teamKey: string) => void;
   onClose: () => void;
 }) {
-  const { teams, categories } = useGala();
+  const { teams, categories } = useCompetition();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] =
     useState<CategorySelectorValue>({ type: 'all' });

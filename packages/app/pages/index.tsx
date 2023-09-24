@@ -24,7 +24,7 @@ export default function ListPage() {
   const [cookies, setCookies, removeCookies] = useCookies(['session']);
   const router = useRouter();
   const create = trpc.create.useMutation();
-  const { data: galas } = trpc.list.useQuery(null);
+  const { data: competitions } = trpc.list.useQuery(null);
 
   return (
     <Box
@@ -63,8 +63,8 @@ export default function ListPage() {
             variant="contained"
             startIcon={<Add />}
             onClick={() => {
-              create.mutateAsync(null).then((gala) => {
-                router.push(`/gala/${gala.uuid}`);
+              create.mutateAsync(null).then((competition) => {
+                router.push(`/competition/${competition.uuid}`);
               });
             }}
           >
@@ -72,18 +72,18 @@ export default function ListPage() {
           </Button>
         </Stack>
         <List>
-          {galas !== undefined && galas.length === 0 && (
+          {competitions !== undefined && competitions.length === 0 && (
             <ListItem disablePadding>
               <ListItemText
                 primary="Vous n'avez pas encore créé de compétition"
-                secondary="Cliquez sur le bouton ci-dessus pour en créer un"
+                secondary="Cliquez sur le bouton ci-dessus pour créer une compétition"
               />
             </ListItem>
           )}
-          {galas !== undefined &&
-            galas.length > 0 &&
-            galas.map((gala) => (
-              <Link key={gala.uuid} href={`/gala/${gala.uuid}`} legacyBehavior>
+          {competitions !== undefined &&
+            competitions.length > 0 &&
+            competitions.map((competition) => (
+              <Link key={competition.uuid} href={`/competition/${competition.uuid}`} legacyBehavior>
                 <ListItem disablePadding>
                   <ListItemButton>
                     <ListItemAvatar>
@@ -92,8 +92,8 @@ export default function ListPage() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={gala.name ? gala.name : 'Compétition sans nom'}
-                      secondary={`${gala.teamCount} équipes`}
+                      primary={competition.name ? competition.name : 'Compétition sans nom'}
+                      secondary={`${competition.teamCount} équipes`}
                     />
                   </ListItemButton>
                 </ListItem>

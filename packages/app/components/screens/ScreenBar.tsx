@@ -1,11 +1,11 @@
 import { Box, CssBaseline, Stack, Typography } from '@mui/material';
-import { ScreenBar, useGala } from '../../lib/store';
+import { ScreenBar, useCompetition } from '../../lib/store';
 import { useEffect, useRef, useState } from 'react';
 import * as Muicon from '@mui/icons-material';
 import { sortBy } from 'lodash';
 
 export default function ScreenBar({ screen }: { screen: ScreenBar }) {
-  const { bar } = useGala();
+  const { bar } = useCompetition();
 
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);

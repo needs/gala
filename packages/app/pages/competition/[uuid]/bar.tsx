@@ -1,5 +1,5 @@
-import { withAuthGala } from '../../../lib/auth';
-import { BarCategory, barDefault, useGala } from '../../../lib/store';
+import { withAuthCompetition } from '../../../lib/auth';
+import { BarCategory, barDefault, useCompetition } from '../../../lib/store';
 import {
   Button,
   Divider,
@@ -71,7 +71,7 @@ function CurrencyField({
 }
 
 export default function BarPage() {
-  const { bar } = useGala();
+  const { bar } = useCompetition();
 
   const swapCategories = (index1: number, index2: number) => {
     for (const category of Object.values(bar)) {
@@ -297,4 +297,4 @@ export default function BarPage() {
   );
 }
 
-export const getServerSideProps = withAuthGala('bar');
+export const getServerSideProps = withAuthCompetition('bar');

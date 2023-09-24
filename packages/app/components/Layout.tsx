@@ -35,7 +35,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import Link from 'next/link';
-import { undoManager, useGala } from '../lib/store';
+import { undoManager, useCompetition } from '../lib/store';
 import { avatarUrl, getUserName } from '../lib/avatar';
 import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
@@ -57,39 +57,39 @@ type Menu = MenuList[];
 export const menuAdmin = (uuid: string): Menu => [
   {
     info: {
-      href: `/gala/${uuid}`,
+      href: `/competition/${uuid}`,
       label: 'Général',
       icon: <EmojiEvents />,
     },
     teams: {
-      href: `/gala/${uuid}/registrations`,
+      href: `/competition/${uuid}/registrations`,
       label: 'Inscriptions',
       icon: <Group />,
     },
     stages: {
-      href: `/gala/${uuid}/stages`,
+      href: `/competition/${uuid}/stages`,
       label: 'Plateaux',
       icon: <Villa />,
     },
     timeline: {
-      href: `/gala/${uuid}/timeline`,
+      href: `/competition/${uuid}/timeline`,
       label: 'Échéancier',
       icon: <EventNote />,
     },
     progress: {
-      href: `/gala/${uuid}/progress`,
+      href: `/competition/${uuid}/progress`,
       label: 'Déroulement',
       icon: <Schedule />,
     },
   },
   {
     bar: {
-      href: `/gala/${uuid}/bar`,
+      href: `/competition/${uuid}/bar`,
       label: 'Buvette',
       icon: <SportsBar />,
     },
     screens: {
-      href: `/gala/${uuid}/screens`,
+      href: `/competition/${uuid}/screens`,
       label: 'Écrans',
       icon: <Tv />,
     },
@@ -214,7 +214,7 @@ function AccountMenu() {
         </Link>
         <Link href="/" legacyBehavior>
           <MenuListItem onClick={handleClose}>
-            <Avatar /> GALAs
+            <Avatar /> Compétitions
           </MenuListItem>
         </Link>
         <Divider />
@@ -244,7 +244,7 @@ export default function Layout({
   layoutInfo?: LayoutInfo;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { info } = useGala();
+  const { info } = useCompetition();
 
   if (layoutInfo === undefined) {
     return <>{children}</>;
@@ -304,7 +304,7 @@ export default function Layout({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {!info.galaName ? 'Compétition sans nom' : info.galaName}
+            {!info.name ? 'Compétition sans nom' : info.name}
           </Typography>
           <Tooltip title="Annuler">
             <IconButton

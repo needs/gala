@@ -38,7 +38,7 @@ export type BarCategory = {
   icon?: Icon;
 };
 export type BarItem = { name: string; price: number; order: number };
-export type Info = { galaName: string };
+export type Info = { name: string };
 
 export type Stage = {
   name: string;
@@ -68,7 +68,7 @@ export type Screen = (ScreenBar | ScreenProgress) & {
 };
 export const screenTypes: Screen['type'][] = ['bar', 'progress'];
 
-export type Gala = {
+export type Competition = {
   players: Record<string, Player>;
   teams: Record<string, Team>;
   categories: Record<string, Category>;
@@ -249,8 +249,8 @@ export const barDefault: Record<string, BarCategory> = {
   },
 };
 
-export const store = syncedStore<{ gala: Gala }>({ gala: {} as Gala });
-export const undoManager = new UndoManager(getYjsDoc(store).getMap('gala'));
+export const store = syncedStore<{ competition: Competition }>({ competition: {} as Competition });
+export const undoManager = new UndoManager(getYjsDoc(store).getMap('competition'));
 
 export function initStore(
   uuid: string,
@@ -276,25 +276,25 @@ export function initStore(
   };
 }
 
-const defaultGala: Gala = {
+const defaultCompetition: Competition = {
   players: {},
   teams: {},
   progresses: {},
   bar: {},
   categories: {},
   info: {
-    galaName: '',
+    name: '',
   },
   screens: {},
   stages: {},
 };
 
-export function useGala(): Gala {
-  const { gala } = useSyncedStore(store);
+export function useCompetition(): Competition {
+  const { competition } = useSyncedStore(store);
 
   const missingEntries = Object.fromEntries(
-    Object.entries(defaultGala).filter(([key]) => !(key in gala))
+    Object.entries(defaultCompetition).filter(([key]) => !(key in competition))
   );
 
-  return Object.assign(gala, missingEntries) as Gala;
+  return Object.assign(competition, missingEntries) as Competition;
 }

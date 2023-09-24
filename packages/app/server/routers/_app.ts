@@ -31,11 +31,11 @@ const isMemberMiddleware = isAuthedMiddleware.unstable_pipe(async (opts) => {
 
   const { uuid } = z.object({ uuid: z.string().uuid() }).parse(input);
 
-  const member = await prisma.galaUser.findUnique({
+  const member = await prisma.competitionUser.findUnique({
     where: {
-      user_id_gala_uuid: {
+      user_id_competition_uuid: {
         user_id: user.id,
-        gala_uuid: uuid,
+        competition_uuid: uuid,
       },
     },
   });
@@ -141,7 +141,7 @@ export const appRouter = router({
       )
     )
     .query(async (opts) => {
-      const galas = await prisma.gala.findMany({
+      const competitions = await prisma.competition.findMany({
         select: {
           uuid: true,
           name: true,
@@ -156,7 +156,7 @@ export const appRouter = router({
         },
       });
 
-      return galas;
+      return competitions;
     }),
 
   create: authedProcedure
@@ -165,7 +165,7 @@ export const appRouter = router({
     .mutation(async (opts) => {
       const data = Y.encodeStateAsUpdate(new Y.Doc());
 
-      const gala = await prisma.gala.create({
+      const competition = await prisma.competition.create({
         data: {
           data: Buffer.from(data),
           name: '',
@@ -181,7 +181,7 @@ export const appRouter = router({
       });
 
       return {
-        uuid: gala.uuid,
+        uuid: competition.uuid,
       };
     }),
 
@@ -195,7 +195,7 @@ export const appRouter = router({
       await prisma.screenShortId.create({
         data: {
           short_id: shortId,
-          gala_uuid: opts.input.uuid,
+          competition_uuid: opts.input.uuid,
           screen_uuid: opts.input.screenUuid,
         },
       });
@@ -218,7 +218,7 @@ export const appRouter = router({
       )
       .use(isMemberMiddleware)
       .query(async (opts) => {
-        const members = await prisma.galaUser.findMany({
+        const members = await prisma.competitionUser.findMany({
           select: {
             user: {
               select: {
@@ -230,7 +230,7 @@ export const appRouter = router({
             created_at: true,
           },
           where: {
-            gala_uuid: opts.input.uuid,
+            competition_uuid: opts.input.uuid,
           },
         });
 
@@ -267,10 +267,10 @@ export const appRouter = router({
           },
         });
 
-        await prisma.galaUser.create({
+        await prisma.competitionUser.create({
           data: {
             user_id: user.id,
-            gala_uuid: uuid,
+            competition_uuid: uuid,
             role: role,
           },
         });
@@ -295,9 +295,9 @@ export const appRouter = router({
         });
 
         if (user !== null) {
-          await prisma.galaUser.deleteMany({
+          await prisma.competitionUser.deleteMany({
             where: {
-              gala_uuid: uuid,
+              competition_uuid: uuid,
               user_id: user.id,
             },
           });
@@ -319,9 +319,9 @@ export const appRouter = router({
       .mutation(async (opts) => {
         const { uuid, email, role } = opts.input;
 
-        await prisma.galaUser.updateMany({
+        await prisma.competitionUser.updateMany({
           where: {
-            gala_uuid: uuid,
+            competition_uuid: uuid,
             user: {
               email: email,
             },

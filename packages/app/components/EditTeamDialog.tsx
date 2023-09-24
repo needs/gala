@@ -15,7 +15,7 @@ import CategorySelector, {
 import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import AddPlayerButton from './AddPlayerButton';
-import { Team, useGala } from '../lib/store';
+import { Team, useCompetition } from '../lib/store';
 
 export default function EditTeamDialog({
   open,
@@ -26,7 +26,7 @@ export default function EditTeamDialog({
   team: Team;
   onClose: () => void;
 }) {
-  const { players, categories } = useGala();
+  const { players, categories } = useCompetition();
 
   const importFromClipboard = useCallback(() => {
     navigator.clipboard.readText().then((text) => {

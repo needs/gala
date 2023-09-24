@@ -13,7 +13,7 @@ import {
   TimelineRotation,
   getApparatusIconPath,
   getApparatusName,
-  useGala,
+  useCompetition,
 } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
@@ -63,7 +63,7 @@ function TimelineEditTeamButton({
   onRemove: () => void;
   readOnly?: boolean;
 }) {
-  const { players } = useGala();
+  const { players } = useCompetition();
   const [open, setOpen] = useState(false);
 
   return (
@@ -122,7 +122,7 @@ export default function TimelineRotation({
   rotation: TimelineRotation;
   readOnly?: boolean;
 }) {
-  const { teams } = useGala();
+  const { teams } = useCompetition();
 
   return (
     <Paper elevation={1}>

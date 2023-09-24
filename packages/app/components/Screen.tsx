@@ -7,7 +7,7 @@ import {
   allApparatuses,
   getApparatusIconPath,
   getApparatusName,
-  useGala,
+  useCompetition,
 } from '../lib/store';
 
 function Apparatus({
@@ -19,7 +19,7 @@ function Apparatus({
 }) {
   const width = `${(1 / allApparatuses.length) * 100}%`;
 
-  const { teams, progresses, players } = useGala();
+  const { teams, progresses, players } = useCompetition();
 
   const progress = progresses[stageKey];
 

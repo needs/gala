@@ -12,7 +12,7 @@ import fr from 'date-fns/locale/fr';
 import '../components/TvFrame.css';
 
 export type PageProps = {
-  galaUuid?: string;
+  competitionUuid?: string;
   layoutInfo?: LayoutInfo;
   userInfo?: UserInfo;
 };
@@ -25,7 +25,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   return (
     <CookiesProvider>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        <StoreProvider galaUuid={pageProps.galaUuid}>
+        <StoreProvider competitionUuid={pageProps.competitionUuid}>
           <Layout layoutInfo={pageProps.layoutInfo}>
             <Component {...pageProps} />
             <Analytics />
