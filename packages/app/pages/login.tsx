@@ -21,7 +21,7 @@ import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
 import Router from 'next/router';
 import { GetServerSideProps } from 'next';
-import { getUser } from '@gala/auth';
+import { getUser } from '@tgym.fr/auth';
 import Link from 'next/link';
 
 function Login({

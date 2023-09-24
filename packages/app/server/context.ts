@@ -1,6 +1,6 @@
 import { inferAsyncReturnType } from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
-import { getUser } from '@gala/auth';
+import { getUser } from '@tgym.fr/auth';
 
 export async function createContext({
   req,

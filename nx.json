@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "npmScope": "gala",
+  "npmScope": "tgym.fr",
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",

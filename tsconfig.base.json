@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@gala/auth": ["packages/auth/src/index.ts"]
+      "@tgym.fr/auth": ["packages/auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -4,7 +4,7 @@ import { middleware, procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
 import { auth } from 'firebase-admin';
-import { isIdTokenValid } from '@gala/auth';
+import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
 
 const isAuthedMiddleware = middleware((opts) => {

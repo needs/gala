@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
-import { getRole, getUser } from '@gala/auth';
+import { getRole, getUser } from '@tgym.fr/auth';
 import { serialize } from 'cookie';
 
 export type UserInfo = {

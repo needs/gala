@@ -1,6 +1,6 @@
 import { Hocuspocus } from "@hocuspocus/server";
 import { Database } from "@hocuspocus/extension-database";
-import { getRole, getUser } from "@gala/auth";
+import { getRole, getUser } from "@tgym.fr/auth";
 import { prisma } from "./prisma";
 
 const server = new Hocuspocus({
