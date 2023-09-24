@@ -88,7 +88,7 @@
     {
       "label": "Frontend",
       "type": "shell",
-      "command": "npx nx serve gala",
+      "command": "npx nx serve app",
       "isBackground": true,
 
     },
