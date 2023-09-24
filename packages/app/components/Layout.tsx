@@ -304,7 +304,7 @@ export default function Layout({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {!info.galaName ? 'GALA sans nom' : info.galaName}
+            {!info.galaName ? 'Compétition sans nom' : info.galaName}
           </Typography>
           <Tooltip title="Annuler">
             <IconButton

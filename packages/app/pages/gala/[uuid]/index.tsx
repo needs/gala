@@ -170,7 +170,7 @@ export default function Index({ galaUuid }: { galaUuid: string }) {
           Information générales
         </Typography>
         <TextField
-          label="Nom du GALA"
+          label="Nom de la compétition"
           value={info.galaName}
           onChange={(e) => {
             info.galaName = e.target.value;

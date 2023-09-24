@@ -57,7 +57,7 @@ export default function ListPage() {
           alignItems="center"
         >
           <Typography variant="h6" component="h1">
-            Vos GALAs
+            Vos compétitions
           </Typography>
           <Button
             variant="contained"
@@ -68,14 +68,14 @@ export default function ListPage() {
               });
             }}
           >
-            Créer un GALA
+            Compétition
           </Button>
         </Stack>
         <List>
           {galas !== undefined && galas.length === 0 && (
             <ListItem disablePadding>
               <ListItemText
-                primary="Vous n'avez pas encore créé de GALA"
+                primary="Vous n'avez pas encore créé de compétition"
                 secondary="Cliquez sur le bouton ci-dessus pour en créer un"
               />
             </ListItem>
@@ -92,7 +92,7 @@ export default function ListPage() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={gala.name ? gala.name : 'GALA sans nom'}
+                      primary={gala.name ? gala.name : 'Compétition sans nom'}
                       secondary={`${gala.teamCount} équipes`}
                     />
                   </ListItemButton>
