@@ -1,8 +1,8 @@
 import admin from 'firebase-admin';
 import { PrismaClient, User } from '@prisma/client';
 
-export const isIdTokenValid = async (idToken: string) => {
-  const user = await admin.auth().verifyIdToken(idToken).catch(() => {
+export const isIdTokenValid = async (adminApp: admin.app.App, idToken: string) => {
+  const user = await adminApp.auth().verifyIdToken(idToken).catch(() => {
     return undefined;
   })
 
@@ -11,12 +11,12 @@ export const isIdTokenValid = async (idToken: string) => {
   return user !== undefined && user.email_verified;
 }
 
-export const getUser = async (sessionCookie: string | undefined) => {
+export const getUser = async (adminApp: admin.app.App, prisma: PrismaClient, sessionCookie: string | undefined) => {
   if (sessionCookie === undefined) {
     return undefined;
   }
 
-  const tokenData = await admin.auth().verifySessionCookie(sessionCookie, true).catch(() => {
+  const tokenData = await adminApp.auth().verifySessionCookie(sessionCookie, true).catch(() => {
     return undefined;
   })
 
@@ -42,9 +42,7 @@ export const getUser = async (sessionCookie: string | undefined) => {
   });
 }
 
-const prisma = new PrismaClient();
-
-export const getRole = async (uuid: string, user: User | undefined) => {
+export const getRole = async (prisma: PrismaClient, uuid: string, user: User | undefined) => {
   if (user === undefined) {
     return undefined;
   }

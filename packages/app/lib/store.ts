@@ -256,18 +256,22 @@ export function initStore(
   uuid: string,
   token: string,
   onLoad: () => void,
-  onUnload: () => void
+  onUnload: () => void,
+  onFail: () => void
 ) {
   const document = getYjsDoc(store);
 
   const provider = new HocuspocusProvider({
-    url: 'ws://127.0.0.1:1234',
+    url: process.env["NEXT_PUBLIC_HOCUSPOCUS_URL"] ?? 'ws://127.0.0.1:1234',
     name: uuid,
     document: document,
     token,
     onSynced: () => {
       onLoad();
     },
+    onAuthenticationFailed: () => {
+      onFail();
+    }
   });
 
   return () => {

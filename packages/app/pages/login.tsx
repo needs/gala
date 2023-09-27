@@ -16,6 +16,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { adminApp } from '../lib/firebase-admin';
 import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
@@ -23,6 +24,7 @@ import Router from 'next/router';
 import { GetServerSideProps } from 'next';
 import { getUser } from '@tgym.fr/auth';
 import Link from 'next/link';
+import { prisma } from '../lib/prisma';
 
 function Login({
   onLogin,
@@ -307,7 +309,7 @@ export default function Index() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const user = await getUser(req.cookies['session']);
+  const user = await getUser(adminApp, prisma, req.cookies['session']);
 
   if (user !== undefined) {
     return {

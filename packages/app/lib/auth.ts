@@ -3,6 +3,9 @@ import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
 import { getRole, getUser } from '@tgym.fr/auth';
 import { serialize } from 'cookie';
+import { PrismaClient } from '@prisma/client';
+import { prisma } from './prisma';
+import { adminApp } from './firebase-admin';
 
 export type UserInfo = {
   foo: string;
@@ -27,7 +30,7 @@ export const withAuth: (option: {
   callback?: GetServerSideProps<PageProps>;
 }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
-    const user = await getUser(context.req.cookies['session']);
+    const user = await getUser(adminApp, prisma, context.req.cookies['session']);
 
     if (user === undefined) {
       context.res.setHeader('Set-Cookie', [
@@ -38,7 +41,7 @@ export const withAuth: (option: {
 
     if (checkMembership === true) {
       const competitionUuid = context.query.uuid as string;
-      const role = await getRole(competitionUuid, user);
+      const role = await getRole(prisma, competitionUuid, user);
 
       if (role === undefined) {
         return redirectToHome;

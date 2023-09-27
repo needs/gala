@@ -2,6 +2,7 @@ import { Hocuspocus } from "@hocuspocus/server";
 import { Database } from "@hocuspocus/extension-database";
 import { getRole, getUser } from "@tgym.fr/auth";
 import { prisma } from "./prisma";
+import { adminApp } from "./firebase";
 
 const server = new Hocuspocus({
   debounce: 5000,
@@ -9,8 +10,8 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
-    const user = await getUser(sessionCookie);
-    const role = await getRole(documentName, user);
+    const user = await getUser(adminApp, prisma, sessionCookie);
+    const role = await getRole(prisma, documentName, user);
 
     if (role !== "EDITOR" && role !== "OWNER") {
       data.connection.readOnly = true;

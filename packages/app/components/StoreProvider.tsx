@@ -3,6 +3,7 @@ import { Competition, initStore, store } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
 import { useSyncedStore } from '@syncedstore/react';
+import { useRouter } from 'next/router';
 
 const StoreProvider = ({
   children,
@@ -14,6 +15,7 @@ const StoreProvider = ({
   const [storeLoaded, setStoreLoaded] = useState(false);
   const [cookies] = useCookies(['session']);
   const sessionCookie = cookies.session;
+  const router = useRouter();
 
   useEffect(() => {
     const init = async () => {
@@ -26,7 +28,8 @@ const StoreProvider = ({
           competitionUuid,
           sessionCookie,
           () => setStoreLoaded(true),
-          () => setStoreLoaded(false)
+          () => setStoreLoaded(false),
+          () => router.push('/login')
         );
       }
     };

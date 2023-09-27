@@ -6,6 +6,7 @@ import { prisma } from '../../lib/prisma';
 import { auth } from 'firebase-admin';
 import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
+import { adminApp } from '../../lib/firebase-admin';
 
 const isAuthedMiddleware = middleware((opts) => {
   const { ctx } = opts;
@@ -75,7 +76,7 @@ export const appRouter = router({
       // Set session expiration to 10 days.
       const expiresIn = 60 * 60 * 24 * 10 * 1000;
 
-      if (!(await isIdTokenValid(idToken))) {
+      if (!(await isIdTokenValid(adminApp, idToken))) {
         throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
       }
 
