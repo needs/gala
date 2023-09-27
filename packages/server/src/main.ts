@@ -4,6 +4,14 @@ import { getRole, getUser } from "@tgym.fr/auth";
 import { prisma } from "./prisma";
 import { adminApp } from "./firebase";
 
+function getPort() {
+  const port = process.env["PORT"];
+  if (port === undefined) {
+    return 1234;
+  }
+  return parseInt(port, 10);
+}
+
 const server = new Hocuspocus({
   debounce: 5000,
 
@@ -50,7 +58,7 @@ const server = new Hocuspocus({
       },
     }),
   ],
-  port: 1234,
+  port: getPort(),
 });
 
 server.listen();
