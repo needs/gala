@@ -6,8 +6,7 @@ import {
   getDefaultScreen,
 } from '../../../lib/store';
 import { Chip, Snackbar, Stack, Typography } from '@mui/material';
-import { Add, SportsBar } from '@mui/icons-material';
-import { nanoid } from 'nanoid';
+import { Add } from '@mui/icons-material';
 import TvFrame from '../../../components/TvFrame';
 import EditScreenDialog, {
   getScreenIcon,
@@ -116,9 +115,8 @@ function CreateScreenButton({
 }) {
   const [open, setOpen] = useState(false);
   const [screen, setScreen] = useState<Screen>({
-    name: 'Nouvel écran',
-    shortUrlId: undefined,
     ...getDefaultScreen('bar'),
+    name: 'Nouvel écran',
   });
 
   return (
@@ -148,9 +146,8 @@ function CreateScreenButton({
         alignItems="center"
         onClick={() => {
           setScreen({
-            name: 'Nouvel écran',
-            shortUrlId: undefined,
             ...getDefaultScreen('bar'),
+            name: 'Nouvel écran',
           });
           setOpen(true);
         }}

@@ -60,12 +60,10 @@ export type TimelinePause = {
 };
 export type TimelineRotationApparatus = { teams: Record<string, boolean> };
 
-export type ScreenBar = { type: 'bar' };
-export type ScreenProgress = { type: 'progress'; stageKey: string };
-export type Screen = (ScreenBar | ScreenProgress) & {
-  name: string;
-  shortUrlId: string | undefined;
-};
+export type BaseScreen = { name: string; shortUrlId: string | undefined };
+export type ScreenBar = { type: 'bar' } & BaseScreen;
+export type ScreenProgress = { type: 'progress'; stageKey: string } & BaseScreen;
+export type Screen = ScreenBar | ScreenProgress;
 export const screenTypes: Screen['type'][] = ['bar', 'progress'];
 
 export type Competition = {
@@ -148,10 +146,14 @@ export function getDefaultScreen(
   switch (screenType) {
     case 'bar':
       return {
+        name: '',
+        shortUrlId: undefined,
         type: 'bar',
       };
     case 'progress':
       return {
+        name: '',
+        shortUrlId: undefined,
         type: 'progress',
         stageKey: '',
       };

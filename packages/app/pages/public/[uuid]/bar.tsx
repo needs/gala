@@ -14,20 +14,18 @@ export default function Bar() {
 
   return (
     <Stack direction="column" divider={<Divider />}>
-      {Object.entries(bar).map(([category, items]) => (
-        <Stack direction="column" gap={2} padding={4} key={category}>
+      {Object.entries(bar).map(([categoryKey, category]) => (
+        <Stack direction="column" gap={2} padding={4} key={categoryKey}>
           <Typography variant="h4" component="h2">
-            {category}
+            {category.name}
           </Typography>
-          {Object.entries(items).map(([item, prices]) => (
-            <Stack direction="row" justifyContent="space-between" key={item}>
+          {Object.entries(category.items).map(([itemKey, item]) => (
+            <Stack direction="row" justifyContent="space-between" key={itemKey}>
               <Typography variant="h5" component="h3">
-                {item}
+                {item.name}
               </Typography>
               <Typography variant="h5" component="h3">
-                {prices
-                  .map((price) => (price === 0 ? 'Gratuit' : toEuro(price)))
-                  .join(' / ')}
+                {item.price === 0 ? 'Gratuit' : toEuro(item.price)}
               </Typography>
             </Stack>
           ))}
