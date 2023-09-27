@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { middleware, procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
-import { auth } from 'firebase-admin';
 import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
 import { adminApp } from '../../lib/firebase-admin';
@@ -80,7 +79,7 @@ export const appRouter = router({
         throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
       }
 
-      const sessionCookie = await auth().createSessionCookie(idToken, {
+      const sessionCookie = await adminApp.auth().createSessionCookie(idToken, {
         expiresIn,
       });
 
