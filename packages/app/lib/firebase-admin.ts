@@ -12,4 +12,4 @@ const globalForAdminApp = globalThis as unknown as {
 
 export const adminApp = globalForAdminApp.adminApp ?? adminAppSingleton();
 
-if (process.env.NODE_ENV !== 'production') globalForAdminApp.adminApp = adminApp;
+globalForAdminApp.adminApp = adminApp;
