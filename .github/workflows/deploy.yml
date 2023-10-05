@@ -15,8 +15,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set NX shas
-        uses: nrwl/nx-set-shas@v3
+#      - name: Set NX shas
+#        uses: nrwl/nx-set-shas@v3
 
       - name: Log in to Docker Registry
         uses: docker/login-action@v3
