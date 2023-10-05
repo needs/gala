@@ -63,6 +63,8 @@ jobs:
 
       - name: Prisma Deploy
         run: npx nx affected -t prisma-deploy --parallel=3
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Docker push app
         uses: docker/build-push-action@v5
