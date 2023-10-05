@@ -49,6 +49,7 @@ jobs:
       - name: Docker push app
         uses: docker/build-push-action@v5
         with:
+          context: .
           file: packages/app/Dockerfile
           tags: ${{ secrets.DOCKER_REGISTRY }}/app:latest
           push: true
@@ -56,6 +57,7 @@ jobs:
       - name: Docker push server
         uses: docker/build-push-action@v5
         with:
+          context: .
           file: packages/server/Dockerfile
           tags: ${{ secrets.DOCKER_REGISTRY }}/server:latest
           push: true
