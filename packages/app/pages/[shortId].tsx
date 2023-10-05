@@ -24,4 +24,6 @@ export const getServerSideProps = (async (context) => {
   };
 }) satisfies GetServerSideProps;
 
-export default function ShortIdPage() {}
+export default function ShortIdPage() {
+  return null;
+}

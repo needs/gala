@@ -1,8 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { Competition, initStore, store } from '../lib/store';
+import { initStore } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
-import { useSyncedStore } from '@syncedstore/react';
 import { useRouter } from 'next/router';
 
 const StoreProvider = ({
@@ -34,6 +33,7 @@ const StoreProvider = ({
       }
     };
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitionUuid, sessionCookie]);
 
   if (competitionUuid !== undefined && !storeLoaded) {

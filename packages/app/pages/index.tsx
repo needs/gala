@@ -21,7 +21,7 @@ import { useCookies } from 'react-cookie';
 import Link from 'next/link';
 
 export default function ListPage() {
-  const [cookies, setCookies, removeCookies] = useCookies(['session']);
+  const removeCookies = useCookies(['session'])[2];
   const router = useRouter();
   const create = trpc.create.useMutation();
   const { data: competitions } = trpc.list.useQuery(null);

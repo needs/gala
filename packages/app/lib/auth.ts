@@ -3,7 +3,6 @@ import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
 import { getRole, getUser } from '@tgym.fr/auth';
 import { serialize } from 'cookie';
-import { PrismaClient } from '@prisma/client';
 import { prisma } from './prisma';
 import { adminApp } from './firebase-admin';
 

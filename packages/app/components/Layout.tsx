@@ -145,7 +145,7 @@ function AccountMenu() {
   };
 
   const router = useRouter();
-  const [cookies, setCookies, removeCookies] = useCookies(['session']);
+  const removeCookies = useCookies(['session'])[2];
 
   const { data: user } = trpc.user.useQuery(null);
 

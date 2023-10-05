@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import {
   ApparatusKey,
-  allApparatuses,
   getApparatusIconPath,
   getApparatusName,
 } from '../lib/store';
