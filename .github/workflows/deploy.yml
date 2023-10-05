@@ -25,16 +25,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Restore cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            node_modules
+            dist
+          key: ${{ runner.os }}-data
+
       - name: Install dependencies
         run: npm ci
 
 #      - name: Check format
 #        run: npx nx format:check
-
-      - name: Download dist
-        uses: actions/download-artifact@v2
-        with:
-          name: dist
 
       - name: Lint
         run: npx nx affected -t lint --parallel=3
@@ -48,11 +52,14 @@ jobs:
       - name: Test
         run: npx nx affected -t test --parallel=3
 
-      - name: Upload dist
-        uses: actions/upload-artifact@v3
+      - name: Save cache
+        id: cache-save
+        uses: actions/cache/save@v3
         with:
-          name: dist
-          path: dist
+          path: |
+            node_modules
+            dist
+          key: ${{ runner.os }}-data
 
       - name: Prisma Deploy
         run: npx nx affected -t prisma-deploy --parallel=3
