@@ -15,6 +15,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore cache
+        id: cache-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            dist
+          key: ${{ runner.os }}-data
+
       - name: Set NX shas
         uses: nrwl/nx-set-shas@v3
 
@@ -24,15 +32,6 @@ jobs:
           registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Restore cache
-        id: cache-restore
-        uses: actions/cache/restore@v3
-        with:
-          path: |
-            node_modules
-            dist
-          key: ${{ runner.os }}-data
 
       - name: Install dependencies
         run: npm ci
@@ -57,7 +56,6 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: |
-            node_modules
             dist
           key: ${{ runner.os }}-data
 
