@@ -15,7 +15,7 @@ import {
 import { trpc } from '../utils/trpc';
 import { useRouter } from 'next/router';
 import { signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { getFirebaseAppAuth } from '../lib/firebase';
 import { withAuth } from '../lib/auth';
 import { useCookies } from 'react-cookie';
 import Link from 'next/link';
@@ -104,7 +104,7 @@ export default function ListPage() {
         <Button
           onClick={() => {
             removeCookies('session');
-            signOut(auth).then(() => {
+            signOut(getFirebaseAppAuth()).then(() => {
               router.push('/login');
             });
           }}

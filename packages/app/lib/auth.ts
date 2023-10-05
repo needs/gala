@@ -4,7 +4,7 @@ import { merge } from 'lodash';
 import { getRole, getUser } from '@tgym.fr/auth';
 import { serialize } from 'cookie';
 import { prisma } from './prisma';
-import { adminApp } from './firebase-admin';
+import { getFirebaseAdminApp } from './firebase-admin';
 
 export type UserInfo = {
   foo: string;
@@ -29,6 +29,7 @@ export const withAuth: (option: {
   callback?: GetServerSideProps<PageProps>;
 }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
+    const adminApp = getFirebaseAdminApp();
     const user = await getUser(adminApp, prisma, context.req.cookies['session']);
 
     if (user === undefined) {

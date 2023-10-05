@@ -15,8 +15,8 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import { adminApp } from '../lib/firebase-admin';
+import { getFirebaseAppAuth } from '../lib/firebase';
+import { getFirebaseAdminApp } from '../lib/firebase-admin';
 import { useCallback, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
@@ -39,6 +39,8 @@ function Login({
   } = trpc.login.useMutation();
 
   const authenticate = useCallback(() => {
+    const auth = getFirebaseAppAuth();
+
     if (auth.currentUser !== null) {
       // Force refresh token so that email_verified is updated
       getIdToken(auth.currentUser, true).then((idToken) => {
@@ -87,6 +89,8 @@ function Verify({ onEmailVerified }: { onEmailVerified: () => void }) {
   useEffect(() => {
     // Firebase doesn't update emailVerified in real time, so we need to poll.
     const interval = setInterval(() => {
+      const auth = getFirebaseAppAuth();
+
       if (auth.currentUser !== null) {
         auth.currentUser.reload().then(() => {
           if (auth.currentUser !== null && auth.currentUser.emailVerified) {
@@ -117,6 +121,8 @@ function Verify({ onEmailVerified }: { onEmailVerified: () => void }) {
 
       <Button
         onClick={() => {
+          const auth = getFirebaseAppAuth();
+
           if (auth.currentUser !== null) {
             sendEmailVerification(auth.currentUser).catch((error) => {
               console.error(error);
@@ -149,6 +155,8 @@ function Form({
     <form
       onSubmit={(event) => {
         event.preventDefault();
+
+        const auth = getFirebaseAppAuth();
 
         setErrorMessage(undefined);
         signInWithEmailAndPassword(auth, email, password)
@@ -197,6 +205,8 @@ function Form({
             <Button
               variant="outlined"
               onClick={() => {
+                const auth = getFirebaseAppAuth();
+
                 setErrorMessage(undefined);
                 createUserWithEmailAndPassword(auth, email, password)
                   .then((userCredential) => {
@@ -237,6 +247,7 @@ export default function Index() {
   }, [sessionCookie]);
 
   useEffect(() => {
+    const auth = getFirebaseAppAuth();
     removeCookies('session');
 
     auth.authStateReady().then(() => {
@@ -309,6 +320,7 @@ export default function Index() {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const adminApp = getFirebaseAdminApp();
   const user = await getUser(adminApp, prisma, req.cookies['session']);
 
   if (user !== undefined) {

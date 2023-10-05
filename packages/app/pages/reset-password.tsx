@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { auth } from '../lib/firebase';
+import { getFirebaseAppAuth } from '../lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -40,6 +40,7 @@ export default function ListPage() {
       <form
         onSubmit={async (event) => {
           event.preventDefault();
+          const auth = getFirebaseAppAuth();
           sendPasswordResetEmail(auth, email)
             .then(() => {
               setIsSuccess(true);

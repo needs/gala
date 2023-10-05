@@ -38,7 +38,7 @@ import Link from 'next/link';
 import { undoManager, useCompetition } from '../lib/store';
 import { avatarUrl, getUserName } from '../lib/avatar';
 import { signOut } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { getFirebaseAppAuth } from '../lib/firebase';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
@@ -220,6 +220,7 @@ function AccountMenu() {
         <Divider />
         <MenuListItem
           onClick={() => {
+            const auth = getFirebaseAppAuth();
             removeCookies('session');
             signOut(auth).then(() => {
               router.push('/login');

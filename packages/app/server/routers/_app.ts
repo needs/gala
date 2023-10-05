@@ -5,7 +5,7 @@ import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
 import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
-import { adminApp } from '../../lib/firebase-admin';
+import { getFirebaseAdminApp } from '../../lib/firebase-admin';
 
 const isAuthedMiddleware = middleware((opts) => {
   const { ctx } = opts;
@@ -68,6 +68,7 @@ export const appRouter = router({
     .input(z.object({ idToken: z.string() }))
     .output(z.object({ sessionCookie: z.string(), expiresIn: z.number() }))
     .mutation(async (opts) => {
+      const adminApp = getFirebaseAdminApp();
       const { idToken } = opts.input;
 
       // TODO: Double check that this flow is not subject to CSRF attacks.

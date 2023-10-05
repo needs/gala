@@ -1,15 +1,13 @@
 import { initializeAdminApp } from "@tgym.fr/auth";
 
-const adminAppSingleton = () => {
-  return initializeAdminApp();
+const globalForFirebaseAdmin = globalThis as unknown as {
+  app: ReturnType<typeof initializeAdminApp> | undefined;
 };
 
-type AdminAppSingleton = ReturnType<typeof adminAppSingleton>;
+export const getFirebaseAdminApp = () => {
+  if (globalForFirebaseAdmin.app === undefined) {
+    globalForFirebaseAdmin.app = initializeAdminApp();
+  }
 
-const globalForAdminApp = globalThis as unknown as {
-  adminApp: AdminAppSingleton | undefined;
-};
-
-export const adminApp = globalForAdminApp.adminApp ?? adminAppSingleton();
-
-globalForAdminApp.adminApp = adminApp;
+  return globalForFirebaseAdmin.app;
+}
