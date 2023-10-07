@@ -32,6 +32,9 @@ jobs:
 
       - name: Build
         run: npx nx run-many -t build --parallel=3
+        env:
+          NEXT_PUBLIC_FIREBASE_CONFIG: ${{ vars.NEXT_PUBLIC_FIREBASE_CONFIG }}
+          NEXT_PUBLIC_HOCUSPOCUS_URL: ${{ vars.NEXT_PUBLIC_HOCUSPOCUS_URL }}
 
       - name: Test
         run: npx nx run-many -t test --parallel=3

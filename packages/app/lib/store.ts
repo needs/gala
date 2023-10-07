@@ -264,7 +264,7 @@ export function initStore(
   const document = getYjsDoc(store);
 
   const provider = new HocuspocusProvider({
-    url: process.env["NEXT_PUBLIC_HOCUSPOCUS_URL"] ?? 'ws://127.0.0.1:1234',
+    url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
     name: uuid,
     document: document,
     token,

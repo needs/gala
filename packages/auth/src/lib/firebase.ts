@@ -10,22 +10,11 @@ const firebaseConfigSchema = z.object({
 function getFirebaseConfig() {
   const FIREBASE_CONFIG = process.env["FIREBASE_CONFIG"];
 
-  console.log("Firebase config found", FIREBASE_CONFIG)
-
-  if (FIREBASE_CONFIG !== undefined) {
-    try {
-      return firebaseConfigSchema.parse(JSON.parse(FIREBASE_CONFIG));
-    } catch (e) {
-      console.error(e);
-      console.warn("Using regular env vars for Firebase config.");
-    }
+  if (FIREBASE_CONFIG === undefined) {
+    throw new Error("Missing Firebase config.");
   }
 
-  return firebaseConfigSchema.parse({
-    projectId: process.env["FIREBASE_PROJECT_ID"],
-    privateKey: process.env["FIREBASE_PRIVATE_KEY"],
-    clientEmail: process.env["FIREBASE_CLIENT_EMAIL"],
-  });
+  return firebaseConfigSchema.parse(JSON.parse(FIREBASE_CONFIG));
 }
 
 export const initializeAdminApp = () => {
