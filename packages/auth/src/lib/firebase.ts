@@ -10,6 +10,8 @@ const firebaseConfigSchema = z.object({
 function getFirebaseConfig() {
   const FIREBASE_CONFIG = process.env["FIREBASE_CONFIG"];
 
+  console.log("Firebase config found", FIREBASE_CONFIG)
+
   if (FIREBASE_CONFIG !== undefined) {
     try {
       return firebaseConfigSchema.parse(JSON.parse(FIREBASE_CONFIG));
