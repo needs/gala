@@ -72,7 +72,7 @@ jobs:
       - name: Deploy server
         uses: azure/container-apps-deploy-action@v1
         with:
-          containerAppName: server
+          containerAppName: hocuspocus
           imageToDeploy: s0laster/tgym.fr:server
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
