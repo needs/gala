@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "hocuspocus",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/server/src",
+  "sourceRoot": "packages/hocuspocus/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -10,12 +10,12 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/packages/server",
+        "outputPath": "dist/packages/hocuspocus",
         "format": ["cjs"],
         "bundle": false,
-        "main": "packages/server/src/main.ts",
-        "tsConfig": "packages/server/tsconfig.app.json",
-        "assets": ["packages/server/src/assets"],
+        "main": "packages/hocuspocus/src/main.ts",
+        "tsConfig": "packages/hocuspocus/tsconfig.app.json",
+        "assets": ["packages/hocuspocus/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -40,14 +40,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "server:build"
+        "buildTarget": "hocuspocus:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "server:build:development"
+          "buildTarget": "hocuspocus:build:development"
         },
         "production": {
-          "buildTarget": "server:build:production"
+          "buildTarget": "hocuspocus:build:production"
         }
       }
     },
@@ -55,14 +55,14 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/server/**/*.ts"]
+        "lintFilePatterns": ["packages/hocuspocus/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/server/jest.config.ts",
+        "jestConfig": "packages/hocuspocus/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -74,7 +74,7 @@
     },
     "docker-build": {
       "dependsOn": ["build"],
-      "command": "docker build -f packages/server/Dockerfile . -t server"
+      "command": "docker build -f packages/hocuspocus/Dockerfile . -t server"
     }
   },
   "tags": []

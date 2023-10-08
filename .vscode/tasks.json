@@ -14,10 +14,10 @@
       "args": "Frontend"
     },
     {
-      "id": "terminateServer",
+      "id": "terminateHocuspocus",
       "type": "command",
       "command": "workbench.action.tasks.terminate",
-      "args": "Server"
+      "args": "Hocuspocus"
     },
     {
       "id": "terminateDocker",
@@ -44,7 +44,7 @@
       "label": "Terminate Serve",
       "dependsOn": [
         "Terminate Frontend",
-        "Terminate Server",
+        "Terminate Hocuspocus",
         "Terminate Docker"
       ],
     },
@@ -54,9 +54,9 @@
       "command": "echo ${input:terminateFrontend}",
     },
     {
-      "label": "Terminate Server",
+      "label": "Terminate Hocuspocus",
       "type": "process",
-      "command": "echo ${input:terminateServer}",
+      "command": "echo ${input:terminateHocuspocus}",
     },
     {
       "label": "Terminate Docker",
@@ -76,7 +76,7 @@
       "dependsOn": [
         "Docker",
         "Frontend",
-        "Server",
+        "Hocuspocus",
       ],
     },
     {
@@ -93,11 +93,10 @@
 
     },
     {
-      "label": "Server",
+      "label": "Hocuspocus",
       "type": "shell",
-      "command": "npx nx serve server",
+      "command": "npx nx serve hocuspocus",
       "isBackground": true,
-
     },
   ]
 }

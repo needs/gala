@@ -44,15 +44,15 @@ jobs:
         with:
           context: .
           file: packages/app/Dockerfile
-          tags: s0laster/tgym.fr:app
+          tags: s0laster/tgym.fr-app:latest
           push: true
 
-      - name: Docker push server
+      - name: Docker push hocuspocus
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: packages/server/Dockerfile
-          tags: s0laster/tgym.fr:server
+          file: packages/hocuspocus/Dockerfile
+          tags: s0laster/tgym.fr-hocuspocus:latest
           push: true
 
       - name: Log in to Azure
@@ -65,17 +65,17 @@ jobs:
         with:
           resourceGroup: tgym.fr
           containerAppName: app
-          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr:app
+          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr-app:latest
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy server
+      - name: Deploy hocuspocus
         uses: azure/container-apps-deploy-action@v1
         with:
           resourceGroup: tgym.fr
           containerAppName: hocuspocus
-          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr:server
+          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr-hocuspocus:latest
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
