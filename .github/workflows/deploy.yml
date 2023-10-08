@@ -20,7 +20,7 @@ jobs:
         with:
           resourceGroup: tgym.fr
           containerAppName: app
-          imageToDeploy: s0laster/tgym.fr:app
+          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr:app
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
@@ -30,7 +30,7 @@ jobs:
         with:
           resourceGroup: tgym.fr
           containerAppName: hocuspocus
-          imageToDeploy: s0laster/tgym.fr:server
+          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr:server
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
