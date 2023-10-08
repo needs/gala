@@ -214,7 +214,7 @@ function AccountMenu() {
         </Link>
         <Link href="/" legacyBehavior>
           <MenuListItem onClick={handleClose}>
-            <Avatar /> Compétitions
+            <Avatar><EmojiEvents /></Avatar> Compétitions
           </MenuListItem>
         </Link>
         <Divider />
