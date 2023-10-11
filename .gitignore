@@ -46,3 +46,6 @@ Thumbs.db
 
 # Dev SQLite database
 /db.sqlite
+
+# Production environment file
+/.env.prod
