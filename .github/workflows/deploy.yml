@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: packages/app/Dockerfile
+          file: apps/app/Dockerfile
           tags: s0laster/tgym.fr-app:latest
           push: true
 
@@ -51,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: packages/hocuspocus/Dockerfile
+          file: apps/hocuspocus/Dockerfile
           tags: s0laster/tgym.fr-hocuspocus:latest
           push: true
 
