@@ -70,7 +70,6 @@ export default function StagesPage() {
         Object.values(stage.timeline).forEach((rotation) => {
           if (rotation.type === 'rotation') {
             Object.assign(apparatuses, rotation.apparatuses);
-            console.log('app', rotation.apparatuses);
           }
         });
 

@@ -50,8 +50,6 @@ const server = new Hocuspocus({
           }>('competition')
           .toJSON();
 
-        console.log(competition);
-
         const teamCount = Object.values(competition['teams']).length;
         const name = competition.info.name ?? '';
 
