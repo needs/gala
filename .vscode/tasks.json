@@ -8,10 +8,16 @@
   },
   "inputs": [
     {
-      "id": "terminateFrontend",
+      "id": "terminateApp",
       "type": "command",
       "command": "workbench.action.tasks.terminate",
-      "args": "Frontend"
+      "args": "App"
+    },
+    {
+      "id": "terminateWebsite",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "Website"
     },
     {
       "id": "terminateHocuspocus",
@@ -43,15 +49,21 @@
     {
       "label": "Terminate Serve",
       "dependsOn": [
-        "Terminate Frontend",
+        "Terminate App",
+        "Terminate Website",
         "Terminate Hocuspocus",
         "Terminate Docker"
       ],
     },
     {
-      "label": "Terminate Frontend",
+      "label": "Terminate App",
       "type": "process",
-      "command": "echo ${input:terminateFrontend}",
+      "command": "echo ${input:terminateApp}",
+    },
+    {
+      "label": "Terminate Website",
+      "type": "process",
+      "command": "echo ${input:terminateWebsite}",
     },
     {
       "label": "Terminate Hocuspocus",
@@ -75,7 +87,8 @@
       "label": "Start Serve",
       "dependsOn": [
         "Docker",
-        "Frontend",
+        "App",
+        "Website",
         "Hocuspocus",
       ],
     },
@@ -86,11 +99,16 @@
       "isBackground": true,
     },
     {
-      "label": "Frontend",
+      "label": "App",
       "type": "shell",
       "command": "npx nx serve app",
       "isBackground": true,
-
+    },
+    {
+      "label": "Website",
+      "type": "shell",
+      "command": "npx nx serve website",
+      "isBackground": true,
     },
     {
       "label": "Hocuspocus",
