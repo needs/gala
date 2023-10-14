@@ -47,6 +47,14 @@ jobs:
           tags: s0laster/tgym.fr-app:latest
           push: true
 
+      - name: Docker push website
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/website/Dockerfile
+          tags: s0laster/tgym.fr-website:latest
+          push: true
+
       - name: Docker push hocuspocus
         uses: docker/build-push-action@v5
         with:
@@ -66,6 +74,16 @@ jobs:
           resourceGroup: tgym.fr
           containerAppName: app
           imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr-app:latest
+          registryUrl: registry.hub.docker.com
+          registryUsername: ${{ secrets.DOCKER_USERNAME }}
+          registryPassword: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Deploy website
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          resourceGroup: tgym.fr
+          containerAppName: website
+          imageToDeploy: registry.hub.docker.com/s0laster/tgym.fr-website:latest
           registryUrl: registry.hub.docker.com
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
