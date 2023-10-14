@@ -1,6 +1,6 @@
 import "./animate.css"
 import "./glightbox.min.css"
-import "./lineIcons.css"
+import "./lineicons.css"
 import "./bootstrap.min.css"
 import "./style.css"
 
