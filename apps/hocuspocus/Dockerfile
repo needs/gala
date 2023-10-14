@@ -21,7 +21,7 @@ RUN chown -R hocuspocus:hocuspocus .
 # The bundled output will include external dependencies.
 RUN npm --prefix hocuspocus --omit=dev -f install
 
-COPY apps/app/prisma/schema.prisma hocuspocus/prisma/schema.prisma
+COPY libs/prisma/prisma/schema.prisma hocuspocus/prisma/schema.prisma
 RUN cd hocuspocus && npx prisma generate
 
 CMD [ "node", "hocuspocus" ]

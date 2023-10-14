@@ -21,7 +21,7 @@ RUN chown -R app:app .
 # The bundled output will include external dependencies.
 RUN npm --omit=dev -f install
 
-COPY apps/app/prisma/schema.prisma prisma/schema.prisma
+COPY libs/prisma/prisma/schema.prisma prisma/schema.prisma
 RUN npx prisma generate
 
 CMD [ "npm", "start" ]
