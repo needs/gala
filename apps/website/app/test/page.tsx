@@ -5,6 +5,7 @@ import "./bootstrap.min.css"
 import "./style.css"
 
 import Script from "next/script"
+import Image from "next/image"
 
 export default function Page() {
   const isIe = false;
@@ -58,7 +59,7 @@ export default function Page() {
                 <div className="col-lg-12">
                   <nav className="navbar navbar-expand-lg">
                     <a className="navbar-brand" href="index.html">
-                      <img src="/images/logo/logo.svg" alt="Logo" />
+                      <Image src="/images/logo/logo.svg" alt="Logo" />
                     </a>
                     <button
                       className="navbar-toggler"
@@ -175,7 +176,7 @@ export default function Page() {
                     data-wow-duration="1.3s"
                     data-wow-delay="1.4s"
                   >
-                    <img
+                    <Image
                       src="/images/header/header-hero.png"
                       alt="hero"
                     />
@@ -204,35 +205,35 @@ export default function Page() {
                     data-wow-duration="1s"
                     data-wow-delay="0.2s"
                   >
-                    <img src="/images/brands/uideck.svg" alt="brand" />
+                    <Image src="/images/brands/uideck.svg" alt="brand" />
                   </div>
                   <div
                     className="single-logo mt-30 wow fadeIn"
                     data-wow-duration="1.5s"
                     data-wow-delay="0.2s"
                   >
-                    <img src="/images/brands/ayroui.svg" alt="brand" />
+                    <Image src="/images/brands/ayroui.svg" alt="brand" />
                   </div>
                   <div
                     className="single-logo mt-30 wow fadeIn"
                     data-wow-duration="1.5s"
                     data-wow-delay="0.3s"
                   >
-                    <img src="/images/brands/graygrids.svg" alt="brand" />
+                    <Image src="/images/brands/graygrids.svg" alt="brand" />
                   </div>
                   <div
                     className="single-logo mt-30 wow fadeIn"
                     data-wow-duration="1.5s"
                     data-wow-delay="0.4s"
                   >
-                    <img src="/images/brands/lineicons.svg" alt="brand" />
+                    <Image src="/images/brands/lineicons.svg" alt="brand" />
                   </div>
                   <div
                     className="single-logo mt-30 wow fadeIn"
                     data-wow-duration="1.5s"
                     data-wow-delay="0.5s"
                   >
-                    <img
+                    <Image
                       src="/images/brands/ecommerce-html.svg"
                       alt="brand"
                     />
@@ -264,12 +265,12 @@ export default function Page() {
                   data-wow-delay="0.2s"
                 >
                   <div className="services-icon">
-                    <img
+                    <Image
                       className="shape"
                       src="/images/services/services-shape.svg"
                       alt="shape"
                     />
-                    <img
+                    <Image
                       className="shape-1"
                       src="/images/services/services-shape-1.svg"
                       alt="shape"
@@ -297,12 +298,12 @@ export default function Page() {
                   data-wow-delay="0.5s"
                 >
                   <div className="services-icon">
-                    <img
+                    <Image
                       className="shape"
                       src="/images/services/services-shape.svg"
                       alt="shape"
                     />
-                    <img
+                    <Image
                       className="shape-1"
                       src="/images/services/services-shape-2.svg"
                       alt="shape"
@@ -330,12 +331,12 @@ export default function Page() {
                   data-wow-delay="0.8s"
                 >
                   <div className="services-icon">
-                    <img
+                    <Image
                       className="shape"
                       src="/images/services/services-shape.svg"
                       alt="shape"
                     />
-                    <img
+                    <Image
                       className="shape-1"
                       src="/images/services/services-shape-3.svg"
                       alt="shape"
@@ -396,19 +397,19 @@ export default function Page() {
                     data-wow-duration="1s"
                     data-wow-delay="0.5s"
                   >
-                    <img src="/images/about/about1.svg" alt="about" />
+                    <Image src="/images/about/about1.svg" alt="about" />
                   </div>
                 </div>
               </div>
             </div>
             <div className="about-shape-1">
-              <img src="/images/about/about-shape-1.svg" alt="shape" />
+              <Image src="/images/about/about-shape-1.svg" alt="shape" />
             </div>
           </div>
 
           <div className="about-area pt-70">
             <div className="about-shape-2">
-              <img src="/images/about/about-shape-2.svg" alt="shape" />
+              <Image src="/images/about/about-shape-2.svg" alt="shape" />
             </div>
             <div className="container">
               <div className="row align-items-center">
@@ -444,7 +445,7 @@ export default function Page() {
                     data-wow-duration="1s"
                     data-wow-delay="0.5s"
                   >
-                    <img src="/images/about/about2.svg" alt="about" />
+                    <Image src="/images/about/about2.svg" alt="about" />
                   </div>
                 </div>
               </div>
@@ -487,13 +488,13 @@ export default function Page() {
                     data-wow-duration="1s"
                     data-wow-delay="0.5s"
                   >
-                    <img src="/images/about/about3.svg" alt="about" />
+                    <Image src="/images/about/about3.svg" alt="about" />
                   </div>
                 </div>
               </div>
             </div>
             <div className="about-shape-1">
-              <img src="/images/about/about-shape-1.svg" alt="shape" />
+              <Image src="/images/about/about-shape-1.svg" alt="shape" />
             </div>
           </div>
         </section>
@@ -588,14 +589,14 @@ export default function Page() {
                   data-wow-duration="1s"
                   data-wow-delay="0.5s"
                 >
-                  <img
+                  <Image
                     className="dots"
                     src="/images/video/dots.svg"
                     alt="dots"
                   />
                   <div className="video-wrapper">
                     <div className="video-image">
-                      <img src="/images/video/video.png" alt="video" />
+                      <Image src="/images/video/video.png" alt="video" />
                     </div>
                     <div className="video-icon">
                       <a
@@ -646,7 +647,7 @@ export default function Page() {
                     data-wow-delay="0.2s"
                   >
                     <a className="logo" href="/">
-                      <img src="/images/logo/logo.svg" alt="logo" />
+                      <Image src="/images/logo/logo.svg" alt="logo" />
                     </a>
                     <p className="text">
                       Lorem ipsum dolor sit amet consetetur sadipscing elitr,
