@@ -165,7 +165,7 @@ export default function Page() {
                     data-wow-duration="1.3s"
                     data-wow-delay="1.4s"
                   >
-                    <img src="/images/header/header-hero.png" alt="hero" />
+                    <img src="/images/header/header-hero2.png" alt="hero" />
                   </div>
                 </div>
               </div>
