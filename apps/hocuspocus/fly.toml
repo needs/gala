@@ -1,0 +1,14 @@
+# fly.toml app configuration file generated for tgymfr-hocuspocus on 2024-01-05T15:22:21+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "tgymfr-hocuspocus"
+primary_region = "cdg"
+
+[build]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
