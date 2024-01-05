@@ -7,7 +7,7 @@
 FROM docker.io/node:20-alpine
 
 ENV HOST=0.0.0.0
-ENV PORT=4200
+ENV PORT=1234
 
 WORKDIR /app
 
