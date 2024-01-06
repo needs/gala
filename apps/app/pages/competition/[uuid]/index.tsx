@@ -49,9 +49,18 @@ const RoleSelector = ({
         variant="standard"
         onChange={(event) => onChange(event.target.value as Role)}
       >
-        <MenuItem value="OWNER">Organisateur</MenuItem>
-        <MenuItem value="EDITOR">Collaborateur</MenuItem>
-        <MenuItem value="READER">Observateur</MenuItem>
+        <MenuItem value="OWNER">
+          <ListItemText primary="Organisateur" secondary="Accès total" />
+        </MenuItem>
+        <MenuItem value="EDITOR">
+          <ListItemText
+            primary="Collaborateur"
+            secondary="Accès total sauf gestion des droits"
+          />
+        </MenuItem>
+        <MenuItem value="READER">
+          <ListItemText primary="Observateur" secondary="Lecture seule" />
+        </MenuItem>
       </Select>
     </FormControl>
   );
