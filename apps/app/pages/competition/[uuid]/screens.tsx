@@ -5,8 +5,15 @@ import {
   Screen,
   getDefaultScreen,
 } from '../../../lib/store';
-import { Chip, Snackbar, Stack, Typography } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import {
+  Chip,
+  IconButton,
+  Snackbar,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { Add, Close } from '@mui/icons-material';
 import TvFrame from '../../../components/TvFrame';
 import EditScreenDialog, {
   getScreenIcon,
@@ -19,9 +26,11 @@ import { trpc } from '../../../utils/trpc';
 function EditScreenButton({
   screen,
   onChange,
+  onDelete,
 }: {
   screen: Screen;
   onChange: (screen: Screen) => void;
+  onDelete: () => void;
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -55,18 +64,33 @@ function EditScreenButton({
           }}
           padding={1}
         >
-          <Chip
-            label="Activé"
-            variant="outlined"
-            color="success"
-            size="small"
-            sx={{
-              '& .MuiChip-label': {
-                marginX: 'auto',
-              },
-              marginLeft: 'auto',
-            }}
-          />
+          <Stack
+            direction="row"
+            gap={1}
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Chip
+              label="Activé"
+              variant="outlined"
+              color="success"
+              size="small"
+              sx={{
+                '& .MuiChip-label': {
+                  marginX: 'auto',
+                },
+              }}
+            />
+            <Tooltip title="Double cliquez pour supprimer">
+              <IconButton
+                size="small"
+                color="error"
+                onDoubleClick={() => onDelete()}
+              >
+                <Close fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
 
           <Stack
             direction="row"
@@ -182,6 +206,7 @@ export default function ScreensPage({
           key={screenKey}
           screen={screen.value}
           onChange={(screen) => (screens[screenKey] = boxed(screen))}
+          onDelete={() => delete screens[screenKey]}
         />
       ))}
       <CreateScreenButton
