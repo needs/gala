@@ -6,10 +6,19 @@ import './style.css';
 
 import Script from 'next/script';
 import Image from 'next/image';
+import prisma from '../utils/prisma';
 
-export default function Page() {
+export default async function Page() {
   const isIe = false;
   const isLoading = false;
+
+  const competitionAggregation = await prisma.competition.aggregate({
+    _sum: {
+      cumulativeDuration: true,
+      playerCount: true,
+      teamCount: true,
+    },
+  });
 
   return (
     <html lang="en">
@@ -501,7 +510,8 @@ export default function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end="125"
+                            cup-end={(competitionAggregation._sum.playerCount ?? 0 ).toString()}
+                            cup-append=""
                           ></span>
 
                           <p className="text">Joueurs</p>
@@ -521,7 +531,8 @@ export default function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end="87"
+                            cup-end={((competitionAggregation._sum.cumulativeDuration ?? 0) / 60).toString()}
+                            cup-append=""
                           ></span>
                           <p className="text">Heures</p>
                         </div>
@@ -540,7 +551,8 @@ export default function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end="59"
+                            cup-end="0"
+                            cup-append=""
                           ></span>
                           <p className="text">Spectateurs</p>
                         </div>
