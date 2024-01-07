@@ -34,6 +34,8 @@ model CompetitionUser {
   competition_uuid String
 
   @@id([user_id, competition_uuid])
+  @@index([competition_uuid])
+  @@index([user_id])
 }
 
 model Competition {
@@ -54,4 +56,6 @@ model ScreenShortId {
   competition      Competition @relation(fields: [competition_uuid], references: [uuid])
   competition_uuid String
   screen_uuid      String
+
+  @@index([competition_uuid])
 }
