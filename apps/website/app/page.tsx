@@ -7,18 +7,26 @@ import './style.css';
 import Script from 'next/script';
 import Image from 'next/image';
 import prisma from '../utils/prisma';
+import { cache } from 'react';
+
+export const revalidate = 120;
+
+const getStats = cache(async () => {
+  const competitionAggregation = await prisma.competition.aggregate({
+    _sum: {
+      cumulativeDuration: true,
+      playerCount: true,
+    },
+  });
+
+  return competitionAggregation._sum;
+});
 
 export default async function Page() {
   const isIe = false;
   const isLoading = false;
 
-  const competitionAggregation = await prisma.competition.aggregate({
-    _sum: {
-      cumulativeDuration: true,
-      playerCount: true,
-      teamCount: true,
-    },
-  });
+  const { playerCount, cumulativeDuration } = await getStats();
 
   return (
     <html lang="en">
@@ -69,7 +77,12 @@ export default async function Page() {
                 <div className="col-lg-12">
                   <nav className="navbar navbar-expand-lg">
                     <a className="navbar-brand" href="/">
-                      <Image src="/images/logo/logo.png" alt="Logo" width={118} height={50}/>
+                      <Image
+                        src="/images/logo/logo.png"
+                        alt="Logo"
+                        width={118}
+                        height={50}
+                      />
                     </a>
                     <button
                       className="navbar-toggler"
@@ -273,9 +286,7 @@ export default async function Page() {
                     <i className="lni lni-baloon"> </i>
                   </div>
                   <div className="services-content mt-30">
-                    <h4 className="services-title">
-                      Épuré
-                    </h4>
+                    <h4 className="services-title">Épuré</h4>
                     <p className="text">
                       {
                         "Tgym se concentre sur l'essentiel : la gestion des compétitions et des galas de gymnastique."
@@ -307,9 +318,7 @@ export default async function Page() {
                     <i className="lni lni-cog"> </i>
                   </div>
                   <div className="services-content mt-30">
-                    <h4 className="services-title">
-                      Simple
-                    </h4>
+                    <h4 className="services-title">Simple</h4>
                     <p className="text">
                       {
                         "Tgym est simple d'utilisation et ne nécessite aucune formation."
@@ -341,11 +350,11 @@ export default async function Page() {
                     <i className="lni lni-bolt-alt"> </i>
                   </div>
                   <div className="services-content mt-30">
-                    <h4 className="services-title">
-                      Puissant
-                    </h4>
+                    <h4 className="services-title">Puissant</h4>
                     <p className="text">
-                      {"Collaboratif est le plus complet possible, sans sacrifier l'ergonomie."}
+                      {
+                        "Collaboratif est le plus complet possible, sans sacrifier l'ergonomie."
+                      }
                     </p>
                     {/*<a className="more" href="https://app.tgym.fr/">
                       Learn More <i className="lni lni-chevron-right"> </i>
@@ -374,7 +383,9 @@ export default async function Page() {
                       </h3>
                     </div>
                     <p className="text">
-                      {"Conçut avec des technologies modernes et résiliente.  Toutes les données sont sauvegardées en temps réel et sont accessibles depuis n'importe quel appareil.  Plusieurs personnes peuvent travailler en même temps sur le même événement."}
+                      {
+                        "Conçut avec des technologies modernes et résiliente.  Toutes les données sont sauvegardées en temps réel et sont accessibles depuis n'importe quel appareil.  Plusieurs personnes peuvent travailler en même temps sur le même événement."
+                      }
                     </p>
                     <a href="https://app.tgym.fr/" className="main-btn">
                       Essayer gratuitement
@@ -416,7 +427,9 @@ export default async function Page() {
                       </h3>
                     </div>
                     <p className="text">
-                      {"Tgym est en constante évolution et utilisé régulièrement pour organiser des compétitions.  Tgym est conçut pour évoluer rapidemment et s'adapter à vos nouveau besoins.  Enfin Tgym est gratuit et le restera."}
+                      {
+                        "Tgym est en constante évolution et utilisé régulièrement pour organiser des compétitions.  Tgym est conçut pour évoluer rapidemment et s'adapter à vos nouveau besoins.  Enfin Tgym est gratuit et le restera."
+                      }
                     </p>
                     <a href="https://app.tgym.fr/" className="main-btn">
                       Essayer gratuitement
@@ -452,7 +465,9 @@ export default async function Page() {
                       </h3>
                     </div>
                     <p className="text">
-                      {"Pensé pour être utilisé même par des novices en informatique.  Tgym est conçut pour être utilisé par des bénévoles, sans formation et sans assistance.  Tgym est gratuit et le restera.  Notre but est de simplement rendre l'organisation des compétition plus facile et apporter aux spectateurs et gymnastes un meilleur confort."}
+                      {
+                        "Pensé pour être utilisé même par des novices en informatique.  Tgym est conçut pour être utilisé par des bénévoles, sans formation et sans assistance.  Tgym est gratuit et le restera.  Notre but est de simplement rendre l'organisation des compétition plus facile et apporter aux spectateurs et gymnastes un meilleur confort."
+                      }
                     </p>
                     <a href="https://app.tgym.fr/" className="main-btn">
                       Essayer gratuitement
@@ -510,7 +525,7 @@ export default async function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end={(competitionAggregation._sum.playerCount ?? 0 ).toString()}
+                            cup-end={(playerCount ?? 0).toString()}
                             cup-append=""
                           ></span>
 
@@ -531,7 +546,9 @@ export default async function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end={((competitionAggregation._sum.cumulativeDuration ?? 0) / 60).toString()}
+                            cup-end={(
+                              (cumulativeDuration ?? 0) / 60
+                            ).toString()}
                             cup-append=""
                           ></span>
                           <p className="text">Heures</p>
@@ -576,13 +593,14 @@ export default async function Page() {
                 <div className="col-lg-6">
                   <div className="subscribe-content mt-45">
                     <h2 className="subscribe-title">
-                      Essayer tgym <span>et créer votre première compétition</span>
+                      Essayer tgym{' '}
+                      <span>et créer votre première compétition</span>
                     </h2>
                   </div>
                 </div>
                 <div className="col-lg-6">
                   <div className="subscribe-form mt-50">
-                      <button className="main-btn">Essayer</button>
+                    <button className="main-btn">Essayer</button>
                   </div>
                 </div>
               </div>
@@ -596,10 +614,17 @@ export default async function Page() {
                     data-wow-delay="0.2s"
                   >
                     <a className="logo" href="/">
-                      <Image src="/images/logo/logo.png" alt="logo" width={160} height={68}/>
+                      <Image
+                        src="/images/logo/logo.png"
+                        alt="logo"
+                        width={160}
+                        height={68}
+                      />
                     </a>
                     <p className="text">
-                      {"N'hésitez pas à prendre contact pour demander de l'aide, poser vos questions ou proposer des améliorations."}
+                      {
+                        "N'hésitez pas à prendre contact pour demander de l'aide, poser vos questions ou proposer des améliorations."
+                      }
                     </p>
                     {/*<ul className="social">
                       <li>
