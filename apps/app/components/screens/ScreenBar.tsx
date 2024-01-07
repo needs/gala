@@ -1,8 +1,10 @@
 import { Box, CssBaseline, Stack, Typography } from '@mui/material';
-import { ScreenBar, useCompetition } from '../../lib/store';
+import { useCompetition } from '../../lib/store';
 import { useEffect, useRef, useState } from 'react';
 import * as Muicon from '@mui/icons-material';
 import { sortBy } from 'lodash';
+import { ScreenBar } from '@tgym.fr/core';
+import { isIcon } from '../SelectIconDialog';
 
 export default function ScreenBar({ screen }: { screen: ScreenBar }) {
   const { bar } = useCompetition();
@@ -85,7 +87,9 @@ export default function ScreenBar({ screen }: { screen: ScreenBar }) {
                     alignItems="center"
                     padding={4}
                   >
-                    {category.icon !== undefined && renderIcon(category.icon)}
+                    {category.icon !== undefined &&
+                      isIcon(category.icon) &&
+                      renderIcon(category.icon)}
                     <Typography variant="h2" fontWeight="bold">
                       {category.name}
                     </Typography>

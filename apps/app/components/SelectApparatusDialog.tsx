@@ -11,11 +11,11 @@ import {
   ListItemText,
 } from '@mui/material';
 import {
-  ApparatusKey,
   getApparatusIconPath,
   getApparatusName,
 } from '../lib/store';
 import Image from 'next/image';
+import { ApparatusKey } from '@tgym.fr/core';
 
 export default function SelectApparatusDialog({
   apparatuses,

@@ -1,7 +1,5 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import {
-  ApparatusKey,
-  TimelineRotation,
   stageApparatuses,
   useCompetition,
 } from '../../../lib/store';
@@ -14,6 +12,7 @@ import { format, formatDuration, intervalToDuration } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { isEmpty } from 'lodash';
 import { ProgressGenericInfo, getCurrentRotation } from '../../../lib/progress';
+import { ApparatusKey, TimelineRotation } from '@tgym.fr/core';
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
   if (startDate === undefined && endDate === undefined) {

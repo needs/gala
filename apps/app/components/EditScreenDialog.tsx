@@ -15,17 +15,14 @@ import {
   ListItemIcon,
 } from '@mui/material';
 import {
-  Screen,
-  ScreenBar,
-  ScreenProgress,
   getDefaultScreen,
   getScreenName,
-  screenTypes,
   useCompetition,
 } from '../lib/store';
 import { Schedule, SportsBar } from '@mui/icons-material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
+import { Screen, ScreenBar, ScreenProgress, screenTypes } from '@tgym.fr/core';
 
 export function getScreenIcon(
   screenType: Screen['type'],

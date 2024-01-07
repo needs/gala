@@ -2,7 +2,6 @@ import { withAuthCompetition } from '../../../lib/auth';
 import {
   getScreenName,
   useCompetition,
-  Screen,
   getDefaultScreen,
 } from '../../../lib/store';
 import {
@@ -22,6 +21,7 @@ import { useState } from 'react';
 import { boxed } from '@syncedstore/core';
 import { v4 as uuidv4 } from 'uuid';
 import { trpc } from '../../../utils/trpc';
+import { Screen } from '@tgym.fr/core';
 
 function EditScreenButton({
   screen,

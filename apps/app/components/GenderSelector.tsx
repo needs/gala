@@ -1,6 +1,6 @@
 import { ToggleButtonGroup, ToggleButton } from '@mui/material';
-import { Gender, genders } from '../lib/store';
 import GenderIcon from './GenderIcon';
+import { Gender, genders } from '@tgym.fr/core';
 
 export default function GenderSelector({
   gender,

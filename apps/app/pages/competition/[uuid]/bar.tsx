@@ -1,5 +1,5 @@
 import { withAuthCompetition } from '../../../lib/auth';
-import { BarCategory, barDefault, useCompetition } from '../../../lib/store';
+import { barDefault, useCompetition } from '../../../lib/store';
 import {
   Button,
   Divider,
@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { isEmpty, sortBy } from 'lodash';
 import SelectIconButton from '../../../components/SelectIconButton';
+import { BarCategory } from '@tgym.fr/core';
+import { isIcon } from '../../../components/SelectIconDialog';
 
 function CurrencyField({
   value,
@@ -155,7 +157,11 @@ export default function BarPage() {
                   >
                     <Stack direction="row" gap={4}>
                       <SelectIconButton
-                        icon={category.icon}
+                        icon={
+                          category.icon !== undefined && isIcon(category.icon)
+                            ? category.icon
+                            : undefined
+                        }
                         onIcon={(icon) => (category.icon = icon)}
                       />
                       <TextField

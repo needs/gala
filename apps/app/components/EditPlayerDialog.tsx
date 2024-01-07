@@ -8,8 +8,8 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { Player } from '../lib/store';
 import GenderSelector from './GenderSelector';
+import { Player } from '@tgym.fr/core';
 
 export default function EditPlayerDialog({
   open,

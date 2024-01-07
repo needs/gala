@@ -3,7 +3,7 @@ import { Database } from '@hocuspocus/extension-database';
 import { getRole, getUser } from '@tgym.fr/auth';
 import { prisma } from './prisma';
 import { adminApp } from './firebase';
-import { YMap } from 'yjs/dist/src/internals';
+import { competitionSchema } from '@tgym.fr/core';
 
 function getPort() {
   const port = process.env['PORT'];
@@ -43,15 +43,22 @@ const server = new Hocuspocus({
         return Uint8Array.from(competition.data);
       },
       store: async ({ documentName, state, document }) => {
-        const competition = document
-          .getMap<{
-            teams: YMap<string>;
-            info: YMap<{ name: string }>;
-          }>('competition')
-          .toJSON();
+        const competition = competitionSchema.parse(
+          document.getMap('competition').toJSON()
+        );
 
-        const teamCount = Object.values(competition['teams']).length;
-        const name = competition.info.name ?? '';
+        const teamCount = Object.values(competition.teams).length;
+        const playerCount = Object.values(competition.players).length;
+        const cumulativeDuration = Object.values(competition.stages)
+          .map((stage) =>
+            Object.values(stage.timeline).map(
+              (timeline) => timeline.durationInMinutes
+            )
+          )
+          .flat()
+          .reduce((a, b) => a + b, 0);
+
+        const name = competition.info.name;
 
         await prisma.competition.update({
           where: {
@@ -61,6 +68,8 @@ const server = new Hocuspocus({
             data: state,
             name,
             teamCount,
+            playerCount,
+            cumulativeDuration,
           },
         });
       },

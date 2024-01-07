@@ -1,8 +1,5 @@
 import { Alert, Box, CssBaseline, Stack, Typography } from '@mui/material';
 import {
-  ApparatusKey,
-  ScreenProgress,
-  TimelineRotation,
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
@@ -12,6 +9,7 @@ import { getCurrentRotation } from '../../lib/progress';
 import Image from 'next/image';
 import GenderAvatar from '../GenderAvatar';
 import { useEffect, useRef, useState } from 'react';
+import { ApparatusKey, ScreenProgress, TimelineRotation } from '@tgym.fr/core';
 
 function Start() {
   return (

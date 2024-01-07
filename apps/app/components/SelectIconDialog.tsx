@@ -18,6 +18,10 @@ const allIcons = Object.entries(Muicon).filter(([key]) =>
   key.includes('Outlined')
 );
 
+export function isIcon(key: string): key is Icon {
+  return allIcons.some(([icon]) => icon === key);
+}
+
 export default function SelectIconDialog({
   open,
   icon,

@@ -14,7 +14,8 @@ import CategorySelector, {
 import { addPlayer } from '../lib/player';
 import EditPlayerButton from './EditPlayerButton';
 import AddPlayerButton from './AddPlayerButton';
-import { Team, useCompetition } from '../lib/store';
+import { useCompetition } from '../lib/store';
+import { Team } from '@tgym.fr/core';
 
 export default function EditTeamDialog({
   open,

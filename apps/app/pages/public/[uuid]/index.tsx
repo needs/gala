@@ -3,14 +3,13 @@ import { fullName } from '../../../lib/utils';
 import Image from 'next/image';
 import GenderIcon from '../../../components/GenderIcon';
 import {
-  ApparatusKey,
-  Progress,
   getApparatusIconPath,
   getApparatusName,
   useCompetition,
 } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
+import { ApparatusKey, Progress } from '@tgym.fr/core';
 
 function Apparatus({
   apparatusKey,

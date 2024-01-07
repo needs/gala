@@ -1,5 +1,5 @@
 import { Wc, Woman, Man, QuestionMark } from '@mui/icons-material';
-import { Gender } from '../lib/store';
+import { Gender } from '@tgym.fr/core';
 
 export function genderColor(gender: Gender | undefined) {
   switch (gender) {

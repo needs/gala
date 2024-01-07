@@ -1,13 +1,9 @@
 import { addMinutes } from 'date-fns';
 import {
-  ApparatusKey,
-  Stage,
-  TimelinePause,
-  TimelineRotation,
-  TimelineRotationApparatus,
   stageApparatuses,
   stageRotations,
 } from './store';
+import { ApparatusKey, Stage, TimelinePause, TimelineRotation, TimelineRotationApparatus } from '@tgym.fr/core';
 
 type CurrentRotation =
   | {

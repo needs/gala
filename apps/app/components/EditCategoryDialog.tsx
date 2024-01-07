@@ -8,8 +8,8 @@ import {
   FormLabel,
   Stack,
 } from '@mui/material';
-import { Category } from '../lib/store';
 import GenderSelector from './GenderSelector';
+import { Category } from '@tgym.fr/core';
 
 export default function EditCategoryDialog({
   open,

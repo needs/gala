@@ -17,14 +17,13 @@ import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
 import { withAuthCompetition } from '../../../lib/auth';
 import {
-  ApparatusKey,
-  allApparatuses,
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
   useCompetition,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
+import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
 
 function AddApparatusButton({
   apparatuses,
@@ -168,7 +167,7 @@ export default function StagesPage() {
                 />
                 <Stack direction="row" gap={2}>
                   <AddApparatusButton
-                    apparatuses={allApparatuses.filter(
+                    apparatuses={allApparatusKeys.filter(
                       (apparatus) =>
                         stage.apparatuses === undefined ||
                         !(apparatus in stage.apparatuses)

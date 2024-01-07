@@ -8,9 +8,6 @@ import {
   Typography,
 } from '@mui/material';
 import {
-  ApparatusKey,
-  Team,
-  TimelineRotation,
   getApparatusIconPath,
   getApparatusName,
   useCompetition,
@@ -22,6 +19,7 @@ import SelectTeamDialog from './SelectTeamDialog';
 import { Add, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
+import { ApparatusKey, Team, TimelineRotation } from '@tgym.fr/core';
 
 function TimelineAddTeamButton({
   onAdd,

@@ -1,83 +1,12 @@
 import { syncedStore, getYjsDoc, Box } from '@syncedstore/core';
 import { HocuspocusProvider } from '@hocuspocus/provider';
-import { Icon } from '../components/SelectIconDialog';
 import { sortBy } from 'lodash';
 import { useSyncedStore } from '@syncedstore/react';
 import { UndoManager } from 'yjs';
+import { ApparatusKey, BarCategory, Competition as OriginalCompetition, Screen, ScreenBar, ScreenProgress, Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
 
-export const genders = ['man', 'woman', 'mixed'] as const;
-export type Gender = (typeof genders)[number];
-export const allApparatuses = [
-  'vault',
-  'unevenBars',
-  'beam',
-  'floor',
-  'highBar',
-  'parallelBars',
-  'rings',
-  'pommelHorse',
-] as const;
-export type ApparatusKey = (typeof allApparatuses)[number];
-
-export type Player = { firstName: string; lastName: string; gender: Gender };
-export type Team = {
-  name: string;
-  members: Record<string, boolean>;
-  categoryKey: string | undefined;
-};
-export type Category = {
-  name: string;
-  gender: Gender;
-  apparatuses: Record<string, { name: string; icon: string }>;
-};
-export type Progress = Partial<Record<ApparatusKey, string>>;
-export type BarCategory = {
-  name: string;
-  items: Record<string, BarItem>;
-  order: number;
-  icon?: Icon;
-};
-export type BarItem = { name: string; price: number; order: number };
-export type Info = { name: string };
-
-export type Stage = {
-  name: string;
-  timeline: Record<string, TimelineRotation | TimelinePause>;
-  timelineStartDate: string;
-  progress?: number;
-  apparatuses: Partial<Record<ApparatusKey, number>>;
-};
-export type TimelineRotation = {
-  type: 'rotation';
-  order: number;
-  apparatuses: Partial<Record<ApparatusKey, TimelineRotationApparatus>>;
-  durationInMinutes: number;
-};
-export type TimelinePause = {
-  type: 'pause';
-  order: number;
-  durationInMinutes: number;
-};
-export type TimelineRotationApparatus = { teams: Record<string, boolean> };
-
-export type BaseScreen = { name: string; shortUrlId: string | undefined };
-export type ScreenBar = { type: 'bar' } & BaseScreen;
-export type ScreenProgress = {
-  type: 'progress';
-  stageKey: string;
-} & BaseScreen;
-export type Screen = ScreenBar | ScreenProgress;
-export const screenTypes: Screen['type'][] = ['bar', 'progress'];
-
-export type Competition = {
-  players: Record<string, Player>;
-  teams: Record<string, Team>;
-  categories: Record<string, Category>;
-  stages: Record<string, Stage>;
-  progresses: Record<string, Progress>;
-  bar: Record<string, BarCategory>;
+export type Competition = Omit<OriginalCompetition, 'screens'> & {
   screens: Record<string, Box<Screen>>;
-  info: Info;
 };
 
 export function getApparatusName(apparatusKey: ApparatusKey): string {
@@ -289,7 +218,7 @@ export function initStore(
   };
 }
 
-const defaultCompetition: Competition = {
+const defaultCompetition: OriginalCompetition = {
   players: {},
   teams: {},
   progresses: {},

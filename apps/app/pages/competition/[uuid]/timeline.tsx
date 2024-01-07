@@ -17,9 +17,6 @@ import { withAuthCompetition } from '../../../lib/auth';
 import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import {
-  ApparatusKey,
-  TimelinePause,
-  TimelineRotation,
   stageApparatuses,
   useCompetition,
 } from '../../../lib/store';
@@ -35,6 +32,7 @@ import { sortBy } from 'lodash';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
 import fr from 'date-fns/locale/fr';
+import { ApparatusKey, TimelinePause, TimelineRotation } from '@tgym.fr/core';
 
 function TimelineRotationContainer({
   children,

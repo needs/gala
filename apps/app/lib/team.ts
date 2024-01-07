@@ -1,4 +1,4 @@
-import { Team } from './store';
+import { Team } from '@tgym.fr/core';
 import { v4 as uuidv4 } from 'uuid';
 
 export const defaultTeam: Team = {

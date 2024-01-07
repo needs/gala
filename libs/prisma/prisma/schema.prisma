@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -39,14 +39,16 @@ model CompetitionUser {
 }
 
 model Competition {
-  uuid             String            @id @default(uuid())
-  name             String
-  teamCount        Int
-  data             Bytes
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @updatedAt
-  users            CompetitionUser[]
-  screen_short_ids ScreenShortId[]
+  uuid               String            @id @default(uuid())
+  name               String
+  teamCount          Int
+  playerCount        Int               @default(0)
+  cumulativeDuration Int               @default(0)
+  data               Bytes
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @updatedAt
+  users              CompetitionUser[]
+  screen_short_ids   ScreenShortId[]
 }
 
 model ScreenShortId {

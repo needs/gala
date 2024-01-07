@@ -1,6 +1,6 @@
 import { Avatar } from '@mui/material';
-import { Gender } from '../lib/store';
 import GenderIcon, { genderColor } from './GenderIcon';
+import { Gender } from '@tgym.fr/core';
 
 export default function GenderAvatar({
   gender,

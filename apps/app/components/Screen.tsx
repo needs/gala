@@ -3,12 +3,11 @@ import Image from 'next/image';
 import { fullName } from '../lib/utils';
 import GenderAvatar from '../components/GenderAvatar';
 import {
-  ApparatusKey,
-  allApparatuses,
   getApparatusIconPath,
   getApparatusName,
   useCompetition,
 } from '../lib/store';
+import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
 
 function Apparatus({
   apparatusKey,
@@ -17,7 +16,7 @@ function Apparatus({
   apparatusKey: ApparatusKey;
   stageKey: 'stage1' | 'stage2';
 }) {
-  const width = `${(1 / allApparatuses.length) * 100}%`;
+  const width = `${(1 / allApparatusKeys.length) * 100}%`;
 
   const { teams, progresses, players } = useCompetition();
 
@@ -103,7 +102,7 @@ export default function Screen({
         justifyContent="center"
         divider={<Divider orientation="vertical" />}
       >
-        {allApparatuses.map((apparatusKey) => (
+        {allApparatusKeys.map((apparatusKey) => (
           <Apparatus
             stageKey={stageKey}
             key={apparatusKey}

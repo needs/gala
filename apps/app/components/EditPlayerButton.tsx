@@ -1,9 +1,9 @@
 import { Chip, Avatar } from '@mui/material';
 import { useState } from 'react';
-import { Player } from '../lib/store';
 import { fullName } from '../lib/utils';
 import EditPlayerDialog from './EditPlayerDialog';
 import GenderIcon from './GenderIcon';
+import { Player } from '@tgym.fr/core';
 
 export default function EditPlayerButton({
   player,
