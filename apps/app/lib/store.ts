@@ -213,6 +213,7 @@ export function initStore(
   });
 
   return () => {
+    console.log('destroying store');
     onUnload();
     provider.destroy();
   };

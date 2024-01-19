@@ -16,9 +16,9 @@ primary_region = "cdg"
   protocol = "tcp"
 
   [http_service.concurrency]
-    type = "requests"
-    hard_limit = 250
-    soft_limit = 200
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
 
   [[services.ports]]
     handlers = ["tls", "http"]
