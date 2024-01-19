@@ -17,22 +17,19 @@ const StoreProvider = ({
   const router = useRouter();
 
   useEffect(() => {
-    const init = async () => {
-      if (
-        typeof window !== 'undefined' &&
-        competitionUuid !== undefined &&
-        sessionCookie !== undefined
-      ) {
-        return initStore(
-          competitionUuid,
-          sessionCookie,
-          () => setStoreLoaded(true),
-          () => setStoreLoaded(false),
-          () => router.push('/login')
-        );
-      }
-    };
-    init();
+    if (
+      typeof window !== 'undefined' &&
+      competitionUuid !== undefined &&
+      sessionCookie !== undefined
+    ) {
+      return initStore(
+        competitionUuid,
+        sessionCookie,
+        () => setStoreLoaded(true),
+        () => setStoreLoaded(false),
+        () => router.push('/login')
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitionUuid, sessionCookie]);
 
