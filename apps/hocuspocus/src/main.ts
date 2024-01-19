@@ -19,6 +19,8 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
+    console.log('onAuthenticate', { sessionCookie, documentName });
+
     const user = await getUser(adminApp, prisma, sessionCookie);
     const role = await getRole(prisma, documentName, user);
 

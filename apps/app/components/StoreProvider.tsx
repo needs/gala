@@ -22,6 +22,8 @@ const StoreProvider = ({
       competitionUuid !== undefined &&
       sessionCookie !== undefined
     ) {
+      console.log('init store', competitionUuid, sessionCookie);
+
       return initStore(
         competitionUuid,
         sessionCookie,
