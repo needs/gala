@@ -204,13 +204,15 @@ export function initStore(
     name: uuid,
     document: document,
     token,
+    preserveConnection: true,
+
     onSynced: () => {
       onLoad();
     },
     onAuthenticationFailed: () => {
       onFail();
     },
-    onClose: (data) => {
+    onClose: () => {
       onFail();
     }
   });
