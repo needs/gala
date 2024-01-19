@@ -1,7 +1,6 @@
 import { AppProps } from 'next/app';
 import Layout, { LayoutInfo } from '../components/Layout';
 import '../styles/global.css';
-import { Analytics } from '@vercel/analytics/react';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
 import { CookiesProvider } from 'react-cookie';
@@ -28,7 +27,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
         <StoreProvider competitionUuid={pageProps.competitionUuid}>
           <Layout layoutInfo={pageProps.layoutInfo}>
             <Component {...pageProps} />
-            <Analytics />
           </Layout>
         </StoreProvider>
       </LocalizationProvider>
