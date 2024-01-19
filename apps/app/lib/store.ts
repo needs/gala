@@ -210,6 +210,9 @@ export function initStore(
     onAuthenticationFailed: () => {
       onFail();
     },
+    onClose: (data) => {
+      onFail();
+    }
   });
 
   return () => {
