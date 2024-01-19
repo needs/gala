@@ -1,5 +1,6 @@
 import { Hocuspocus } from '@hocuspocus/server';
 import { Database } from '@hocuspocus/extension-database';
+import { Logger } from "@hocuspocus/extension-logger";
 import { getRole, getUser } from '@tgym.fr/auth';
 import { prisma } from './prisma';
 import { adminApp } from './firebase';
@@ -19,8 +20,6 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
-    console.log('onAuthenticate', { sessionCookie, documentName });
-
     const user = await getUser(adminApp, prisma, sessionCookie);
     const role = await getRole(prisma, documentName, user);
 
@@ -30,6 +29,7 @@ const server = new Hocuspocus({
   },
 
   extensions: [
+    new Logger(),
     new Database({
       fetch: async ({ documentName }) => {
         const competition = await prisma.competition.findUnique({
