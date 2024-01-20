@@ -28,20 +28,11 @@ const server = new Hocuspocus({
     }
   },
 
-  async onConnect(data) {
-    console.log('onConnect', data);
-  },
-  async onRequest(data) {
-    console.log('onRequest', data);
-  },
-  async onUpgrade(data) {
-    console.log('onUpgrade', data);
-  },
-
   extensions: [
     new Logger(),
     new Database({
       fetch: async ({ documentName }) => {
+        console.log('fetching', documentName)
         const competition = await prisma.competition.findUnique({
           where: {
             uuid: documentName,
@@ -51,6 +42,7 @@ const server = new Hocuspocus({
         if (competition === null) {
           return new Uint8Array();
         }
+        console.log('fetched', documentName)
 
         return Uint8Array.from(competition.data);
       },
