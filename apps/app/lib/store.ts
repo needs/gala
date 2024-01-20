@@ -204,7 +204,6 @@ export function initStore(
     name: uuid,
     document: document,
     token,
-    preserveConnection: true,
 
     onSynced: () => {
       onLoad();
