@@ -28,6 +28,16 @@ const server = new Hocuspocus({
     }
   },
 
+  async onConnect(data) {
+    console.log('onConnect', data);
+  },
+  async onRequest(data) {
+    console.log('onRequest', data);
+  },
+  async onUpgrade(data) {
+    console.log('onUpgrade', data);
+  },
+
   extensions: [
     new Logger(),
     new Database({
