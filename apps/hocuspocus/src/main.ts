@@ -15,7 +15,6 @@ function getPort() {
 }
 
 const server = new Hocuspocus({
-  debounce: 5000,
   timeout: 60000,
 
   async onAuthenticate(data) {
