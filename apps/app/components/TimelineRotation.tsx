@@ -10,7 +10,6 @@ import {
 import {
   getApparatusIconPath,
   getApparatusName,
-  useCompetition,
 } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
@@ -20,6 +19,7 @@ import { Add, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
 import { ApparatusKey, Team, TimelineRotation } from '@tgym.fr/core';
+import { useCompetition } from './StoreProvider';
 
 function TimelineAddTeamButton({
   onAdd,

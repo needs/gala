@@ -1,8 +1,8 @@
-import { useCompetition } from '../../../../lib/store';
 import { GetServerSideProps } from 'next';
 import ScreenBar from '../../../../components/screens/ScreenBar';
 import ScreenProgress from '../../../../components/screens/ScreenProgress';
 import ScreenInvalid from '../../../../components/screens/ScreenInvalid';
+import { useCompetition } from '../../../../components/StoreProvider';
 
 export default function ScreenPage({ screenUuid }: { screenUuid: string }) {
   const { screens } = useCompetition();

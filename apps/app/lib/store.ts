@@ -1,9 +1,9 @@
 import { syncedStore, getYjsDoc, Box } from '@syncedstore/core';
 import { HocuspocusProvider } from '@hocuspocus/provider';
 import { sortBy } from 'lodash';
-import { useSyncedStore } from '@syncedstore/react';
 import { UndoManager } from 'yjs';
 import { ApparatusKey, BarCategory, Competition as OriginalCompetition, Screen, ScreenBar, ScreenProgress, Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
+import { MappedTypeDescription } from '@syncedstore/core/types/doc';
 
 export type Competition = Omit<OriginalCompetition, 'screens'> & {
   screens: Record<string, Box<Screen>>;
@@ -183,20 +183,20 @@ export const barDefault: Record<string, BarCategory> = {
   },
 };
 
-export const store = syncedStore<{ competition: Competition }>({
-  competition: {} as Competition,
-});
-export const undoManager = new UndoManager(
-  getYjsDoc(store).getMap('competition')
-);
-
 export function initStore(
   uuid: string,
   token: string,
   onLoad: () => void,
-  onUnload: () => void,
   onFail: () => void
 ) {
+  const store = syncedStore<{ competition: Competition }>({
+    competition: {} as Competition,
+  });
+
+  const undoManager = new UndoManager(
+    getYjsDoc(store).getMap('competition')
+  );
+
   const document = getYjsDoc(store);
 
   const provider = new HocuspocusProvider({
@@ -216,13 +216,14 @@ export function initStore(
     }
   });
 
-  return () => {
-    onUnload();
-    provider.destroy();
-  };
+  return {
+    provider,
+    store,
+    undoManager,
+  }
 }
 
-const defaultCompetition: OriginalCompetition = {
+export const defaultCompetition: OriginalCompetition = {
   players: {},
   teams: {},
   progresses: {},
@@ -235,12 +236,6 @@ const defaultCompetition: OriginalCompetition = {
   stages: {},
 };
 
-export function useCompetition(): Competition {
-  const { competition } = useSyncedStore(store);
-
-  const missingEntries = Object.fromEntries(
-    Object.entries(defaultCompetition).filter(([key]) => !(key in competition))
-  );
-
-  return Object.assign(competition, missingEntries) as Competition;
-}
+export type Store = MappedTypeDescription<{
+  competition: Competition;
+}>;

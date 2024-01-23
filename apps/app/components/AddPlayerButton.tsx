@@ -3,8 +3,8 @@ import { IconButton } from '@mui/material';
 import { useState } from 'react';
 import EditPlayerDialog from './EditPlayerDialog';
 import { addPlayer, defaultPlayer } from '../lib/player';
-import { useCompetition } from '../lib/store';
 import { Team } from '@tgym.fr/core';
+import { useCompetition } from './StoreProvider';
 
 export default function AddPlayerButton({ team }: { team?: Team }) {
   const { players } = useCompetition();

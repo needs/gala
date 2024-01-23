@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { CategorySelectorValue } from './CategorySelector';
-import { useCompetition } from '../lib/store';
+import { useCompetition } from './StoreProvider';
 import GenderAvatar from './GenderAvatar';
 import { FilterList } from '@mui/icons-material';
 import SelectCategoryMenu from './SelectCategoryMenu';

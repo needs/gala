@@ -1,4 +1,3 @@
-import { useCompetition } from '../../../lib/store';
 import {
   Avatar,
   Box,
@@ -30,6 +29,7 @@ import { addTeam, defaultTeam } from '../../../lib/team';
 import { withAuthCompetition } from '../../../lib/auth';
 import EditCategoryDialog from '../../../components/EditCategoryDialog';
 import { Category, Team } from '@tgym.fr/core';
+import { useCompetition } from '../../../components/StoreProvider';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);

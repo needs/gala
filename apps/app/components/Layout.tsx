@@ -35,13 +35,13 @@ import {
   Tooltip,
 } from '@mui/material';
 import Link from 'next/link';
-import { undoManager, useCompetition } from '../lib/store';
 import { avatarUrl, getUserName } from '../lib/avatar';
 import { signOut } from 'firebase/auth';
 import { getFirebaseAppAuth } from '../lib/firebase';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
+import { useCompetition, useUndoManager } from './StoreProvider';
 
 const drawerWidth = 240;
 
@@ -240,19 +240,16 @@ function AccountMenu() {
   );
 }
 
-export default function Layout({
+function AppLayout({
   children,
   layoutInfo,
 }: {
   children: React.ReactNode;
-  layoutInfo?: LayoutInfo;
+  layoutInfo: LayoutInfo;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { info } = useCompetition();
-
-  if (layoutInfo === undefined) {
-    return <>{children}</>;
-  }
+  const undoManager = useUndoManager();
 
   const menu = getMenu(layoutInfo);
 
@@ -379,4 +376,18 @@ export default function Layout({
       </Box>
     </Box>
   );
+}
+
+export default function Layout({
+  children,
+  layoutInfo,
+}: {
+  children: React.ReactNode;
+  layoutInfo?: LayoutInfo;
+}) {
+  if (layoutInfo === undefined) {
+    return <>{children}</>;
+  } else {
+    return <AppLayout layoutInfo={layoutInfo}>{children}</AppLayout>;
+  }
 }

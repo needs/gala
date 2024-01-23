@@ -1,7 +1,6 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import {
   stageApparatuses,
-  useCompetition,
 } from '../../../lib/store';
 import { withAuthCompetition } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
@@ -13,6 +12,7 @@ import fr from 'date-fns/locale/fr';
 import { isEmpty } from 'lodash';
 import { ProgressGenericInfo, getCurrentRotation } from '../../../lib/progress';
 import { ApparatusKey, TimelineRotation } from '@tgym.fr/core';
+import { useCompetition } from '../../../components/StoreProvider';
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
   if (startDate === undefined && endDate === undefined) {

@@ -1,6 +1,6 @@
 import { ListItemText, MenuItem, ListItemAvatar, Menu } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { useCompetition } from '../lib/store';
+import { useCompetition } from './StoreProvider';
 import { CategorySelectorValue } from './CategorySelector';
 
 export default function SelectCategoryMenu({

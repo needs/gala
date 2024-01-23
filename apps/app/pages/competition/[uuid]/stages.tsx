@@ -20,10 +20,10 @@ import {
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
-  useCompetition,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
 import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
+import { useCompetition } from '../../../components/StoreProvider';
 
 function AddApparatusButton({
   apparatuses,

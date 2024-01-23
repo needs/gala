@@ -1,10 +1,10 @@
 import { Box, CssBaseline, Stack, Typography } from '@mui/material';
-import { useCompetition } from '../../lib/store';
 import { useEffect, useRef, useState } from 'react';
 import * as Muicon from '@mui/icons-material';
 import { sortBy } from 'lodash';
 import { ScreenBar } from '@tgym.fr/core';
 import { isIcon } from '../SelectIconDialog';
+import { useCompetition } from '../StoreProvider';
 
 export default function ScreenBar({ screen }: { screen: ScreenBar }) {
   const { bar } = useCompetition();

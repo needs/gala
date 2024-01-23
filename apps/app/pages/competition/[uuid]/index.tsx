@@ -24,13 +24,13 @@ import {
   Typography,
 } from '@mui/material';
 import Head from 'next/head';
-import { useCompetition } from '../../../lib/store';
 
 import { withAuthCompetition } from '../../../lib/auth';
 import { trpc } from '../../../utils/trpc';
 import { Role } from '@prisma/client';
 import { Delete, Email } from '@mui/icons-material';
 import { avatarUrl, getUserName } from '../../../lib/avatar';
+import { useCompetition } from '../../../components/StoreProvider';
 
 const RoleSelector = ({
   value,

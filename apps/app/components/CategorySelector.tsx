@@ -8,7 +8,7 @@ import {
   ListItemAvatar,
 } from '@mui/material';
 import GenderAvatar from './GenderAvatar';
-import { useCompetition } from '../lib/store';
+import { useCompetition } from './StoreProvider';
 import { z } from 'zod';
 
 const categorySelectorValueSchema = z.union([

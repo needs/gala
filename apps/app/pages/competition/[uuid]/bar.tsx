@@ -1,5 +1,5 @@
 import { withAuthCompetition } from '../../../lib/auth';
-import { barDefault, useCompetition } from '../../../lib/store';
+import { barDefault } from '../../../lib/store';
 import {
   Button,
   Divider,
@@ -18,6 +18,7 @@ import { isEmpty, sortBy } from 'lodash';
 import SelectIconButton from '../../../components/SelectIconButton';
 import { BarCategory } from '@tgym.fr/core';
 import { isIcon } from '../../../components/SelectIconDialog';
+import { useCompetition } from '../../../components/StoreProvider';
 
 function CurrencyField({
   value,

@@ -5,9 +5,9 @@ import GenderAvatar from '../components/GenderAvatar';
 import {
   getApparatusIconPath,
   getApparatusName,
-  useCompetition,
 } from '../lib/store';
 import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
+import { useCompetition } from './StoreProvider';
 
 function Apparatus({
   apparatusKey,

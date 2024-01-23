@@ -17,12 +17,12 @@ import {
 import {
   getDefaultScreen,
   getScreenName,
-  useCompetition,
 } from '../lib/store';
 import { Schedule, SportsBar } from '@mui/icons-material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 import { Screen, ScreenBar, ScreenProgress, screenTypes } from '@tgym.fr/core';
+import { useCompetition } from './StoreProvider';
 
 export function getScreenIcon(
   screenType: Screen['type'],

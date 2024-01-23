@@ -5,11 +5,11 @@ import GenderIcon from '../../../components/GenderIcon';
 import {
   getApparatusIconPath,
   getApparatusName,
-  useCompetition,
 } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
 import { ApparatusKey, Progress } from '@tgym.fr/core';
+import { useCompetition } from '../../../components/StoreProvider';
 
 function Apparatus({
   apparatusKey,

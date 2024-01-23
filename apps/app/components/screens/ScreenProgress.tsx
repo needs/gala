@@ -3,13 +3,13 @@ import {
   getApparatusIconPath,
   getApparatusName,
   stageApparatuses,
-  useCompetition,
 } from '../../lib/store';
 import { getCurrentRotation } from '../../lib/progress';
 import Image from 'next/image';
 import GenderAvatar from '../GenderAvatar';
 import { useEffect, useRef, useState } from 'react';
 import { ApparatusKey, ScreenProgress, TimelineRotation } from '@tgym.fr/core';
+import { useCompetition } from '../StoreProvider';
 
 function Start() {
   return (
