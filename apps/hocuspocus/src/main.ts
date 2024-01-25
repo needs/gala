@@ -80,4 +80,7 @@ const server = new Hocuspocus({
   port: getPort(),
 });
 
+// Temporary, for debugging weird latency on first connect.
+server.enableMessageLogging();
+
 server.listen();
