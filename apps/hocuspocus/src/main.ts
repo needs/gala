@@ -20,8 +20,13 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
+    console.time('getUser');
     const user = await getUser(adminApp, prisma, sessionCookie);
+    console.timeEnd('getUser');
+
+    console.time('getRole');
     const role = await getRole(prisma, documentName, user);
+    console.timeEnd('getRole');
 
     if (role !== 'EDITOR' && role !== 'OWNER') {
       data.connection.readOnly = true;
