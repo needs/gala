@@ -28,7 +28,7 @@ export const getUser = async (
 
   const tokenData = await adminApp
     .auth()
-    .verifySessionCookie(sessionCookie, true)
+    .verifySessionCookie(sessionCookie, false)
     .catch(() => {
       return undefined;
     });
