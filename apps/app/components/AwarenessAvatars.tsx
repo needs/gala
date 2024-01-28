@@ -5,8 +5,6 @@ import { avatarUrl } from '../lib/avatar';
 export default function AwarenessAvatars() {
   const awareness = useAwareness();
 
-  console.log(awareness);
-
   return (
     <AvatarGroup max={4}>
       {awareness.states.map((state) => (

@@ -64,7 +64,7 @@ const StoreProvider = ({
     if (
       competitionUuid !== undefined &&
       sessionCookie !== undefined &&
-      user !== undefined
+      user !== undefined && provider === undefined
     ) {
       const name = getUserName(user.email, user.name);
       const { store, provider, undoManager } = initStore(
@@ -72,7 +72,16 @@ const StoreProvider = ({
         sessionCookie,
         name,
         () => setStoreLoaded(true),
-        () => setStoreLoaded(false),
+        () => {
+          provider.destroy();
+          router.push('/login');
+
+          setStore(undefined);
+          setProvider(undefined);
+          setUndoManager(undefined);
+          setAwereness(undefined);
+          setStoreLoaded(false);
+        },
         (awareness) => {
           setAwereness(awareness);
         }
@@ -81,17 +90,6 @@ const StoreProvider = ({
       setStore(store);
       setProvider(provider);
       setUndoManager(undoManager);
-
-      return () => {
-        provider.destroy();
-        router.push('/login');
-
-        setStore(undefined);
-        setProvider(undefined);
-        setUndoManager(undefined);
-        setAwereness(undefined);
-        setStoreLoaded(false);
-      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitionUuid, sessionCookie, user]);
