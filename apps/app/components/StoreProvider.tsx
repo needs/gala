@@ -15,17 +15,24 @@ import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
 import { UndoManager } from 'yjs';
-import { HocuspocusProvider } from '@hocuspocus/provider';
+import {
+  HocuspocusProvider,
+  onAwarenessUpdateParameters,
+} from '@hocuspocus/provider';
 import { useSyncedStore } from '@syncedstore/react';
+import { trpc } from '../utils/trpc';
+import { getUserName } from '../lib/avatar';
 
 const context = createContext<{
   store: Store | undefined;
   provider: HocuspocusProvider | undefined;
   undoManager: UndoManager | undefined;
+  awareness: onAwarenessUpdateParameters | undefined;
 }>({
   store: undefined,
   provider: undefined,
   undoManager: undefined,
+  awareness: undefined,
 });
 
 const StoreProvider = ({
@@ -43,21 +50,32 @@ const StoreProvider = ({
   const [undoManager, setUndoManager] = useState<UndoManager | undefined>(
     undefined
   );
+  const [awareness, setAwereness] = useState<
+    onAwarenessUpdateParameters | undefined
+  >(undefined);
 
   const [cookies] = useCookies(['session']);
   const sessionCookie = cookies.session;
   const router = useRouter();
 
+  const { data: user } = trpc.user.useQuery(null);
+
   useEffect(() => {
     if (
       competitionUuid !== undefined &&
-      sessionCookie !== undefined
+      sessionCookie !== undefined &&
+      user !== undefined
     ) {
+      const name = getUserName(user.email, user.name);
       const { store, provider, undoManager } = initStore(
         competitionUuid,
         sessionCookie,
+        name,
         () => setStoreLoaded(true),
-        () => setStoreLoaded(false)
+        () => setStoreLoaded(false),
+        (awareness) => {
+          setAwereness(awareness);
+        }
       );
 
       setStore(store);
@@ -71,15 +89,14 @@ const StoreProvider = ({
         setStore(undefined);
         setProvider(undefined);
         setUndoManager(undefined);
+        setAwereness(undefined);
         setStoreLoaded(false);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [competitionUuid, sessionCookie]);
+  }, [competitionUuid, sessionCookie, user]);
 
-  if (
-    competitionUuid !== undefined && !storeLoaded
-  ) {
+  if (competitionUuid !== undefined && !storeLoaded) {
     return (
       <Box
         display="flex"
@@ -99,6 +116,7 @@ const StoreProvider = ({
           store,
           provider,
           undoManager,
+          awareness,
         }}
       >
         {children}
@@ -108,13 +126,14 @@ const StoreProvider = ({
 };
 
 function useContextData() {
-  const {
-    store,
-    provider,
-    undoManager,
-  } = useContext(context);
+  const { store, provider, undoManager, awareness } = useContext(context);
 
-  if (store === undefined || provider === undefined || undoManager === undefined) {
+  if (
+    store === undefined ||
+    provider === undefined ||
+    undoManager === undefined ||
+    awareness === undefined
+  ) {
     throw new Error('useContext must be used inside StoreProvider');
   }
 
@@ -122,6 +141,7 @@ function useContextData() {
     store,
     provider,
     undoManager,
+    awareness,
   };
 }
 
@@ -139,6 +159,11 @@ export function useCompetition(): Competition {
 export function useUndoManager() {
   const { undoManager } = useContextData();
   return undoManager;
+}
+
+export function useAwareness() {
+  const { awareness } = useContextData();
+  return awareness;
 }
 
 export default StoreProvider;

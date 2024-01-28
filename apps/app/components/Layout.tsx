@@ -35,6 +35,7 @@ import {
 import Link from 'next/link';
 import { useCompetition, useUndoManager } from './StoreProvider';
 import AccountIconButton from './AccountIconButton';
+import AwarenessAvatars from './AwarenessAvatars';
 
 const drawerWidth = 240;
 
@@ -194,7 +195,8 @@ function AppLayout({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {!info.name ? 'Compétition sans nom' : info.name}
           </Typography>
-          <Stack direction="row" gap={2}>
+          <Stack direction="row" gap={2} alignItems="center">
+            <AwarenessAvatars />
             <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
               <Tooltip title="Annuler">
                 <IconButton
