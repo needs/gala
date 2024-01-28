@@ -198,6 +198,7 @@ function AppLayout({
             <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
               <Tooltip title="Annuler">
                 <IconButton
+                  color='primary'
                   onClick={() => {
                     undoManager.undo();
                   }}
@@ -208,6 +209,7 @@ function AppLayout({
               </Tooltip>
               <Tooltip title="Refaire">
                 <IconButton
+                  color='primary'
                   onClick={() => {
                     undoManager.redo();
                   }}
