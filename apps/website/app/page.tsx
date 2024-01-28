@@ -16,6 +16,7 @@ const getStats = cache(async () => {
     _sum: {
       cumulativeDuration: true,
       playerCount: true,
+      viewCount: true,
     },
   });
 
@@ -26,7 +27,7 @@ export default async function Page() {
   const isIe = false;
   const isLoading = false;
 
-  const { playerCount, cumulativeDuration } = await getStats();
+  const { playerCount, cumulativeDuration, viewCount } = await getStats();
 
   return (
     <html lang="en">
@@ -568,10 +569,12 @@ export default async function Page() {
                         <div className="counter-items text-center">
                           <span
                             className="count countup text-uppercase"
-                            cup-end="0"
+                            cup-end={(
+                              (viewCount ?? 0)
+                            ).toString()}
                             cup-append=""
                           ></span>
-                          <p className="text">Spectateurs</p>
+                          <p className="text">Vues</p>
                         </div>
                       </div>
                     </div>
