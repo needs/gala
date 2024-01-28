@@ -194,29 +194,38 @@ function AppLayout({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {!info.name ? 'Compétition sans nom' : info.name}
           </Typography>
-          <Tooltip title="Annuler">
-            <IconButton
-              color="inherit"
-              onClick={() => {
-                undoManager.undo();
-              }}
-              disabled={!undoManager.canUndo()}
+          <Stack direction="row" gap={2}>
+            <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
+              <Tooltip title="Annuler">
+                <IconButton
+                  onClick={() => {
+                    undoManager.undo();
+                  }}
+                  disabled={!undoManager.canUndo()}
+                >
+                  <Undo />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Refaire">
+                <IconButton
+                  onClick={() => {
+                    undoManager.redo();
+                  }}
+                  disabled={!undoManager.canRedo()}
+                >
+                  <Redo />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+            <Stack
+              direction="row"
+              bgcolor="#ffffffaa"
+              borderRadius={999}
+              p={0.5}
             >
-              <Undo />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Refaire">
-            <IconButton
-              color="inherit"
-              onClick={() => {
-                undoManager.redo();
-              }}
-              disabled={!undoManager.canRedo()}
-            >
-              <Redo />
-            </IconButton>
-          </Tooltip>
-          <AccountIconButton />
+              <AccountIconButton />
+            </Stack>
+          </Stack>
         </Toolbar>
       </AppBar>
       <Box

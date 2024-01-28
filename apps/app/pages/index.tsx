@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   CssBaseline,
-  Icon,
   List,
   ListItem,
   ListItemAvatar,
@@ -15,15 +14,11 @@ import {
 } from '@mui/material';
 import { trpc } from '../utils/trpc';
 import { useRouter } from 'next/router';
-import { signOut } from 'firebase/auth';
-import { getFirebaseAppAuth } from '../lib/firebase';
 import { withAuth } from '../lib/auth';
-import { useCookies } from 'react-cookie';
 import Link from 'next/link';
 import AccountIconButton from '../components/AccountIconButton';
 
 export default function ListPage() {
-  const removeCookies = useCookies(['session'])[2];
   const router = useRouter();
   const create = trpc.create.useMutation();
   const { data: competitions } = trpc.list.useQuery(null);

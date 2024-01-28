@@ -12,6 +12,7 @@ import {
   Menu as MenuList,
   Divider,
   ListItemIcon,
+  Chip,
 } from '@mui/material';
 import Link from 'next/link';
 import { EmojiEvents, Logout } from '@mui/icons-material';
@@ -43,16 +44,16 @@ export default function AccountIconButton() {
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Tooltip title="Mon compte">
-          <IconButton
+          <Chip
+            label={name}
+            avatar={
+              <Avatar sx={{ width: 32, height: 32 }} src={avatarUrl(name)} />
+            }
             onClick={handleClick}
-            size="small"
-            sx={{ ml: 2 }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
-          >
-            <Avatar sx={{ width: 32, height: 32 }} src={avatarUrl(name)} />
-          </IconButton>
+          />
         </Tooltip>
       </Box>
       <MenuList
