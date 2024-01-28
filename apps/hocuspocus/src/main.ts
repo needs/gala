@@ -20,6 +20,9 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
+    // Those depends on Firebase under the hood and where a bit slow previously,
+    // so keep monitoring them for some time.
+
     console.time('getUser');
     const user = await getUser(adminApp, prisma, sessionCookie);
     console.timeEnd('getUser');
@@ -37,14 +40,22 @@ const server = new Hocuspocus({
     new Logger(),
     new Database({
       fetch: async ({ documentName }) => {
-        const competition = await prisma.competition.findUnique({
+        const competition = await prisma.competition.update({
           where: {
             uuid: documentName,
           },
+          data: {
+            viewCount: {
+              increment: 1,
+            }
+          },
+          select: {
+            data: true,
+          }
         });
 
         if (competition === null) {
-          return new Uint8Array();
+          throw new Error('Competition not found');
         }
 
         return Uint8Array.from(competition.data);

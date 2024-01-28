@@ -44,6 +44,7 @@ model Competition {
   teamCount          Int
   playerCount        Int               @default(0)
   cumulativeDuration Int               @default(0)
+  viewCount          Int               @default(0)
   data               Bytes
   created_at         DateTime          @default(now())
   updated_at         DateTime          @updatedAt

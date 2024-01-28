@@ -1,9 +1,10 @@
-import { Add, EmojiEvents } from '@mui/icons-material';
+import { AccessTime, Add, EmojiEvents, Visibility } from '@mui/icons-material';
 import {
   Avatar,
   Box,
   Button,
   CssBaseline,
+  Icon,
   List,
   ListItem,
   ListItemAvatar,
@@ -101,7 +102,15 @@ export default function ListPage() {
                           ? competition.name
                           : 'Compétition sans nom'
                       }
-                      secondary={`${competition.teamCount} équipes`}
+                      secondary={
+                        <Stack direction="row" justifyContent="space-between">
+                          {`${competition.teamCount} équipes, ${competition.playerCount} joueurs`}
+                          <Stack direction="row" gap={2}>
+                          <Stack direction="row" alignItems="center" gap={0.5}><AccessTime fontSize='small' />{`${competition.cumulativeDuration / 60}h`}</Stack>
+                          <Stack direction="row" alignItems="center" gap={0.5}><Visibility fontSize='small' />{`${competition.viewCount}`}</Stack>
+                          </Stack>
+                        </Stack>
+                      }
                     />
                   </ListItemButton>
                 </ListItem>

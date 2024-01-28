@@ -138,6 +138,9 @@ export const appRouter = router({
           uuid: z.string().uuid(),
           name: z.string(),
           teamCount: z.number(),
+          cumulativeDuration: z.number(),
+          playerCount: z.number(),
+          viewCount: z.number(),
         })
       )
     )
@@ -147,6 +150,9 @@ export const appRouter = router({
           uuid: true,
           name: true,
           teamCount: true,
+          cumulativeDuration: true,
+          playerCount: true,
+          viewCount: true,
         },
         where: {
           users: {
