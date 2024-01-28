@@ -60,17 +60,6 @@ export default function ListPage() {
           <Typography variant="h6" component="h1">
             Vos compétitions
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => {
-              create.mutateAsync(null).then((competition) => {
-                router.push(`/competition/${competition.uuid}`);
-              });
-            }}
-          >
-            Compétition
-          </Button>
         </Stack>
         <List>
           {competitions !== undefined && competitions.length === 0 && (
@@ -106,8 +95,22 @@ export default function ListPage() {
                         <Stack direction="row" justifyContent="space-between">
                           {`${competition.teamCount} équipes, ${competition.playerCount} joueurs`}
                           <Stack direction="row" gap={2}>
-                          <Stack direction="row" alignItems="center" gap={0.5}><AccessTime fontSize='small' />{`${competition.cumulativeDuration / 60}h`}</Stack>
-                          <Stack direction="row" alignItems="center" gap={0.5}><Visibility fontSize='small' />{`${competition.viewCount}`}</Stack>
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              gap={0.5}
+                            >
+                              <AccessTime fontSize="small" />
+                              {`${competition.cumulativeDuration / 60}h`}
+                            </Stack>
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              gap={0.5}
+                            >
+                              <Visibility fontSize="small" />
+                              {`${competition.viewCount}`}
+                            </Stack>
                           </Stack>
                         </Stack>
                       }
@@ -118,17 +121,23 @@ export default function ListPage() {
             ))}
         </List>
 
-        <Button
-          onClick={() => {
-            removeCookies('session');
-            signOut(getFirebaseAppAuth()).then(() => {
-              router.push('/login');
-            });
-          }}
-          color="secondary"
-        >
-          Deconnexion
-        </Button>
+        <Box marginLeft="auto">
+          <Button
+            variant={
+              competitions === undefined || competitions.length === 0
+                ? 'contained'
+                : 'outlined'
+            }
+            startIcon={<Add />}
+            onClick={() => {
+              create.mutateAsync(null).then((competition) => {
+                router.push(`/competition/${competition.uuid}`);
+              });
+            }}
+          >
+            Compétition
+          </Button>
+        </Box>
       </Stack>
     </Box>
   );
