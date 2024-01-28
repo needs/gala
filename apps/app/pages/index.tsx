@@ -20,6 +20,7 @@ import { getFirebaseAppAuth } from '../lib/firebase';
 import { withAuth } from '../lib/auth';
 import { useCookies } from 'react-cookie';
 import Link from 'next/link';
+import AccountIconButton from '../components/AccountIconButton';
 
 export default function ListPage() {
   const removeCookies = useCookies(['session'])[2];
@@ -60,6 +61,7 @@ export default function ListPage() {
           <Typography variant="h6" component="h1">
             Vos compétitions
           </Typography>
+          <AccountIconButton />
         </Stack>
         <List>
           {competitions !== undefined && competitions.length === 0 && (

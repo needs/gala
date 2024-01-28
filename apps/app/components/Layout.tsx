@@ -15,7 +15,6 @@ import {
   EventNote,
   FoodBank,
   Group,
-  Logout,
   Menu as MenuIcon,
   Redo,
   Schedule,
@@ -26,7 +25,6 @@ import {
   Villa,
 } from '@mui/icons-material';
 import {
-  Avatar,
   Divider,
   IconButton,
   Menu as MenuList,
@@ -35,13 +33,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import Link from 'next/link';
-import { avatarUrl, getUserName } from '../lib/avatar';
-import { signOut } from 'firebase/auth';
-import { getFirebaseAppAuth } from '../lib/firebase';
-import { useRouter } from 'next/router';
-import { useCookies } from 'react-cookie';
-import { trpc } from '../utils/trpc';
 import { useCompetition, useUndoManager } from './StoreProvider';
+import AccountIconButton from './AccountIconButton';
 
 const drawerWidth = 240;
 
@@ -134,112 +127,6 @@ function getMenu(layoutInfo: LayoutInfo): Menu {
   }
 }
 
-function AccountMenu() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const router = useRouter();
-  const removeCookies = useCookies(['session'])[2];
-
-  const { data: user } = trpc.user.useQuery(null);
-
-  if (user === undefined) {
-    return null;
-  }
-
-  const name = getUserName(user.email, user.name);
-
-  return (
-    <>
-      <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <Tooltip title="Mon compte">
-          <IconButton
-            onClick={handleClick}
-            size="small"
-            sx={{ ml: 2 }}
-            aria-controls={open ? 'account-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-          >
-            <Avatar sx={{ width: 32, height: 32 }} src={avatarUrl(name)} />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      <MenuList
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-            width: 200,
-            mt: 1.5,
-            '& .MuiAvatar-root': {
-              width: 32,
-              height: 32,
-              ml: -0.5,
-              mr: 1,
-            },
-            '&:before': {
-              content: '""',
-              display: 'block',
-              position: 'absolute',
-              top: 0,
-              right: 14,
-              width: 10,
-              height: 10,
-              bgcolor: 'background.paper',
-              transform: 'translateY(-50%) rotate(45deg)',
-              zIndex: 0,
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-      >
-        <Link href="/account" legacyBehavior>
-          <MenuListItem onClick={handleClose}>
-            <Avatar /> Profil
-          </MenuListItem>
-        </Link>
-        <Link href="/" legacyBehavior>
-          <MenuListItem onClick={handleClose}>
-            <Avatar>
-              <EmojiEvents />
-            </Avatar>{' '}
-            Compétitions
-          </MenuListItem>
-        </Link>
-        <Divider />
-        <MenuListItem
-          onClick={() => {
-            const auth = getFirebaseAppAuth();
-            removeCookies('session');
-            signOut(auth).then(() => {
-              router.push('/login');
-            });
-          }}
-        >
-          <ListItemIcon>
-            <Logout fontSize="small" />
-          </ListItemIcon>
-          Déconnexion
-        </MenuListItem>
-      </MenuList>
-    </>
-  );
-}
-
 function AppLayout({
   children,
   layoutInfo,
@@ -329,7 +216,7 @@ function AppLayout({
               <Redo />
             </IconButton>
           </Tooltip>
-          <AccountMenu />
+          <AccountIconButton />
         </Toolbar>
       </AppBar>
       <Box
