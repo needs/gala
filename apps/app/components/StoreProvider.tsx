@@ -53,6 +53,9 @@ const StoreProvider = ({
   const [awareness, setAwereness] = useState<
     onAwarenessUpdateParameters | undefined
   >(undefined);
+  const [loadedCompetitionUuid, setLoadedCompetitionUuid] = useState<
+    string | undefined
+  >(undefined);
 
   const [cookies] = useCookies(['session']);
   const sessionCookie = cookies.session;
@@ -80,6 +83,7 @@ const StoreProvider = ({
           setProvider(undefined);
           setUndoManager(undefined);
           setAwereness(undefined);
+          setLoadedCompetitionUuid(undefined);
           setStoreLoaded(false);
         },
         (awareness) => {
@@ -90,9 +94,20 @@ const StoreProvider = ({
       setStore(store);
       setProvider(provider);
       setUndoManager(undoManager);
+      setLoadedCompetitionUuid(competitionUuid);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [competitionUuid, sessionCookie, user]);
+  }, [competitionUuid, provider, router, sessionCookie, user]);
+
+  useEffect(() => {
+    if (loadedCompetitionUuid !== undefined && competitionUuid !== loadedCompetitionUuid) {
+      setStore(undefined);
+      setProvider(undefined);
+      setUndoManager(undefined);
+      setAwereness(undefined);
+      setLoadedCompetitionUuid(undefined);
+      setStoreLoaded(false);
+    }
+  }, [competitionUuid, loadedCompetitionUuid]);
 
   if (competitionUuid !== undefined && !storeLoaded) {
     return (
