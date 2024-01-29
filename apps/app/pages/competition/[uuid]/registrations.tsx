@@ -310,7 +310,7 @@ export default function TeamsPage() {
                   <Stack gap={2} direction="row" alignItems="center">
                     {icon}
                     <Stack direction="column">
-                      <Typography variant="body1">{name}</Typography>
+                      {name}
                       <Typography variant="caption">
                         {categoryTeams.length}
                         {searchQuery !== '' &&

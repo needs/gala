@@ -199,26 +199,30 @@ function AppLayout({
             <AwarenessAvatars />
             <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
               <Tooltip title="Annuler">
-                <IconButton
-                  color='primary'
-                  onClick={() => {
-                    undoManager.undo();
-                  }}
-                  disabled={!undoManager.canUndo()}
-                >
-                  <Undo />
-                </IconButton>
+                <span>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      undoManager.undo();
+                    }}
+                    disabled={!undoManager.canUndo()}
+                  >
+                    <Undo />
+                  </IconButton>
+                </span>
               </Tooltip>
               <Tooltip title="Refaire">
-                <IconButton
-                  color='primary'
-                  onClick={() => {
-                    undoManager.redo();
-                  }}
-                  disabled={!undoManager.canRedo()}
-                >
-                  <Redo />
-                </IconButton>
+                <span>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      undoManager.redo();
+                    }}
+                    disabled={!undoManager.canRedo()}
+                  >
+                    <Redo />
+                  </IconButton>
+                </span>
               </Tooltip>
             </Stack>
             <Stack

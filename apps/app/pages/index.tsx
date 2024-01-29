@@ -89,13 +89,14 @@ export default function ListPage() {
                           : 'Compétition sans nom'
                       }
                       secondary={
-                        <Stack direction="row" justifyContent="space-between">
+                        <Stack direction="row" justifyContent="space-between" component="span">
                           {`${competition.teamCount} équipes, ${competition.playerCount} joueurs`}
-                          <Stack direction="row" gap={2}>
+                          <Stack direction="row" gap={2} component="span">
                             <Stack
                               direction="row"
                               alignItems="center"
                               gap={0.5}
+                              component="span"
                             >
                               <AccessTime fontSize="small" />
                               {`${competition.cumulativeDuration / 60}h`}
@@ -104,6 +105,7 @@ export default function ListPage() {
                               direction="row"
                               alignItems="center"
                               gap={0.5}
+                              component="span"
                             >
                               <Visibility fontSize="small" />
                               {`${competition.viewCount}`}
