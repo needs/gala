@@ -14,11 +14,14 @@ import {
   Typography,
 } from '@mui/material';
 import { withAuthCompetition } from '../../../lib/auth';
-import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
-import { DateTimePicker } from '@mui/x-date-pickers';
 import {
-  stageApparatuses,
-} from '../../../lib/store';
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  Delete,
+  Remove,
+} from '@mui/icons-material';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import { uuidv4 } from 'lib0/random';
 import {
   addMinutes,
@@ -31,13 +34,15 @@ import { sortBy } from 'lodash';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
 import fr from 'date-fns/locale/fr';
-import { ApparatusKey, TimelinePause, TimelineRotation } from '@tgym.fr/core';
+import { Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
+import { getRotationApparatuses } from '../../../lib/store';
 
 function TimelineRotationContainer({
   children,
   rotation,
   date,
+  headerComponent,
   onMoveUp,
   onMoveDown,
   onDelete,
@@ -45,6 +50,7 @@ function TimelineRotationContainer({
   children: ReactNode;
   rotation: TimelineRotation | TimelinePause;
   date: Date;
+  headerComponent?: ReactNode;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onDelete?: () => void;
@@ -87,6 +93,7 @@ function TimelineRotationContainer({
               maxWidth: '130px',
             }}
           />
+          {headerComponent}
         </Stack>
         <Stack gap={2} direction="row">
           <IconButton
@@ -129,14 +136,14 @@ function TimelineRotationContainer({
 }
 
 function TimelineRotationComponent({
-  apparatuses,
+  stage,
   rotation,
   date,
   onMoveUp,
   onMoveDown,
   onDelete,
 }: {
-  apparatuses: ApparatusKey[];
+  stage: Stage;
   rotation: TimelineRotation;
   date: Date;
   onMoveUp?: () => void;
@@ -147,11 +154,39 @@ function TimelineRotationComponent({
     <TimelineRotationContainer
       rotation={rotation}
       date={date}
+      headerComponent={
+        !('rest' in rotation.apparatuses) ? (
+          <Button
+            variant="text"
+            startIcon={<Add />}
+            onClick={() => {
+              rotation.apparatuses['rest'] = {
+                teams: {},
+              };
+            }}
+          >
+            Repos
+          </Button>
+        ) : (
+          <Tooltip title="Double cliquer pour supprimer le repos">
+            <Button
+              variant="text"
+              color="warning"
+              startIcon={<Remove />}
+              onDoubleClick={() => {
+                delete rotation.apparatuses['rest'];
+              }}
+            >
+              Repos
+            </Button>
+          </Tooltip>
+        )
+      }
       onMoveUp={onMoveUp}
       onMoveDown={onMoveDown}
       onDelete={onDelete}
     >
-      <TimelineRotation_ apparatuses={apparatuses} rotation={rotation} />
+      <TimelineRotation_ stage={stage} rotation={rotation} />
     </TimelineRotationContainer>
   );
 }
@@ -225,8 +260,6 @@ export default function TimelinePage() {
     Object.entries(selectedStage.timeline),
     (entry) => entry[1].order
   );
-
-  const apparatuses = stageApparatuses(selectedStage);
 
   let nextRotationDate = new Date(selectedStage.timelineStartDate);
 
@@ -341,7 +374,9 @@ export default function TimelinePage() {
         };
 
         if (rotation.type === 'rotation') {
-          const isEmpty = apparatuses.every((apparatusKey) => {
+          const rotationApparatuses = getRotationApparatuses(selectedStage, rotation);
+
+          const isEmpty = rotationApparatuses.every((apparatusKey) => {
             const apparatus = rotation.apparatuses[apparatusKey];
             return (
               apparatus === undefined ||
@@ -352,7 +387,7 @@ export default function TimelinePage() {
           return (
             <TimelineRotationComponent
               key={rotationKey}
-              apparatuses={apparatuses}
+              stage={selectedStage}
               rotation={rotation}
               date={rotationDate}
               onMoveUp={order === 0 ? undefined : onMoveUp}

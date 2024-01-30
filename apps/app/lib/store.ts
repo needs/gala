@@ -27,6 +27,8 @@ export function getApparatusName(apparatusKey: ApparatusKey): string {
       return 'Anneaux';
     case 'pommelHorse':
       return "Cheval d'arçon";
+    case 'rest':
+      return "Repos";
   }
 }
 
@@ -48,13 +50,43 @@ export function getApparatusIconPath(apparatusKey: ApparatusKey): string {
       return '/icons/apparatuses/rings.png';
     case 'pommelHorse':
       return '/icons/apparatuses/pommelHorse.png';
+    case 'rest':
+      return '/icons/apparatuses/rest.png';
   }
 }
 
-export function stageApparatuses(stage: Stage): ApparatusKey[] {
+export function isApparatusOptional(apparatusKey: ApparatusKey): boolean {
+  switch (apparatusKey) {
+    case 'vault':
+    case 'unevenBars':
+    case 'beam':
+    case 'floor':
+    case 'highBar':
+    case 'parallelBars':
+    case 'rings':
+    case 'pommelHorse':
+      return false;
+    case 'rest':
+      return true;
+  }
+}
+
+export function getStageApparatuses(stage: Stage): ApparatusKey[] {
   return sortBy(Object.entries(stage.apparatuses), [
     ([apparatusKey, apparatusOrder]) => apparatusOrder,
-  ]).map(([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey);
+  ])
+    .map(([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey)
+    .filter((apparatusKey) => !isApparatusOptional(apparatusKey));
+}
+
+export function getRotationApparatuses(stage: Stage, rotation: TimelineRotation): ApparatusKey[] {
+  const rotationApparatuses = getStageApparatuses(stage);
+
+  if ('rest' in rotation.apparatuses) {
+    rotationApparatuses.push('rest');
+  }
+
+  return rotationApparatuses;
 }
 
 export function stageRotations(

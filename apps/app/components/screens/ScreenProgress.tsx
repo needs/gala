@@ -2,13 +2,13 @@ import { Alert, Box, CssBaseline, Stack, Typography } from '@mui/material';
 import {
   getApparatusIconPath,
   getApparatusName,
-  stageApparatuses,
+  getRotationApparatuses,
 } from '../../lib/store';
 import { getCurrentRotation } from '../../lib/progress';
 import Image from 'next/image';
 import GenderAvatar from '../GenderAvatar';
 import { useEffect, useRef, useState } from 'react';
-import { ApparatusKey, ScreenProgress, TimelineRotation } from '@tgym.fr/core';
+import { ScreenProgress, Stage, TimelineRotation } from '@tgym.fr/core';
 import { useCompetition } from '../StoreProvider';
 
 function Start() {
@@ -32,20 +32,22 @@ function End() {
 }
 
 function Rotation({
+  stage,
   rotation,
-  apparatuses,
 }: {
+  stage: Stage;
   rotation: TimelineRotation;
-  apparatuses: ApparatusKey[];
 }) {
   const { teams, players, categories } = useCompetition();
+
+  const rotationApparatuses = getRotationApparatuses(stage, rotation);
 
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    refs.current = refs.current.slice(0, apparatuses.length);
-  }, [apparatuses.length]);
+    refs.current = refs.current.slice(0, rotationApparatuses.length);
+  }, [rotationApparatuses.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -72,12 +74,12 @@ function Rotation({
       alignItems="start"
       overflow="hidden"
     >
-      {apparatuses.map((apparatus, index) => {
-        const rotationApparatus = rotation.apparatuses[apparatus];
+      {rotationApparatuses.map((apparatusKey, index) => {
+        const rotationApparatus = rotation.apparatuses[apparatusKey];
 
         return (
           <Stack
-            key={apparatus}
+            key={apparatusKey}
             flexGrow="1"
             bgcolor="#ffffff87"
             borderRadius={8}
@@ -86,14 +88,14 @@ function Rotation({
           >
             <Stack direction="row" gap={4} alignItems="center" padding={4}>
               <Image
-                src={getApparatusIconPath(apparatus)}
+                src={getApparatusIconPath(apparatusKey)}
                 alt="Vault"
                 width={96}
                 height={96}
               />
 
               <Typography variant="h2" fontWeight="bold">
-                {getApparatusName(apparatus)}
+                {getApparatusName(apparatusKey)}
               </Typography>
             </Stack>
 
@@ -188,8 +190,6 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
 
   const { currentRotation } = getCurrentRotation(stage);
 
-  const apparatuses = stageApparatuses(stage);
-
   const rotationComponent = () => {
     switch (currentRotation.type) {
       case 'start':
@@ -199,8 +199,8 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
       case 'rotation':
         return (
           <Rotation
+            stage={stage}
             rotation={currentRotation.rotation}
-            apparatuses={apparatuses}
           />
         );
       case 'pause':

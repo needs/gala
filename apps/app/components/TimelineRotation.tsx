@@ -10,6 +10,7 @@ import {
 import {
   getApparatusIconPath,
   getApparatusName,
+  getRotationApparatuses,
 } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
@@ -18,7 +19,7 @@ import SelectTeamDialog from './SelectTeamDialog';
 import { Add, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
-import { ApparatusKey, Team, TimelineRotation } from '@tgym.fr/core';
+import { Stage, Team, TimelineRotation } from '@tgym.fr/core';
 import { useCompetition } from './StoreProvider';
 
 function TimelineAddTeamButton({
@@ -112,20 +113,21 @@ function TimelineEditTeamButton({
 }
 
 export default function TimelineRotation({
-  apparatuses,
+  stage,
   rotation,
   readOnly,
 }: {
-  apparatuses: ApparatusKey[];
+  stage: Stage;
   rotation: TimelineRotation;
   readOnly?: boolean;
 }) {
   const { teams } = useCompetition();
+  const rotationApparatuses = getRotationApparatuses(stage, rotation);
 
   return (
     <Paper elevation={1}>
       <Grid container>
-        {apparatuses.map((apparatuseKey) => {
+        {rotationApparatuses.map((apparatuseKey) => {
           const apparatus = rotation.apparatuses[apparatuseKey];
           const apparatusTeams = apparatus === undefined ? {} : apparatus.teams;
 

@@ -1,6 +1,6 @@
 import { addMinutes } from 'date-fns';
 import {
-  stageApparatuses,
+  getRotationApparatuses,
   stageRotations,
 } from './store';
 import { ApparatusKey, Stage, TimelinePause, TimelineRotation, TimelineRotationApparatus } from '@tgym.fr/core';
@@ -43,7 +43,6 @@ function mod(n: number, m: number) {
 export function getCurrentRotation(stage: Stage): CurrentRotationInfo {
   const progress = stage.progress;
   const rotations = stageRotations(stage);
-  const apparatuses = stageApparatuses(stage);
 
   let tmpProgress = 0;
   let startDate = new Date(stage.timelineStartDate);
@@ -82,10 +81,12 @@ export function getCurrentRotation(stage: Stage): CurrentRotationInfo {
         };
       }
     } else if (rotation.type === 'rotation') {
-      tmpProgress += apparatuses.length;
+      const rotationApparatuses = getRotationApparatuses(stage, rotation);
+
+      tmpProgress += rotationApparatuses.length;
 
       if (progress < tmpProgress) {
-        const offset = progress - tmpProgress + apparatuses.length;
+        const offset = progress - tmpProgress + rotationApparatuses.length;
 
         return {
           startDate,
@@ -95,10 +96,10 @@ export function getCurrentRotation(stage: Stage): CurrentRotationInfo {
             rotation: {
               type: 'rotation',
               apparatuses: Object.fromEntries(
-                apparatuses.map((apparatusKey, index) => [
+                rotationApparatuses.map((apparatusKey, index) => [
                   apparatusKey,
                   rotation.apparatuses[
-                    apparatuses[mod(index - offset, apparatuses.length)]
+                    rotationApparatuses[mod(index - offset, rotationApparatuses.length)]
                   ],
                 ])
               ) as Record<ApparatusKey, TimelineRotationApparatus>,
@@ -112,7 +113,7 @@ export function getCurrentRotation(stage: Stage): CurrentRotationInfo {
           },
           rotationInfo: {
             index: offset + 1,
-            count: apparatuses.length,
+            count: rotationApparatuses.length,
           },
         };
       }

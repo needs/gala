@@ -12,6 +12,7 @@ export const allApparatusKeys = [
   'parallelBars',
   'rings',
   'pommelHorse',
+  'rest',
 ] as const;
 export const apparatusKeySchema = z.enum(allApparatusKeys);
 

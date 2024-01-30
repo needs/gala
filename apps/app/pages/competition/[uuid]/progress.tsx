@@ -1,7 +1,4 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
-import {
-  stageApparatuses,
-} from '../../../lib/store';
 import { withAuthCompetition } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
@@ -11,7 +8,7 @@ import { format, formatDuration, intervalToDuration } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { isEmpty } from 'lodash';
 import { ProgressGenericInfo, getCurrentRotation } from '../../../lib/progress';
-import { ApparatusKey, TimelineRotation } from '@tgym.fr/core';
+import { Stage, TimelineRotation } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
@@ -163,7 +160,7 @@ function ProgressEnd({
 }
 
 function ProgressRotation({
-  apparatuses,
+  stage,
   stageName,
   startDate,
   endDate,
@@ -173,7 +170,7 @@ function ProgressRotation({
   timeslotInfo,
   rotationInfo,
 }: {
-  apparatuses: ApparatusKey[];
+  stage: Stage;
   stageName: string;
   startDate?: Date;
   endDate?: Date;
@@ -194,7 +191,7 @@ function ProgressRotation({
       rotationInfo={rotationInfo}
     >
       <TimelineRotation_
-        apparatuses={apparatuses}
+        stage={stage}
         rotation={rotation}
         readOnly={true}
       />
@@ -276,8 +273,6 @@ export default function ProgressPage() {
           }
         };
 
-        const apparatuses = stageApparatuses(stage);
-
         switch (currentRotation.type) {
           case 'start':
             return (
@@ -304,7 +299,7 @@ export default function ProgressPage() {
           case 'rotation':
             return (
               <ProgressRotation
-                apparatuses={apparatuses}
+                stage={stage}
                 key={stageKey}
                 startDate={startDate}
                 endDate={endDate}

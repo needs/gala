@@ -6,7 +6,6 @@ import { avatarUrl, getUserName } from '../lib/avatar';
 import {
   Avatar,
   Box,
-  IconButton,
   Tooltip,
   MenuItem as MenuListItem,
   Menu as MenuList,

@@ -19,7 +19,8 @@ import { withAuthCompetition } from '../../../lib/auth';
 import {
   getApparatusIconPath,
   getApparatusName,
-  stageApparatuses,
+  getStageApparatuses,
+  isApparatusOptional,
 } from '../../../lib/store';
 import { useEffect, useState } from 'react';
 import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
@@ -131,7 +132,7 @@ export default function StagesPage() {
 
       {Object.entries(stages).map(([stageKey, stage]) => {
         if (stage !== undefined) {
-          const apparatuses = stageApparatuses(stage);
+          const satgeApparatuses = getStageApparatuses(stage);
 
           const teamsCountPerApparatus: Partial<Record<ApparatusKey, number>> =
             {};
@@ -169,8 +170,9 @@ export default function StagesPage() {
                   <AddApparatusButton
                     apparatuses={allApparatusKeys.filter(
                       (apparatus) =>
-                        stage.apparatuses === undefined ||
-                        !(apparatus in stage.apparatuses)
+                        (stage.apparatuses === undefined ||
+                          !(apparatus in stage.apparatuses)) &&
+                        !isApparatusOptional(apparatus)
                     )}
                     onAdd={(apparatus) => {
                       if (stage.apparatuses === undefined) {
@@ -193,7 +195,7 @@ export default function StagesPage() {
                 </Stack>
               </Stack>
 
-              {apparatuses.map((apparatusKey, apparatusOrder) => (
+              {satgeApparatuses.map((apparatusKey, apparatusOrder) => (
                 <Stack
                   key={apparatusKey}
                   direction="row"
@@ -224,7 +226,7 @@ export default function StagesPage() {
                       onClick={() => {
                         if (stage.apparatuses !== undefined) {
                           const prevApparatusKey =
-                            apparatuses[apparatusOrder - 1];
+                            satgeApparatuses[apparatusOrder - 1];
 
                           stage.apparatuses[prevApparatusKey] = apparatusOrder;
                           stage.apparatuses[apparatusKey] = apparatusOrder - 1;
@@ -238,13 +240,13 @@ export default function StagesPage() {
                       onClick={() => {
                         if (stage.apparatuses !== undefined) {
                           const nextApparatusKey =
-                            apparatuses[apparatusOrder + 1];
+                            satgeApparatuses[apparatusOrder + 1];
 
                           stage.apparatuses[nextApparatusKey] = apparatusOrder;
                           stage.apparatuses[apparatusKey] = apparatusOrder + 1;
                         }
                       }}
-                      disabled={apparatusOrder === apparatuses.length - 1}
+                      disabled={apparatusOrder === satgeApparatuses.length - 1}
                     >
                       <ArrowDownward />
                     </IconButton>
