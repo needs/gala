@@ -25,11 +25,11 @@ import CategorySelector, {
 } from '../../../components/CategorySelector';
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
-import { addTeam, defaultTeam } from '../../../lib/team';
 import { withAuthCompetition } from '../../../lib/auth';
 import EditCategoryDialog from '../../../components/EditCategoryDialog';
 import { Category, Team } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
+import AddTeamButton from '../../../components/AddTeamButton';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -46,43 +46,6 @@ function EditTeamButton({ team }: { team: Team }) {
       <IconButton onClick={() => setOpen(true)}>
         <Edit />
       </IconButton>
-    </>
-  );
-}
-
-function AddTeamButton({
-  defaultCategoryKey,
-}: {
-  defaultCategoryKey: string | undefined;
-}) {
-  const [open, setOpen] = useState(false);
-  const { teams } = useCompetition();
-  const [teamKey, setTeamKey] = useState<string | undefined>(undefined);
-  const team = teamKey !== undefined ? teams[teamKey] : undefined;
-
-  return (
-    <>
-      {team !== undefined && (
-        <EditTeamDialog
-          open={open}
-          onClose={() => {
-            setOpen(false);
-          }}
-          team={team}
-        />
-      )}
-      <Button
-        variant="outlined"
-        onClick={() => {
-          setTeamKey(
-            addTeam(teams, { ...defaultTeam, categoryKey: defaultCategoryKey })
-          );
-          setOpen(true);
-        }}
-        startIcon={<Add />}
-      >
-        Équipe
-      </Button>
     </>
   );
 }

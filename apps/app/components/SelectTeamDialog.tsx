@@ -22,6 +22,7 @@ import { useCompetition } from './StoreProvider';
 import GenderAvatar from './GenderAvatar';
 import { FilterList } from '@mui/icons-material';
 import SelectCategoryMenu from './SelectCategoryMenu';
+import AddTeamButton from './AddTeamButton';
 
 export default function SelectTeamDialog({
   open,
@@ -82,51 +83,54 @@ export default function SelectTeamDialog({
       <DialogTitle>Selectionner une équipe</DialogTitle>
       <DialogContent>
         <Stack direction="column" spacing={2}>
-          <Stack direction="column" gap={2} alignItems="center">
-            <FormControl fullWidth variant="standard">
-              <InputLabel>Recherche</InputLabel>
-              <Input
-                autoFocus
-                margin="dense"
-                type="text"
-                fullWidth
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      onClick={(event) => {
-                        setAnchorMenu(event.currentTarget);
-                      }}
-                    >
-                      <Badge
-                        invisible={selectedCategory.type === 'all'}
-                        variant="dot"
-                        color="primary"
+          <Stack direction="column" gap={2} alignItems="stretch">
+            <Stack direction="row" gap={2} alignItems="baseline">
+              <FormControl variant="standard" sx={{ flexGrow: 1}}>
+                <InputLabel>Recherche</InputLabel>
+                <Input
+                  autoFocus
+                  margin="dense"
+                  type="text"
+                  fullWidth
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        onClick={(event) => {
+                          setAnchorMenu(event.currentTarget);
+                        }}
                       >
-                        <FilterList />
-                      </Badge>
-                    </IconButton>
-                    <SelectCategoryMenu
-                      allowNone
-                      allowAll
-                      anchorElement={anchorMenu}
-                      onClose={() => setAnchorMenu(null)}
-                      onSelect={(category) => {
-                        setSelectedCategory(category);
-                        setAnchorMenu(null);
-                      }}
-                    />
-                  </InputAdornment>
-                }
-              />
-            </FormControl>
+                        <Badge
+                          invisible={selectedCategory.type === 'all'}
+                          variant="dot"
+                          color="primary"
+                        >
+                          <FilterList />
+                        </Badge>
+                      </IconButton>
+                      <SelectCategoryMenu
+                        allowNone
+                        allowAll
+                        anchorElement={anchorMenu}
+                        onClose={() => setAnchorMenu(null)}
+                        onSelect={(category) => {
+                          setSelectedCategory(category);
+                          setAnchorMenu(null);
+                        }}
+                      />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+              <AddTeamButton onAddTeam={onSelect} />
+            </Stack>
           </Stack>
 
           <List
             sx={{
-              width: 360,
+              width: 400,
               height: 300,
               bgcolor: 'background.paper',
               overflowY: 'auto',
