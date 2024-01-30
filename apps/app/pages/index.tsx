@@ -17,6 +17,7 @@ import { useRouter } from 'next/router';
 import { withAuth } from '../lib/auth';
 import Link from 'next/link';
 import AccountIconButton from '../components/AccountIconButton';
+import { formatHoursAndMinutes } from '../lib/utils';
 
 export default function ListPage() {
   const router = useRouter();
@@ -89,7 +90,11 @@ export default function ListPage() {
                           : 'Compétition sans nom'
                       }
                       secondary={
-                        <Stack direction="row" justifyContent="space-between" component="span">
+                        <Stack
+                          direction="row"
+                          justifyContent="space-between"
+                          component="span"
+                        >
                           {`${competition.teamCount} équipes, ${competition.playerCount} joueurs`}
                           <Stack direction="row" gap={2} component="span">
                             <Stack
@@ -99,7 +104,9 @@ export default function ListPage() {
                               component="span"
                             >
                               <AccessTime fontSize="small" />
-                              {`${competition.cumulativeDuration / 60}h`}
+                              {formatHoursAndMinutes(
+                                competition.cumulativeDuration
+                              )}
                             </Stack>
                             <Stack
                               direction="row"

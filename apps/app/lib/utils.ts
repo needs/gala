@@ -11,3 +11,11 @@ export function fullName({
 }) {
   return `${capitalizeFirstLetter(firstName)} ${lastName.toUpperCase()}`;
 }
+
+export function formatHoursAndMinutes(durationInMinutes: number) {
+  return `${Math.ceil(
+    durationInMinutes / 60
+  )}h${Intl.NumberFormat('fr-FR', {
+    minimumIntegerDigits: 2,
+  }).format(durationInMinutes % 60)}`
+}
