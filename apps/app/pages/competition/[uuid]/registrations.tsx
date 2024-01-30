@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   FormControl,
   IconButton,
@@ -13,8 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
-import { Add, Clear, Delete, Edit, QuestionMark } from '@mui/icons-material';
+import { Clear, Delete, Edit, QuestionMark } from '@mui/icons-material';
 import { useState } from 'react';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
@@ -30,6 +28,7 @@ import EditCategoryDialog from '../../../components/EditCategoryDialog';
 import { Category, Team } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 import AddTeamButton from '../../../components/AddTeamButton';
+import AddCategoryButton from '../../../components/AddCategoryButton';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -46,42 +45,6 @@ function EditTeamButton({ team }: { team: Team }) {
       <IconButton onClick={() => setOpen(true)}>
         <Edit />
       </IconButton>
-    </>
-  );
-}
-
-function AddCategoryButton() {
-  const [open, setOpen] = useState(false);
-  const { categories } = useCompetition();
-  const [categoryKey, setCategoryKey] = useState<string | undefined>(undefined);
-  const category =
-    categoryKey !== undefined ? categories[categoryKey] : undefined;
-
-  return (
-    <>
-      {category !== undefined && (
-        <EditCategoryDialog
-          open={open}
-          onClose={() => setOpen(false)}
-          category={category}
-        />
-      )}
-      <Button
-        variant="contained"
-        onClick={() => {
-          const categoryKey = uuidv4();
-          categories[categoryKey] = {
-            name: '',
-            gender: 'woman',
-            apparatuses: {},
-          };
-          setCategoryKey(categoryKey);
-          setOpen(true);
-        }}
-        startIcon={<Add />}
-      >
-        Catégorie
-      </Button>
     </>
   );
 }
@@ -237,7 +200,7 @@ export default function TeamsPage() {
               Object.values(teamsByCategory).map((teams) => teams.length)
             )} / ${Object.values(teams).length} équipe(s)`}</Typography>
           </Stack>
-          <AddCategoryButton />
+          <AddCategoryButton variant="contained" />
         </Stack>
 
         {Object.entries(teamsByCategory).map(([categoryKey, categoryTeams]) => {

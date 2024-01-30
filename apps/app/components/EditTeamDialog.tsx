@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   Stack,
+  Box,
 } from '@mui/material';
 import { useCallback } from 'react';
 import CategorySelector, {
@@ -16,6 +17,7 @@ import EditPlayerButton from './EditPlayerButton';
 import AddPlayerButton from './AddPlayerButton';
 import { useCompetition } from './StoreProvider';
 import { Team } from '@tgym.fr/core';
+import AddCategoryButton from './AddCategoryButton';
 
 export default function EditTeamDialog({
   open,
@@ -79,17 +81,26 @@ export default function EditTeamDialog({
             value={team.name}
             onChange={(event) => (team.name = event.target.value)}
           />
-          <CategorySelector
-            allowNone
-            value={categoryKeyToCategorySelectorValue(team.categoryKey)}
-            onChange={(value) => {
-              if (value.type === 'category') {
-                team.categoryKey = value.categoryKey;
-              } else {
-                team.categoryKey = undefined;
-              }
-            }}
-          />
+          <Stack direction="row" gap={2}>
+            <Box width={300}>
+              <CategorySelector
+                allowNone
+                value={categoryKeyToCategorySelectorValue(team.categoryKey)}
+                onChange={(value) => {
+                  if (value.type === 'category') {
+                    team.categoryKey = value.categoryKey;
+                  } else {
+                    team.categoryKey = undefined;
+                  }
+                }}
+              />
+            </Box>
+            <AddCategoryButton
+              onAddCategory={(categoryKey) => {
+                team.categoryKey = categoryKey;
+              }}
+            />
+          </Stack>
           <Stack direction="row" gap={1} flexWrap="wrap">
             {Object.keys(team.members).map((playerKey) => {
               const player = players[playerKey];
