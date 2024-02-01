@@ -23,6 +23,7 @@ import GenderAvatar from './GenderAvatar';
 import { FilterList } from '@mui/icons-material';
 import SelectCategoryMenu from './SelectCategoryMenu';
 import AddTeamButton from './AddTeamButton';
+import { fullTeamName } from '../lib/team';
 
 export default function SelectTeamDialog({
   open,
@@ -85,7 +86,7 @@ export default function SelectTeamDialog({
         <Stack direction="column" spacing={2}>
           <Stack direction="column" gap={2} alignItems="stretch">
             <Stack direction="row" gap={2} alignItems="baseline">
-              <FormControl variant="standard" sx={{ flexGrow: 1}}>
+              <FormControl variant="standard" sx={{ flexGrow: 1 }}>
                 <InputLabel>Recherche</InputLabel>
                 <Input
                   autoFocus
@@ -154,8 +155,11 @@ export default function SelectTeamDialog({
                     <GenderAvatar size={40} gender={category?.gender} />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={`${team.name}${team.label !== undefined ? ` - Équipe ${team.label}` : ''}`}
+                    primary={fullTeamName(team)}
                     secondary={category?.name ?? 'Sans catégorie'}
+                    primaryTypographyProps={
+                      team.name !== '' ? undefined : { fontStyle: 'italic' }
+                    }
                   />
                 </ListItemButton>
               );

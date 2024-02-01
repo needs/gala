@@ -2,14 +2,12 @@ import { Avatar, Box, Chip, Divider, Stack, Typography } from '@mui/material';
 import { fullName } from '../../../lib/utils';
 import Image from 'next/image';
 import GenderIcon from '../../../components/GenderIcon';
-import {
-  getApparatusIconPath,
-  getApparatusName,
-} from '../../../lib/store';
+import { getApparatusIconPath, getApparatusName } from '../../../lib/store';
 import { GetServerSideProps } from 'next';
 import { PageProps } from '../../_app';
 import { ApparatusKey, Progress } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
+import { getTeamName, getTeamNameSxProps } from '../../../lib/team';
 
 function Apparatus({
   apparatusKey,
@@ -37,8 +35,13 @@ function Apparatus({
         <Typography color="gray">Aucune équipe</Typography>
       ) : (
         <>
-          <Typography variant="h6" paddingY={3} paddingX={1}>
-            {team.name}
+          <Typography
+            variant="h6"
+            paddingY={3}
+            paddingX={1}
+            sx={getTeamNameSxProps(team)}
+          >
+            {getTeamName(team)}
           </Typography>
 
           <Stack

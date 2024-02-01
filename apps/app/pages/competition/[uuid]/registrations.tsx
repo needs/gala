@@ -37,6 +37,7 @@ import {
   migrateTeamLabels,
   restoreTeamLabels,
 } from '../../../lib/migrateTeamLabels';
+import { getTeamName, getTeamNameSxProps } from '../../../lib/team';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -354,7 +355,9 @@ export default function TeamsPage() {
                           padding={1}
                           alignItems="baseline"
                         >
-                          {team.name}
+                          <Typography sx={getTeamNameSxProps(team)}>
+                            {getTeamName(team)}
+                          </Typography>
                           {team.label !== undefined && (
                             <Typography
                               variant="caption"

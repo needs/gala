@@ -21,6 +21,7 @@ import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
 import { Stage, Team, TimelineRotation } from '@tgym.fr/core';
 import { useCompetition } from './StoreProvider';
+import { getTeamName, getTeamNameSxProps } from '../lib/team';
 
 function TimelineAddTeamButton({
   onAdd,
@@ -80,7 +81,7 @@ function TimelineEditTeamButton({
             justifyContent="space-between"
           >
             <Stack direction="row" gap={1} alignItems="center">
-              <Typography variant="body1">{team.name}</Typography>
+              <Typography variant="body1" sx={getTeamNameSxProps(team)}>{getTeamName(team)}</Typography>
               {team.label !== undefined && (
                 <Typography
                   variant="caption"

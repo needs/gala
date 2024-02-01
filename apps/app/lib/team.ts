@@ -12,3 +12,17 @@ export function addTeam(teams: Partial<Record<string, Team>>, team: Team) {
   teams[newTeamKey] = team;
   return newTeamKey;
 }
+
+export function fullTeamName(team: Team) {
+  const teamName = getTeamName(team);
+  const teamLabel = team.label === undefined ? '' : ` - Équipe ${team.label}`;
+  return `${teamName}${teamLabel}`
+}
+
+export function getTeamName(team: Team) {
+  return team.name === '' ? 'Équipe sans nom' : team.name;
+}
+
+export function getTeamNameSxProps(team: Team) {
+  return team.name === '' ? { fontStyle: 'italic' } : {};
+}
