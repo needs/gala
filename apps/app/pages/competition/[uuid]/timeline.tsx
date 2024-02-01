@@ -9,6 +9,8 @@ import {
   MenuItem,
   Select,
   Stack,
+  Tab,
+  Tabs,
   TextField,
   Tooltip,
   Typography,
@@ -265,71 +267,68 @@ export default function TimelinePage() {
 
   return (
     <Stack direction="column" padding={4} gap={4}>
-      <Stack
-        direction="row"
-        gap={2}
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        <Stack direction="row" gap={2}>
-          <FormControl sx={{ width: 300 }}>
-            <InputLabel>Plateau</InputLabel>
-            <Select
-              value={selectedStageKey}
-              label="Plateau"
-              onChange={(event) => {
-                setSelectedStageKey(event.target.value);
+      <Stack direction="column">
+        <Stack
+          direction="row"
+          gap={2}
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Tabs
+            value={selectedStageKey}
+            onChange={(event, newValue) => {
+              setSelectedStageKey(newValue);
+            }}
+            variant="scrollable"
+            scrollButtons
+            allowScrollButtonsMobile
+          >
+            {Object.entries(stages).map(
+              ([stageKey, stage]) =>
+                stage !== undefined && (
+                  <Tab key={stageKey} label={stage.name} value={stageKey} />
+                )
+            )}
+          </Tabs>
+          <Stack direction="row" gap={2} py={2}>
+            <Button
+              variant="outlined"
+              startIcon={<Add />}
+              onClick={() => {
+                Object.values(selectedStage.timeline).forEach((rotation) => {
+                  rotation.order += 1;
+                });
+
+                selectedStage.timeline[uuidv4()] = {
+                  type: 'pause',
+                  order: 0,
+                  durationInMinutes: 30,
+                };
               }}
-              placeholder="Selectionner un plateau"
             >
-              {Object.entries(stages).map(
-                ([stageKey, stage]) =>
-                  stage !== undefined && (
-                    <MenuItem key={stageKey} value={stageKey}>
-                      {stage.name}
-                    </MenuItem>
-                  )
-              )}
-            </Select>
-          </FormControl>
-        </Stack>
-        <Stack direction="row" gap={2}>
-          <Button
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={() => {
-              Object.values(selectedStage.timeline).forEach((rotation) => {
-                rotation.order += 1;
-              });
+              Pause
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                Object.values(selectedStage.timeline).forEach((rotation) => {
+                  rotation.order += 1;
+                });
 
-              selectedStage.timeline[uuidv4()] = {
-                type: 'pause',
-                order: 0,
-                durationInMinutes: 30,
-              };
-            }}
-          >
-            Pause
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              Object.values(selectedStage.timeline).forEach((rotation) => {
-                rotation.order += 1;
-              });
-
-              selectedStage.timeline[uuidv4()] = {
-                type: 'rotation',
-                apparatuses: {},
-                order: 0,
-                durationInMinutes: 60,
-              };
-            }}
-            startIcon={<Add />}
-          >
-            Rotation
-          </Button>
+                selectedStage.timeline[uuidv4()] = {
+                  type: 'rotation',
+                  apparatuses: {},
+                  order: 0,
+                  durationInMinutes: 60,
+                };
+              }}
+              startIcon={<Add />}
+            >
+              Rotation
+            </Button>
+          </Stack>
         </Stack>
+        <Divider />
       </Stack>
 
       <Stack direction="column" gap={2}>
@@ -374,7 +373,10 @@ export default function TimelinePage() {
         };
 
         if (rotation.type === 'rotation') {
-          const rotationApparatuses = getRotationApparatuses(selectedStage, rotation);
+          const rotationApparatuses = getRotationApparatuses(
+            selectedStage,
+            rotation
+          );
 
           const isEmpty = rotationApparatuses.every((apparatusKey) => {
             const apparatus = rotation.apparatuses[apparatusKey];
