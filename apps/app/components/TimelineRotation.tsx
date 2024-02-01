@@ -79,9 +79,29 @@ function TimelineEditTeamButton({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Typography variant="body1">{team.name}</Typography>
+            <Stack direction="row" gap={1} alignItems="center">
+              <Typography variant="body1">{team.name}</Typography>
+              {team.label !== undefined && (
+                <Typography
+                  variant="caption"
+                  px={1}
+                  py={0.25}
+                  sx={{
+                    backgroundColor: '#eeeeee',
+                    borderRadius: 2,
+                  }}
+                >
+                  Équipe {team.label}
+                </Typography>
+              )}
+            </Stack>
+
             {!readOnly && (
-              <IconButton size="small" onClick={onRemove}>
+              <IconButton
+                size="small"
+                onClick={onRemove}
+                sx={{ justifySelf: 'end' }}
+              >
                 <Remove />
               </IconButton>
             )}

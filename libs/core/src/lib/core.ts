@@ -29,6 +29,7 @@ export type Player = z.infer<typeof playerSchema>;
 
 export const teamSchema = z.object({
   name: z.string(),
+  label: z.string().optional(),
   members: z.record(z.boolean()),
   categoryKey: z.string().optional(),
 });

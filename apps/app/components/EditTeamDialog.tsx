@@ -81,6 +81,15 @@ export default function EditTeamDialog({
             value={team.name}
             onChange={(event) => (team.name = event.target.value)}
           />
+          <TextField
+            margin="dense"
+            label="Numéro"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={team.label ?? ""}
+            onChange={(event) => (team.label = event.target.value ? event.target.value : undefined)}
+          />
           <Stack direction="row" gap={2}>
             <Box width={300}>
               <CategorySelector

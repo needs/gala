@@ -118,7 +118,7 @@ function Rotation({
                       >
                         <Stack paddingY={3} paddingX={1}>
                           <Typography variant="h4" fontWeight="bold">
-                            {team.name}
+                            {`${team.name}${team.label !== undefined ? ` - Équipe ${team.label}` : ''}`}
                           </Typography>
                           <Typography variant="h5" color="grey">
                             {category.name}

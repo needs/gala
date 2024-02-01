@@ -154,7 +154,7 @@ export default function SelectTeamDialog({
                     <GenderAvatar size={40} gender={category?.gender} />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={team.name}
+                    primary={`${team.name}${team.label !== undefined ? ` - Équipe ${team.label}` : ''}`}
                     secondary={category?.name ?? 'Sans catégorie'}
                   />
                 </ListItemButton>

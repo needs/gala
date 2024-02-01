@@ -290,9 +290,29 @@ export default function TeamsPage() {
                         divider={<Divider orientation="vertical" flexItem />}
                         width="100%"
                       >
-                        <Box minWidth={300} maxWidth={300} padding={1}>
+                        <Stack
+                          direction="row"
+                          gap={2}
+                          minWidth={300}
+                          maxWidth={300}
+                          padding={1}
+                          alignItems="baseline"
+                        >
                           {team.name}
-                        </Box>
+                          {team.label !== undefined && (
+                            <Typography
+                              variant="caption"
+                              px={1}
+                              py={0.5}
+                              sx={{
+                                backgroundColor: '#eeeeee',
+                                borderRadius: 2,
+                              }}
+                            >
+                              Équipe {team.label}
+                            </Typography>
+                          )}
+                        </Stack>
                         <Stack
                           direction="row"
                           gap={1}
