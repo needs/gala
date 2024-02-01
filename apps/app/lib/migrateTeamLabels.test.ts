@@ -100,6 +100,12 @@ describe('migrateTeam', () => {
       expectedTeamLabel: '1',
     });
   });
+
+  test('Being equal to "équipe 1"', () => {
+    shouldNotMigrateTeam({
+      teamName: "équipe 1",
+    });
+  });
 });
 
 

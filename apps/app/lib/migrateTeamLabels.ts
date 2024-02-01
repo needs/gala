@@ -6,7 +6,8 @@ const regex = /\s*-?\s*(équipe|equipe)\s(\w+)$/i;
 export function hasTeamLabelToMigrate(teams: Team[]): boolean {
   return teams.some(
     (team) => {
-      return regex.test(team.name);
+      const match = regex.exec(team.name);
+      return match !== null && match[0] !== team.name;
     }
   )
 }
@@ -14,7 +15,7 @@ export function hasTeamLabelToMigrate(teams: Team[]): boolean {
 export function migrateTeam(team: Team): void {
   const match = regex.exec(team.name);
 
-  if (match !== null) {
+  if (match !== null && match[0] !== team.name) {
     if (team.label === undefined) {
       team.label = match[2];
     }
