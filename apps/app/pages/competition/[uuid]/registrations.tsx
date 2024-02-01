@@ -1,6 +1,9 @@
 import {
+  Alert,
+  AlertTitle,
   Avatar,
   Box,
+  Button,
   Divider,
   FormControl,
   IconButton,
@@ -17,7 +20,7 @@ import { useState } from 'react';
 import EditTeamDialog from '../../../components/EditTeamDialog';
 import Head from 'next/head';
 import GenderAvatar from '../../../components/GenderAvatar';
-import { groupBy, sum } from 'lodash';
+import { cloneDeep, groupBy, sum } from 'lodash';
 import CategorySelector, {
   CategorySelectorValue,
 } from '../../../components/CategorySelector';
@@ -29,6 +32,11 @@ import { Category, Team } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 import AddTeamButton from '../../../components/AddTeamButton';
 import AddCategoryButton from '../../../components/AddCategoryButton';
+import {
+  hasTeamLabelToMigrate,
+  migrateTeamLabels,
+  restoreTeamLabels,
+} from '../../../lib/migrateTeamLabels';
 
 function EditTeamButton({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
@@ -70,6 +78,9 @@ export default function TeamsPage() {
   const { teams, players, categories } = useCompetition();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [teamsBeforeLabelsMigration, setTeamsBeforeLabelsMigration] = useState<
+    Record<string, Team> | undefined
+  >(undefined);
   const [categoryFilter, setCategoryFilter] = useState<CategorySelectorValue>({
     type: 'all',
   });
@@ -164,6 +175,51 @@ export default function TeamsPage() {
         <title>Équipes</title>
       </Head>
       <Stack padding={4} gap={4}>
+        {hasTeamLabelToMigrate(Object.values(teams)) && (
+          <Alert
+            severity="info"
+            action={
+              <Button
+                color="inherit"
+                onClick={() => {
+                  setTeamsBeforeLabelsMigration(cloneDeep(teams));
+                  migrateTeamLabels(Object.values(teams));
+                }}
+              >
+                Migration automatique
+              </Button>
+            }
+          >
+            <AlertTitle>{"Utilisez les numéros d'équipe !"}</AlertTitle>
+            {
+              "Au lieu d'ajouter le numéro d'équipe dans le nom de l'équipe, utilisez le champ dédié pour le numéro d'équipe."
+            }
+          </Alert>
+        )}
+        {teamsBeforeLabelsMigration !== undefined && (
+          <Alert
+            severity="success"
+            action={
+              <Button
+                color="inherit"
+                onClick={() => {
+                  restoreTeamLabels(teams, teamsBeforeLabelsMigration);
+                  setTeamsBeforeLabelsMigration(undefined);
+                }}
+              >
+                Restaurer
+              </Button>
+            }
+          >
+            <AlertTitle>
+              {"Toute vos équipes utilisent les numéros d'équipe !"}
+            </AlertTitle>
+            {
+              "La migration automatique s'est bien déroulée. Vous pouvez restaurer les équipes si vous souhaitez revenir à l'état précédant la migration."
+            }
+          </Alert>
+        )}
+
         <Stack direction="row" justifyContent="space-between">
           <Stack direction="row" gap={2} alignItems="center">
             <FormControl variant="outlined" size="small">
