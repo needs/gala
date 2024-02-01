@@ -195,45 +195,47 @@ function AppLayout({
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {!info.name ? 'Compétition sans nom' : info.name}
           </Typography>
-          <Stack direction="row" gap={2} alignItems="center">
-            <AwarenessAvatars />
-            <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
-              <Tooltip title="Annuler">
-                <span>
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      undoManager.undo();
-                    }}
-                    disabled={!undoManager.canUndo()}
-                  >
-                    <Undo />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Refaire">
-                <span>
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      undoManager.redo();
-                    }}
-                    disabled={!undoManager.canRedo()}
-                  >
-                    <Redo />
-                  </IconButton>
-                </span>
-              </Tooltip>
+          {layoutInfo.menu === 'admin' && (
+            <Stack direction="row" gap={2} alignItems="center">
+              <AwarenessAvatars />
+              <Stack direction="row" bgcolor="#ffffffaa" borderRadius={999}>
+                <Tooltip title="Annuler">
+                  <span>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        undoManager.undo();
+                      }}
+                      disabled={!undoManager.canUndo()}
+                    >
+                      <Undo />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Refaire">
+                  <span>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        undoManager.redo();
+                      }}
+                      disabled={!undoManager.canRedo()}
+                    >
+                      <Redo />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+              <Stack
+                direction="row"
+                bgcolor="#ffffffaa"
+                borderRadius={999}
+                p={0.5}
+              >
+                <AccountIconButton />
+              </Stack>
             </Stack>
-            <Stack
-              direction="row"
-              bgcolor="#ffffffaa"
-              borderRadius={999}
-              p={0.5}
-            >
-              <AccountIconButton />
-            </Stack>
-          </Stack>
+          )}
         </Toolbar>
       </AppBar>
       <Box
