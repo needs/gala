@@ -15,6 +15,7 @@ import {
   EventNote,
   FoodBank,
   Group,
+  Home,
   Menu as MenuIcon,
   Redo,
   Schedule,
@@ -94,6 +95,11 @@ export const menuVisitor = (uuid: string): Menu => [
   {
     home: {
       href: `/public/${uuid}`,
+      label: 'Accueil',
+      icon: <Home />,
+    },
+    stages: {
+      href: `/public/${uuid}/stages`,
       label: 'Plateaux',
       icon: <ViewDay />,
     },
