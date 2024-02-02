@@ -440,4 +440,4 @@ export default function TimelinePage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('timeline');
+export const getServerSideProps = withAuthCompetition('schedule');
