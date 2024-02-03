@@ -1,5 +1,12 @@
 import { z } from 'zod';
 
+// Boxed values are a synced store concept that allows changing a full object at
+// once.  Under the hood it's a simple object with a "value" field.  Add a
+// custom zod schema to validate the value.
+const boxedSchema = <T extends z.ZodType<any>>(schema: T) => z.object({
+  value: schema,
+});
+
 export const genders = ['man', 'woman', 'mixed'] as const;
 export const genderSchema = z.enum(genders);
 
@@ -133,16 +140,16 @@ export const screenTypes: Screen['type'][] = ['bar', 'progress'];
 export type Screen = z.infer<typeof screenSchema>;
 
 export const competitionSchema = z.object({
-  players: z.record(playerSchema),
-  teams: z.record(teamSchema),
-  categories: z.record(categorySchema),
-  stages: z.record(stageSchema),
-  progresses: z.record(progressSchema),
-  bar: z.record(barCategorySchema),
-  screens: z.record(screenSchema),
+  players: z.record(playerSchema).default({}),
+  teams: z.record(teamSchema).default({}),
+  categories: z.record(categorySchema).default({}),
+  stages: z.record(stageSchema).default({}),
+  progresses: z.record(progressSchema).default({}),
+  bar: z.record(barCategorySchema).default({}),
+  screens: z.record(boxedSchema(screenSchema)).default({}),
   info: z.object({
     name: z.string(),
-  }),
+  }).default({ name: '' }),
 });
 
 export type Competition = z.infer<typeof competitionSchema>;
