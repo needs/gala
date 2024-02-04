@@ -66,8 +66,8 @@ export const menuAdmin = (uuid: string): Menu => [
       label: 'Plateaux',
       icon: <Villa />,
     },
-    schedule: {
-      href: `/competition/${uuid}/schedule`,
+    timeline: {
+      href: `/competition/${uuid}/timeline`,
       label: 'Échéancier',
       icon: <EventNote />,
     },

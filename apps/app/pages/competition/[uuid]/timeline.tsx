@@ -436,4 +436,4 @@ export default function TimelinePage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('schedule');
+export const getServerSideProps = withAuthCompetition('timeline');
