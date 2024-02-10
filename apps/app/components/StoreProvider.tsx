@@ -67,9 +67,9 @@ const StoreProvider = ({
     if (
       competitionUuid !== undefined &&
       sessionCookie !== undefined &&
-      user !== undefined && provider === undefined
+      provider === undefined
     ) {
-      const name = getUserName(user.email, user.name);
+      const name = user !== undefined ? getUserName(user.email, user.name) : 'Anonyme';
       const { store, provider, undoManager } = initStore(
         competitionUuid,
         sessionCookie,
