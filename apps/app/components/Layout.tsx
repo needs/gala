@@ -98,11 +98,6 @@ export const menuVisitor = (uuid: string): Menu => [
       label: 'Accueil',
       icon: <Home />,
     },
-    stages: {
-      href: `/public/${uuid}/stages`,
-      label: 'Plateaux',
-      icon: <ViewDay />,
-    },
     bar: {
       href: `/public/${uuid}/bar`,
       label: 'Buvette',
