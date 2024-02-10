@@ -146,7 +146,7 @@ export const competitionSchema = z.object({
   stages: z.record(stageSchema).default({}),
   progresses: z.record(progressSchema).default({}),
   bar: z.record(barCategorySchema).default({}),
-  screens: z.record(boxedSchema(screenSchema)).default({}),
+  screens: z.record(screenSchema).default({}),
   info: z.object({
     name: z.string(),
   }).default({ name: '' }),
