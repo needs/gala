@@ -11,7 +11,7 @@ import { ScheduledRotation, getCurrentScheduledRotation } from '../../../lib/pro
 import { Stage } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 
-function formatRotationTime(startDate?: Date, endDate?: Date) {
+export function formatRotationTime(startDate?: Date, endDate?: Date) {
   if (startDate === undefined && endDate === undefined) {
     return '';
   } else if (startDate !== undefined && endDate === undefined) {

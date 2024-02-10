@@ -3,7 +3,7 @@ import {
   getRotationApparatuses,
   stageRotations,
 } from './store';
-import { ApparatusKey, Stage, TimelinePause, TimelineRotation, TimelineRotationApparatus } from '@tgym.fr/core';
+import { Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
 
 export type ScheduledRotation =
   {
@@ -33,7 +33,7 @@ export type ScheduledRotation =
     timelineLength: number;
   };
 
-function computeScheduledRotations(stage: Stage): ScheduledRotation[] {
+export function computeScheduledRotations(stage: Stage): ScheduledRotation[] {
   const rotations = stageRotations(stage);
 
   let startDate: Date, endDate = new Date(stage.timelineStartDate);
@@ -72,11 +72,11 @@ function computeScheduledRotations(stage: Stage): ScheduledRotation[] {
             apparatuses: Object.fromEntries(
               rotationApparatuses.map((apparatusKey, apparatusIndex) => [
                 apparatusKey,
-                rotation.apparatuses[
+                { ...rotation.apparatuses[
                 rotationApparatuses[mod(apparatusIndex - rotationIndex, rotationApparatuses.length)]
-                ],
+                ]},
               ])
-            ) as Record<ApparatusKey, TimelineRotationApparatus>,
+            ),
             durationInMinutes: rotation.durationInMinutes / rotationApparatuses.length,
           },
           startDate: rotationStartDate,

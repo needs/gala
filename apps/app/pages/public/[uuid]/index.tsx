@@ -5,6 +5,11 @@ import { useCompetition } from '../../../components/StoreProvider';
 import { useState } from 'react';
 import GenderAvatar from '../../../components/GenderAvatar';
 import { getTeamName, getTeamNameSxProps } from '../../../lib/team';
+import { computeScheduledRotations } from '../../../lib/progress';
+import { compact } from 'lodash';
+import { formatRotationTime } from '../../competition/[uuid]/progress';
+import { getApparatusName } from '../../../lib/store';
+import { ApparatusKey } from '@tgym.fr/core';
 
 export default function Index() {
   const { players, teams, stages } = useCompetition();
@@ -40,27 +45,26 @@ export default function Index() {
           return {
             stage,
             stageKey,
-            rotations: Object.values(stage.timeline).filter((rotation) => {
-              if (rotation.type !== 'rotation') {
-                return false;
+            apparatuses: compact(computeScheduledRotations(stage).flatMap((scheduledRotation) => {
+              if (scheduledRotation.type !== 'rotation') {
+                return [];
               }
 
-              return Object.values(rotation.apparatuses).some((apparatus) => {
-                return Object.keys(apparatus.teams).includes(teamKey);
+              return Object.entries(scheduledRotation.rotation.apparatuses).map(([apparatusKey, apparatus]) => {
+                if (apparatus.teams !== undefined && Object.keys(apparatus.teams).includes(teamKey)) {
+                  return {
+                    apparatusKey,
+                    startDate: scheduledRotation.startDate,
+                    endDate: scheduledRotation.endDate,
+                  }
+                } else {
+                  return undefined;
+                };
               });
-            }),
+            }))
           };
         })
-        .filter(({ rotations }) => rotations.length > 0)
-        .flatMap(({ stage, stageKey, rotations }) => {
-          return rotations.map((rotation) => {
-            return {
-              stage,
-              stageKey,
-              rotation,
-            };
-          });
-        });
+        .filter(({ apparatuses }) => apparatuses.length > 0)
 
       return { playerKey, player, team, rotationsPerStage };
     });
@@ -122,10 +126,17 @@ export default function Index() {
                   </Stack>
                 </Stack>
                 {rotationsPerStage !== undefined &&
-                  rotationsPerStage.map(({ stage, stageKey, rotation }) => (
-                    <Stack key={stageKey} direction="row" gap={1} px={2} py={1}>
+                  rotationsPerStage.map(({ stage, stageKey, apparatuses }) => (
+                    <Stack key={stageKey} direction="column" gap={1} px={2} py={1}>
                       <Typography sx={{ fontWeight: "bold" }}>{stage.name}</Typography>
-                      <Typography>Commence dans 10 minutes</Typography>
+                      {apparatuses.map(({ apparatusKey, startDate, endDate }, index) => {
+                        return (
+                          <Stack key={index} direction="row" gap={1} pl={2}>
+                            <Typography>{getApparatusName(apparatusKey as ApparatusKey)}</Typography>
+                            <Typography>{formatRotationTime(startDate, endDate)}</Typography>
+                          </Stack>
+                        );
+                      })}
                     </Stack>
                   ))}
               </Stack>
