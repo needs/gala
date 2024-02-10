@@ -4,11 +4,11 @@ import {
   getApparatusName,
   getRotationApparatuses,
 } from '../../lib/store';
-import { getCurrentRotation } from '../../lib/progress';
+import { ScheduledRotation, getCurrentScheduledRotation } from '../../lib/progress';
 import Image from 'next/image';
 import GenderAvatar from '../GenderAvatar';
 import { useEffect, useRef, useState } from 'react';
-import { ScreenProgress, Stage, TimelineRotation } from '@tgym.fr/core';
+import { ScreenProgress, Stage } from '@tgym.fr/core';
 import { useCompetition } from '../StoreProvider';
 
 function Start() {
@@ -36,11 +36,11 @@ function Rotation({
   rotation,
 }: {
   stage: Stage;
-  rotation: TimelineRotation;
+  rotation: Extract<ScheduledRotation, { type: 'rotation' }>;
 }) {
   const { teams, players, categories } = useCompetition();
 
-  const rotationApparatuses = getRotationApparatuses(stage, rotation);
+  const rotationApparatuses = getRotationApparatuses(stage, rotation.rotation);
 
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
@@ -75,7 +75,7 @@ function Rotation({
       overflow="hidden"
     >
       {rotationApparatuses.map((apparatusKey, index) => {
-        const rotationApparatus = rotation.apparatuses[apparatusKey];
+        const rotationApparatus = rotation.rotation.apparatuses[apparatusKey];
 
         return (
           <Stack
@@ -188,10 +188,10 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
     );
   }
 
-  const { currentRotation } = getCurrentRotation(stage);
+  const currentScheduledRotation = getCurrentScheduledRotation(stage);
 
   const rotationComponent = () => {
-    switch (currentRotation.type) {
+    switch (currentScheduledRotation.type) {
       case 'start':
         return <Start />;
       case 'end':
@@ -200,7 +200,7 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
         return (
           <Rotation
             stage={stage}
-            rotation={currentRotation.rotation}
+            rotation={currentScheduledRotation}
           />
         );
       case 'pause':

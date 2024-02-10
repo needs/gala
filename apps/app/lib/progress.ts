@@ -5,129 +5,112 @@ import {
 } from './store';
 import { ApparatusKey, Stage, TimelinePause, TimelineRotation, TimelineRotationApparatus } from '@tgym.fr/core';
 
-type CurrentRotation =
+export type ScheduledRotation =
+  {
+    type: 'start';
+    startDate: Date;
+  }
   | {
-      type: 'start';
-    }
+    type: 'end';
+    endDate: Date;
+  }
   | {
-      type: 'end';
-    }
+    type: 'rotation';
+    startDate: Date;
+    endDate: Date;
+    rotation: TimelineRotation;
+    timelineIndex: number;
+    timelineLength: number;
+    rotationIndex: number;
+    rotationLength: number;
+  }
   | {
-      type: 'rotation';
-      rotation: TimelineRotation;
-    }
-  | {
-      type: 'pause';
-      rotation: TimelinePause;
-    };
+    type: 'pause';
+    startDate: Date;
+    endDate: Date;
+    durationInMinutes: TimelinePause["durationInMinutes"];
+    timelineIndex: number;
+    timelineLength: number;
+  };
 
-export type ProgressGenericInfo = {
-  index: number;
-  count: number;
-};
+function computeScheduledRotations(stage: Stage): ScheduledRotation[] {
+  const rotations = stageRotations(stage);
 
-export type CurrentRotationInfo = {
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  currentRotation: CurrentRotation;
+  let startDate: Date, endDate = new Date(stage.timelineStartDate);
 
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
-};
+  const scheduledRotations: ScheduledRotation[] = [
+    {
+      type: 'start',
+      startDate: endDate,
+    }
+  ]
+
+  scheduledRotations.push(...rotations.flatMap((rotation, timelineIndex): (ScheduledRotation[]) => {
+    startDate = endDate;
+    endDate = addMinutes(startDate, rotation.durationInMinutes);
+
+    if (rotation.type === 'pause') {
+      return [{
+        type: 'pause',
+        startDate,
+        endDate,
+        timelineIndex,
+        timelineLength: rotations.length,
+        durationInMinutes: rotation.durationInMinutes,
+      }];
+    } else {
+      const rotationApparatuses = getRotationApparatuses(stage, rotation);
+
+      return rotationApparatuses.map((apparatusKey, rotationIndex) => {
+        const rotationStartDate = addMinutes(startDate, (rotation.durationInMinutes / rotationApparatuses.length) * rotationIndex);
+        const rotationEndDate = addMinutes(startDate, (rotation.durationInMinutes / rotationApparatuses.length) * (rotationIndex + 1));
+
+        return {
+          type: 'rotation',
+          rotation: {
+            ...rotation,
+            apparatuses: Object.fromEntries(
+              rotationApparatuses.map((apparatusKey, apparatusIndex) => [
+                apparatusKey,
+                rotation.apparatuses[
+                rotationApparatuses[mod(apparatusIndex - rotationIndex, rotationApparatuses.length)]
+                ],
+              ])
+            ) as Record<ApparatusKey, TimelineRotationApparatus>,
+            durationInMinutes: rotation.durationInMinutes / rotationApparatuses.length,
+          },
+          startDate: rotationStartDate,
+          endDate: rotationEndDate,
+          timelineIndex,
+          timelineLength: rotations.length,
+          rotationIndex,
+          rotationLength: rotationApparatuses.length,
+        };
+      });
+    }
+  }));
+
+  scheduledRotations.push({
+    type: 'end',
+    endDate,
+  });
+
+  return scheduledRotations;
+}
 
 function mod(n: number, m: number) {
   'use strict';
   return ((n % m) + m) % m;
 }
 
-export function getCurrentRotation(stage: Stage): CurrentRotationInfo {
-  const progress = stage.progress;
-  const rotations = stageRotations(stage);
+export function getCurrentScheduledRotation(stage: Stage): ScheduledRotation {
+  const scheduledRotations = computeScheduledRotations(stage);
 
-  let tmpProgress = 0;
-  let startDate = new Date(stage.timelineStartDate);
-
-  if (progress === undefined || progress < 0) {
-    return {
-      startDate,
-      endDate: undefined,
-      currentRotation: {
-        type: 'start',
-      },
-    };
+  if (stage.progress === undefined || stage.progress < 0) {
+    return scheduledRotations[0];
+  } else if (stage.progress >= scheduledRotations.length - 1) {
+    return scheduledRotations[scheduledRotations.length - 1];
+  } else {
+    return scheduledRotations[Math.floor(stage.progress)];
   }
-
-  let timeslotIndex = 1;
-
-  for (const rotation of rotations) {
-    const endDate = addMinutes(startDate, rotation.durationInMinutes);
-
-    if (rotation.type === 'pause') {
-      tmpProgress += 1;
-
-      if (progress < tmpProgress) {
-        return {
-          startDate,
-          endDate,
-          currentRotation: {
-            type: 'pause',
-            rotation,
-          },
-
-          timeslotInfo: {
-            index: timeslotIndex,
-            count: rotations.length,
-          },
-        };
-      }
-    } else if (rotation.type === 'rotation') {
-      const rotationApparatuses = getRotationApparatuses(stage, rotation);
-
-      tmpProgress += rotationApparatuses.length;
-
-      if (progress < tmpProgress) {
-        const offset = progress - tmpProgress + rotationApparatuses.length;
-
-        return {
-          startDate,
-          endDate,
-          currentRotation: {
-            type: 'rotation',
-            rotation: {
-              type: 'rotation',
-              apparatuses: Object.fromEntries(
-                rotationApparatuses.map((apparatusKey, index) => [
-                  apparatusKey,
-                  rotation.apparatuses[
-                    rotationApparatuses[mod(index - offset, rotationApparatuses.length)]
-                  ],
-                ])
-              ) as Record<ApparatusKey, TimelineRotationApparatus>,
-              order: rotation.order,
-              durationInMinutes: rotation.durationInMinutes,
-            },
-          },
-          timeslotInfo: {
-            index: timeslotIndex,
-            count: rotations.length,
-          },
-          rotationInfo: {
-            index: offset + 1,
-            count: rotationApparatuses.length,
-          },
-        };
-      }
-    }
-
-    startDate = endDate;
-    timeslotIndex += 1;
-  }
-
-  return {
-    startDate: undefined,
-    endDate: startDate,
-    currentRotation: {
-      type: 'end',
-    },
-  };
 }

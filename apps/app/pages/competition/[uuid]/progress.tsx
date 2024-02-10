@@ -7,8 +7,8 @@ import { ReactNode } from 'react';
 import { format, formatDuration, intervalToDuration } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { isEmpty } from 'lodash';
-import { ProgressGenericInfo, getCurrentRotation } from '../../../lib/progress';
-import { Stage, TimelineRotation } from '@tgym.fr/core';
+import { ScheduledRotation, getCurrentScheduledRotation } from '../../../lib/progress';
+import { Stage } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 
 function formatRotationTime(startDate?: Date, endDate?: Date) {
@@ -46,8 +46,10 @@ function ProgressContainer({
   children,
   onForward,
   onBackward,
-  timeslotInfo,
-  rotationInfo,
+  timelineIndex,
+  timelineLength,
+  rotationIndex,
+  rotationLength,
 }: {
   stageName: string;
   startDate?: Date;
@@ -55,8 +57,10 @@ function ProgressContainer({
   children?: ReactNode;
   onForward?: () => void;
   onBackward?: () => void;
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
+  timelineIndex?: number;
+  timelineLength?: number;
+  rotationIndex?: number;
+  rotationLength?: number;
 }) {
   const rotationTime = formatRotationTime(startDate, endDate);
 
@@ -73,14 +77,14 @@ function ProgressContainer({
             <Typography variant="h5">{stageName}</Typography>
           </Stack>
           <Stack direction="row" gap={2} alignItems="baseline">
-            {timeslotInfo !== undefined && (
+            {timelineIndex !== undefined && timelineLength !== undefined && (
               <Typography variant="body2">
-                Créneau {timeslotInfo.index}/{timeslotInfo.count}
+                Créneau {timelineIndex + 1}/{timelineLength}
               </Typography>
             )}
-            {rotationInfo !== undefined && (
+            {rotationIndex !== undefined && rotationLength !== undefined && (
               <Typography variant="body2">
-                Rotation {rotationInfo.index}/{rotationInfo.count}
+                Rotation {rotationIndex + 1}/{rotationLength}
               </Typography>
             )}
             <Typography variant="body2">{rotationTime}</Typography>
@@ -114,23 +118,19 @@ function ProgressContainer({
 function ProgressStart({
   stageName,
   onForward,
-  startDate,
-  timeslotInfo,
-  rotationInfo,
+  scheduledRotation: {
+    startDate,
+  },
 }: {
   stageName: string;
   onForward: () => void;
-  startDate?: Date;
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
+  scheduledRotation: Extract<ScheduledRotation, {type: 'start'}>;
 }) {
   return (
     <ProgressContainer
       stageName={stageName}
       onForward={onForward}
       startDate={startDate}
-      timeslotInfo={timeslotInfo}
-      rotationInfo={rotationInfo}
     />
   );
 }
@@ -138,23 +138,19 @@ function ProgressStart({
 function ProgressEnd({
   stageName,
   onBackward,
-  endDate,
-  timeslotInfo,
-  rotationInfo,
+  scheduledRotation: {
+    endDate,
+  },
 }: {
   stageName: string;
   onBackward: () => void;
-  endDate?: Date;
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
+  scheduledRotation: Extract<ScheduledRotation, {type: 'end'}>;
 }) {
   return (
     <ProgressContainer
       endDate={endDate}
       stageName={stageName}
       onBackward={onBackward}
-      timeslotInfo={timeslotInfo}
-      rotationInfo={rotationInfo}
     />
   );
 }
@@ -162,23 +158,23 @@ function ProgressEnd({
 function ProgressRotation({
   stage,
   stageName,
-  startDate,
-  endDate,
-  rotation,
   onForward,
   onBackward,
-  timeslotInfo,
-  rotationInfo,
+  scheduledRotation: {
+    startDate,
+    endDate,
+    rotation,
+    timelineIndex,
+    timelineLength,
+    rotationIndex,
+    rotationLength,
+  },
 }: {
   stage: Stage;
   stageName: string;
-  startDate?: Date;
-  endDate?: Date;
-  rotation: TimelineRotation;
   onForward: () => void;
   onBackward: () => void;
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
+  scheduledRotation: Extract<ScheduledRotation, {type: 'rotation'}>;
 }) {
   return (
     <ProgressContainer
@@ -187,8 +183,10 @@ function ProgressRotation({
       endDate={endDate}
       onForward={onForward}
       onBackward={onBackward}
-      timeslotInfo={timeslotInfo}
-      rotationInfo={rotationInfo}
+      timelineIndex={timelineIndex}
+      timelineLength={timelineLength}
+      rotationIndex={rotationIndex}
+      rotationLength={rotationLength}
     >
       <TimelineRotation_
         stage={stage}
@@ -201,20 +199,19 @@ function ProgressRotation({
 
 function ProgressPause({
   stageName,
-  startDate,
-  endDate,
   onForward,
   onBackward,
-  timeslotInfo,
-  rotationInfo,
+  scheduledRotation: {
+    startDate,
+    endDate,
+    timelineIndex,
+    timelineLength,
+  },
 }: {
   stageName: string;
-  startDate?: Date;
-  endDate?: Date;
   onForward: () => void;
   onBackward: () => void;
-  timeslotInfo?: ProgressGenericInfo;
-  rotationInfo?: ProgressGenericInfo;
+  scheduledRotation: Extract<ScheduledRotation, {type: 'pause'}>;
 }) {
   return (
     <ProgressContainer
@@ -223,8 +220,8 @@ function ProgressPause({
       endDate={endDate}
       onForward={onForward}
       onBackward={onBackward}
-      timeslotInfo={timeslotInfo}
-      rotationInfo={rotationInfo}
+      timelineIndex={timelineIndex}
+      timelineLength={timelineLength}
     >
       <TimelinePause_ />
     </ProgressContainer>
@@ -249,13 +246,7 @@ export default function ProgressPage() {
           return null;
         }
 
-        const {
-          currentRotation,
-          startDate,
-          endDate,
-          timeslotInfo,
-          rotationInfo,
-        } = getCurrentRotation(stage);
+        const currentScheduledRotation = getCurrentScheduledRotation(stage);
 
         const onForward = () => {
           if (stage.progress === undefined) {
@@ -273,27 +264,23 @@ export default function ProgressPage() {
           }
         };
 
-        switch (currentRotation.type) {
+        switch (currentScheduledRotation.type) {
           case 'start':
             return (
               <ProgressStart
                 key={stageKey}
-                startDate={startDate}
+                scheduledRotation={currentScheduledRotation}
                 stageName={stage.name}
                 onForward={onForward}
-                timeslotInfo={timeslotInfo}
-                rotationInfo={rotationInfo}
               />
             );
           case 'end':
             return (
               <ProgressEnd
                 key={stageKey}
-                endDate={endDate}
+                scheduledRotation={currentScheduledRotation}
                 stageName={stage.name}
                 onBackward={onBackward}
-                timeslotInfo={timeslotInfo}
-                rotationInfo={rotationInfo}
               />
             );
           case 'rotation':
@@ -301,27 +288,20 @@ export default function ProgressPage() {
               <ProgressRotation
                 stage={stage}
                 key={stageKey}
-                startDate={startDate}
-                endDate={endDate}
                 stageName={stage.name}
-                rotation={currentRotation.rotation}
+                scheduledRotation={currentScheduledRotation}
                 onForward={onForward}
                 onBackward={onBackward}
-                timeslotInfo={timeslotInfo}
-                rotationInfo={rotationInfo}
               />
             );
           case 'pause':
             return (
               <ProgressPause
                 key={stageKey}
-                startDate={startDate}
-                endDate={endDate}
                 stageName={stage.name}
                 onForward={onForward}
                 onBackward={onBackward}
-                timeslotInfo={timeslotInfo}
-                rotationInfo={rotationInfo}
+                scheduledRotation={currentScheduledRotation}
               />
             );
         }
