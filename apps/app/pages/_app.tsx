@@ -21,14 +21,22 @@ type AppPropsWithProoperties = AppProps & {
 };
 
 function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
+  const competitionUuid = pageProps.competitionUuid;
+
   return (
     <CookiesProvider>
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        <StoreProvider competitionUuid={pageProps.competitionUuid}>
+        {competitionUuid !== undefined ? (
+          <StoreProvider competitionUuid={pageProps.competitionUuid}>
+            <Layout layoutInfo={pageProps.layoutInfo}>
+              <Component {...pageProps} />
+            </Layout>
+          </StoreProvider>
+        ) : (
           <Layout layoutInfo={pageProps.layoutInfo}>
             <Component {...pageProps} />
           </Layout>
-        </StoreProvider>
+        )}
       </LocalizationProvider>
     </CookiesProvider>
   );

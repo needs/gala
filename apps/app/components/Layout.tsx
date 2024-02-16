@@ -22,7 +22,6 @@ import {
   SportsBar,
   Tv,
   Undo,
-  ViewDay,
   Villa,
 } from '@mui/icons-material';
 import {

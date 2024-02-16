@@ -1,7 +1,5 @@
-import { syncedStore, getYjsDoc, Box } from '@syncedstore/core';
-import { HocuspocusProvider, onAwarenessUpdateParameters } from '@hocuspocus/provider';
+import { Box } from '@syncedstore/core';
 import { sortBy } from 'lodash';
-import { UndoManager } from 'yjs';
 import { ApparatusKey, BarCategory, Competition as OriginalCompetition, Screen, ScreenBar, ScreenProgress, Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
 import { MappedTypeDescription } from '@syncedstore/core/types/doc';
 
@@ -214,53 +212,6 @@ export const barDefault: Record<string, BarCategory> = {
     },
   },
 };
-
-export function initStore(
-  uuid: string,
-  token: string,
-  userName: string,
-  onLoad: () => void,
-  onFail: () => void,
-  onAwarenessUpdate: (data: onAwarenessUpdateParameters) => void
-) {
-  const store = syncedStore<{ competition: Competition }>({
-    competition: {} as Competition,
-  });
-
-  const undoManager = new UndoManager(
-    getYjsDoc(store).getMap('competition')
-  );
-
-  const document = getYjsDoc(store);
-
-  const provider = new HocuspocusProvider({
-    url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
-    name: uuid,
-    document: document,
-    token,
-
-    onSynced: () => {
-      onLoad();
-    },
-    onAuthenticationFailed: () => {
-      onFail();
-    },
-    onClose: () => {
-      onFail();
-    },
-    onAwarenessUpdate,
-  });
-
-  provider.setAwarenessField('user', {
-    name: userName,
-  });
-
-  return {
-    provider,
-    store,
-    undoManager,
-  }
-}
 
 export const defaultCompetition: OriginalCompetition = {
   players: {},
