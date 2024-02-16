@@ -20,6 +20,11 @@ const server = new Hocuspocus({
   async onAuthenticate(data) {
     const { token: sessionCookie, documentName } = data;
 
+    if (sessionCookie === "anonymous") {
+      data.connection.readOnly = true;
+      return;
+    }
+
     // Those depends on Firebase under the hood and where a bit slow previously,
     // so keep monitoring them for some time.
 

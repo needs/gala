@@ -6,6 +6,7 @@ import { prisma } from '../../lib/prisma';
 import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
 import { getFirebaseAdminApp } from '../../lib/firebase-admin';
+import { getUserName } from '../../lib/avatar';
 
 const isAuthedMiddleware = middleware((opts) => {
   const { ctx } = opts;
@@ -108,6 +109,21 @@ export const appRouter = router({
         created_at,
         is_admin,
       };
+    }),
+
+  userName: procedure
+    .input(z.null())
+    .output(
+      z.string()
+    )
+    .query((opts) => {
+      const user = opts.ctx.user;
+
+      if (user === undefined) {
+        return 'Anonymous';
+      } else {
+        return getUserName(user.email, user.name ?? undefined);
+      }
     }),
 
   updateUser: authedProcedure

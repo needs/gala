@@ -39,7 +39,7 @@ const StoreProvider = ({
   const [awareness, setAwereness] = useState<
     onAwarenessUpdateParameters | undefined
   >(undefined);
-  const { data: user } = trpc.user.useQuery(null);
+  const { data: userName } = trpc.userName.useQuery(null);
 
   const [cookies] = useCookies(['session']);
 
@@ -49,7 +49,7 @@ const StoreProvider = ({
     const provider = new HocuspocusProvider({
       url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
       name: competitionUuid,
-      token: cookies.session,
+      token: cookies.session ?? "anonymous",
 
       onAwarenessUpdate(awareness) {
         setAwereness(awareness);
@@ -84,13 +84,13 @@ const StoreProvider = ({
   });
 
   useEffect(() => {
-    if (user !== undefined) {
-      const name = getUserName(user.email, user.name);
-      values.provider.setAwarenessField('user', {
-        name,
+    console.log('setting awareness', userName);
+    if (userName !== undefined) {
+      values.provider.setAwarenessField('userName', {
+        name: userName,
       });
     }
-  }, [user, values.provider]);
+  }, [userName, values.provider]);
 
   if (competitionUuid !== undefined && !storeLoaded) {
     return (
