@@ -18,6 +18,9 @@ const getStats = cache(async () => {
       playerCount: true,
       viewCount: true,
     },
+    where: {
+      deleted_at: null,
+    }
   });
 
   return competitionAggregation._sum;

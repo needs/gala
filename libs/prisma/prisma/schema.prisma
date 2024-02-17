@@ -48,6 +48,7 @@ model Competition {
   data               Bytes
   created_at         DateTime          @default(now())
   updated_at         DateTime          @updatedAt
+  deleted_at         DateTime?
   users              CompetitionUser[]
   screen_short_ids   ScreenShortId[]
 }

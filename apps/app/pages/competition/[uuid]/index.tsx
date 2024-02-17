@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Avatar,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -31,6 +32,7 @@ import { Role } from '@prisma/client';
 import { Delete, Email } from '@mui/icons-material';
 import { avatarUrl, getUserName } from '../../../lib/avatar';
 import { useCompetition } from '../../../components/StoreProvider';
+import DeleteCompetitionDialog from '../../../components/DeleteCompetitionDialog';
 
 const RoleSelector = ({
   value,
@@ -161,6 +163,7 @@ export default function Index({
   const { mutateAsync: updateMemberRole } =
     trpc.members.updateRole.useMutation();
   const [inviteMemberDialogOpen, setInviteMemberDialogOpen] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
     <>
@@ -266,6 +269,29 @@ export default function Index({
             })}
           </List>
         )}
+        <Typography variant="h6" component="h1">
+          Supprimer la compétition
+        </Typography>
+        <Stack direction="column" gap={2}>
+          <Typography variant="body1">
+            Attention, une fois supprimée, il est impossible de récupérer la
+            compétition.
+          </Typography>
+          <Box>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setOpenDeleteDialog(true)}
+            >
+              Supprimer
+            </Button>
+            <DeleteCompetitionDialog
+              isOpen={openDeleteDialog}
+              onClose={() => setOpenDeleteDialog(false)}
+              competitionUuid={competitionUuid}
+            />
+          </Box>
+        </Stack>
       </Stack>
     </>
   );

@@ -176,6 +176,7 @@ export const appRouter = router({
               user_id: opts.ctx.user.id,
             },
           },
+          deleted_at: null,
         },
       });
 
@@ -206,6 +207,22 @@ export const appRouter = router({
       return {
         uuid: competition.uuid,
       };
+    }),
+
+  delete: authedProcedure
+    .input(z.object({ uuid: z.string().uuid() }))
+    .output(z.null())
+    .mutation(async (opts) => {
+      await prisma.competition.update({
+        where: {
+          uuid: opts.input.uuid,
+        },
+        data: {
+          deleted_at: new Date(),
+        },
+      });
+
+      return null;
     }),
 
   toShortId: procedure
