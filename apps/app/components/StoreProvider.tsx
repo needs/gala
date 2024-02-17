@@ -15,8 +15,7 @@ import {
 } from '@hocuspocus/provider';
 import { useSyncedStore } from '@syncedstore/react';
 import { trpc } from '../utils/trpc';
-import { getUserName } from '../lib/avatar';
-import syncedStore from '@syncedstore/core';
+import syncedStore, { Y } from '@syncedstore/core';
 
 const context = createContext<
   | {
@@ -57,11 +56,6 @@ const StoreProvider = ({
     });
 
     provider.on('synced', () => {
-      Object.keys(defaultCompetition).forEach((key) => {
-        if (!provider.document.getMap('competition').has(key)) {
-          provider.document.getMap('competition').set(key, {});
-        }
-      });
       setStoreLoaded(true);
     });
 
@@ -84,9 +78,8 @@ const StoreProvider = ({
   });
 
   useEffect(() => {
-    console.log('setting awareness', userName);
     if (userName !== undefined) {
-      values.provider.setAwarenessField('userName', {
+      values.provider.setAwarenessField('user', {
         name: userName,
       });
     }

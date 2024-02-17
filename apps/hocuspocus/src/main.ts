@@ -5,6 +5,7 @@ import { getRole, getUser } from '@tgym.fr/auth';
 import { prisma } from './prisma';
 import { adminApp } from './firebase';
 import { competitionSchema } from '@tgym.fr/core';
+import * as Y from 'yjs'
 
 function getPort() {
   const port = process.env['PORT'];
@@ -39,6 +40,16 @@ const server = new Hocuspocus({
     if (role !== 'EDITOR' && role !== 'OWNER') {
       data.connection.readOnly = true;
     }
+  },
+
+  async afterLoadDocument({ document }) {
+    const defaultCompetition = competitionSchema.parse({});
+
+    Object.keys(defaultCompetition).forEach((key) => {
+      if (!document.getMap('competition').has(key)) {
+        document.getMap('competition').set(key, new Y.Map());
+      }
+    });
   },
 
   extensions: [

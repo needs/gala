@@ -149,7 +149,7 @@ export const competitionSchema = z.object({
   screens: z.record(screenSchema).default({}),
   info: z.object({
     name: z.string(),
-  }).default({ name: '' }),
+  }).partial().default({}),
 });
 
 export type Competition = z.infer<typeof competitionSchema>;

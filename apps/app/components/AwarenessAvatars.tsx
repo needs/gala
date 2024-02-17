@@ -19,7 +19,7 @@ export default function AwarenessAvatars() {
         {awareness.states.slice(0, maxAvatars).map((state) => (
           <Avatar
             key={state.clientId}
-            src={avatarUrl(state.user?.userName ?? "Anonymous")}
+            src={avatarUrl(state.user.name ?? "Anonymous")}
             sx={{ width: 24, height: 24 }}
           />
         ))}

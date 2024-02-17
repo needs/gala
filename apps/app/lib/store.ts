@@ -219,9 +219,7 @@ export const defaultCompetition: OriginalCompetition = {
   progresses: {},
   bar: {},
   categories: {},
-  info: {
-    name: '',
-  },
+  info: {},
   screens: {},
   stages: {},
 };
