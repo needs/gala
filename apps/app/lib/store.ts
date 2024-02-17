@@ -213,17 +213,6 @@ export const barDefault: Record<string, BarCategory> = {
   },
 };
 
-export const defaultCompetition: OriginalCompetition = {
-  players: {},
-  teams: {},
-  progresses: {},
-  bar: {},
-  categories: {},
-  info: {},
-  screens: {},
-  stages: {},
-};
-
 export type Store = MappedTypeDescription<{
   competition: Competition;
 }>;

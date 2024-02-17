@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Competition, Store, defaultCompetition } from '../lib/store';
+import { Competition, Store } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
 import { useCookies } from 'react-cookie';
 import { UndoManager } from 'yjs';
