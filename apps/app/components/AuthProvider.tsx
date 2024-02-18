@@ -1,14 +1,20 @@
 import { User } from 'firebase/auth';
 import nookies from 'nookies';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { getFirebaseAppAuth } from '../lib/firebase';
 
-const AuthContext = createContext<{ user: User | null }>({
+const AuthContext = createContext<{ user: User | null, idToken: string | null }>({
   user: null,
+  idToken: null,
 });
+
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [idToken, setIdToken] = useState<string | null>(null);
 
   // Write token as a cookie so that it can be used server-side.
   useEffect(() => {
@@ -17,11 +23,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return auth.onIdTokenChanged(async (user) => {
       if (!user) {
         setUser(null);
+        setIdToken(null);
         nookies.set(undefined, 'token', '', { path: '/' });
       } else {
-        const token = await user.getIdToken();
+        const idToken = await user.getIdToken();
         setUser(user);
-        nookies.set(undefined, 'token', token, { path: '/' });
+        setIdToken(idToken);
+        nookies.set(undefined, 'token', idToken, { path: '/' });
       }
     });
   }, []);
@@ -40,6 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, idToken }}>{children}</AuthContext.Provider>
   );
 }

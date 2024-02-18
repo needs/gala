@@ -29,7 +29,6 @@ export default function AccountIconButton() {
   };
 
   const router = useRouter();
-  const removeCookies = useCookies(['session'])[2];
 
   const { data: user } = trpc.user.useQuery(null);
 
@@ -108,7 +107,6 @@ export default function AccountIconButton() {
         <MenuListItem
           onClick={() => {
             const auth = getFirebaseAppAuth();
-            removeCookies('session');
             signOut(auth).then(() => {
               router.push('/login');
             });

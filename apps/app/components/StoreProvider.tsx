@@ -16,6 +16,8 @@ import {
 import { useSyncedStore } from '@syncedstore/react';
 import { trpc } from '../utils/trpc';
 import syncedStore from '@syncedstore/core';
+import { useAuth } from './AuthProvider';
+import nookies, { parseCookies } from 'nookies';
 
 const context = createContext<
   | {
@@ -40,15 +42,14 @@ const StoreProvider = ({
   >(undefined);
   const { data: userName } = trpc.userName.useQuery(null);
 
-  const [cookies] = useCookies(['session']);
-
   const [values] = useState(() => {
+    const cookies = parseCookies();
     setStoreLoaded(false);
 
     const provider = new HocuspocusProvider({
       url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
       name: competitionUuid,
-      token: cookies.session ?? "anonymous",
+      token: cookies.token,
 
       onAwarenessUpdate(awareness) {
         setAwereness(awareness);
