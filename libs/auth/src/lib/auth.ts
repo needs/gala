@@ -20,15 +20,16 @@ export const isIdTokenValid = async (
 export const getUser = async (
   adminApp: admin.app.App,
   prisma: PrismaClient,
-  sessionCookie: string | undefined
+  idToken: string | undefined,
+  checkForRevocation = false
 ) => {
-  if (sessionCookie === undefined) {
+  if (idToken === undefined) {
     return undefined;
   }
 
   const tokenData = await adminApp
     .auth()
-    .verifySessionCookie(sessionCookie, false)
+    .verifyIdToken(idToken, checkForRevocation)
     .catch(() => {
       return undefined;
     });

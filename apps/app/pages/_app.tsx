@@ -9,6 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import fr from 'date-fns/locale/fr';
 import '../components/TvFrame.css';
+import { AuthProvider } from '../components/AuthProvider';
 
 export type PageProps = {
   competitionUuid?: string;
@@ -25,19 +26,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
 
   return (
     <CookiesProvider>
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-        {competitionUuid !== undefined ? (
-          <StoreProvider competitionUuid={pageProps.competitionUuid}>
+      <AuthProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+          {competitionUuid !== undefined ? (
+            <StoreProvider competitionUuid={pageProps.competitionUuid}>
+              <Layout layoutInfo={pageProps.layoutInfo}>
+                <Component {...pageProps} />
+              </Layout>
+            </StoreProvider>
+          ) : (
             <Layout layoutInfo={pageProps.layoutInfo}>
               <Component {...pageProps} />
             </Layout>
-          </StoreProvider>
-        ) : (
-          <Layout layoutInfo={pageProps.layoutInfo}>
-            <Component {...pageProps} />
-          </Layout>
-        )}
-      </LocalizationProvider>
+          )}
+        </LocalizationProvider>
+      </AuthProvider>
     </CookiesProvider>
   );
 }

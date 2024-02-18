@@ -15,7 +15,7 @@ import {
 } from '@hocuspocus/provider';
 import { useSyncedStore } from '@syncedstore/react';
 import { trpc } from '../utils/trpc';
-import syncedStore, { Y } from '@syncedstore/core';
+import syncedStore from '@syncedstore/core';
 
 const context = createContext<
   | {

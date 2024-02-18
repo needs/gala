@@ -3,9 +3,7 @@ import { z } from 'zod';
 import { middleware, procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
-import { isIdTokenValid } from '@tgym.fr/auth';
 import { nanoid } from 'nanoid';
-import { getFirebaseAdminApp } from '../../lib/firebase-admin';
 import { getUserName } from '../../lib/avatar';
 
 const isAuthedMiddleware = middleware((opts) => {
@@ -65,32 +63,6 @@ const isOwnerMiddleware = isMemberMiddleware.unstable_pipe(async (opts) => {
 });
 
 export const appRouter = router({
-  login: procedure
-    .input(z.object({ idToken: z.string() }))
-    .output(z.object({ sessionCookie: z.string(), expiresIn: z.number() }))
-    .mutation(async (opts) => {
-      const adminApp = getFirebaseAdminApp();
-      const { idToken } = opts.input;
-
-      // TODO: Double check that this flow is not subject to CSRF attacks.
-
-      // Set session expiration to 10 days.
-      const expiresIn = 60 * 60 * 24 * 10 * 1000;
-
-      if (!(await isIdTokenValid(adminApp, idToken))) {
-        throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-      }
-
-      const sessionCookie = await adminApp.auth().createSessionCookie(idToken, {
-        expiresIn,
-      });
-
-      return {
-        sessionCookie,
-        expiresIn,
-      };
-    }),
-
   user: authedProcedure
     .input(z.null())
     .output(

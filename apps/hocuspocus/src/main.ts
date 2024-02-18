@@ -19,19 +19,16 @@ const server = new Hocuspocus({
   timeout: 60000,
 
   async onAuthenticate(data) {
-    const { token: sessionCookie, documentName } = data;
+    const { token: idToken, documentName } = data;
 
-    if (sessionCookie === "anonymous") {
+    console.time('getUser');
+    const user = await getUser(adminApp, prisma, idToken);
+    console.timeEnd('getUser');
+
+    if (user === undefined) {
       data.connection.readOnly = true;
       return;
     }
-
-    // Those depends on Firebase under the hood and where a bit slow previously,
-    // so keep monitoring them for some time.
-
-    console.time('getUser');
-    const user = await getUser(adminApp, prisma, sessionCookie);
-    console.timeEnd('getUser');
 
     console.time('getRole');
     const role = await getRole(prisma, documentName, user);
@@ -39,6 +36,7 @@ const server = new Hocuspocus({
 
     if (role !== 'EDITOR' && role !== 'OWNER') {
       data.connection.readOnly = true;
+      return;
     }
   },
 

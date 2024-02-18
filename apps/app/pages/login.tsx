@@ -11,64 +11,13 @@ import {
 import {
   UserCredential,
   createUserWithEmailAndPassword,
-  getIdToken,
   sendEmailVerification,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { getFirebaseAppAuth } from '../lib/firebase';
-import { getFirebaseAdminApp } from '../lib/firebase-admin';
-import { useCallback, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { trpc } from '../utils/trpc';
-import Router from 'next/router';
-import { GetServerSideProps } from 'next';
-import { getUser } from '@tgym.fr/auth';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { prisma } from '../lib/prisma';
-
-function Login({
-  onLogin,
-}: {
-  onLogin: (sessionCookie: string, expiresIn: number) => void;
-}) {
-  const {
-    mutateAsync: login,
-    isLoading,
-    error,
-    isSuccess,
-  } = trpc.login.useMutation();
-
-  const authenticate = useCallback(() => {
-    const auth = getFirebaseAppAuth();
-
-    if (auth.currentUser !== null) {
-      // Force refresh token so that email_verified is updated
-      getIdToken(auth.currentUser, true).then((idToken) => {
-        login({ idToken }).then(({ sessionCookie, expiresIn }) => {
-          onLogin(sessionCookie, expiresIn);
-        });
-      });
-    }
-  }, [login, onLogin]);
-
-  useEffect(() => {
-    authenticate();
-  }, [authenticate]);
-
-  return (
-    <>
-      {(isLoading || isSuccess) && (
-        <Alert severity="success">{'Authentification...'}</Alert>
-      )}
-      {error && (
-        <>
-          <Alert severity="warning">{"Échec de l'authentification"}</Alert>
-          <Button onClick={authenticate}>Réessayer</Button>
-        </>
-      )}
-    </>
-  );
-}
 
 function Verify({ onEmailVerified }: { onEmailVerified: () => void }) {
   const [disabled, setDisabled] = useState(true);
@@ -233,22 +182,13 @@ function Form({
 }
 
 export default function Index() {
-  const [step, setStep] = useState<'form' | 'verify' | 'login' | 'loading'>(
+  const router = useRouter();
+  const [step, setStep] = useState<'form' | 'verify' | 'loading'>(
     'loading'
   );
 
-  const [cookies, setCookies, removeCookies] = useCookies(['session']);
-  const sessionCookie = cookies.session;
-
-  useEffect(() => {
-    if (sessionCookie !== undefined) {
-      Router.push('/');
-    }
-  }, [sessionCookie]);
-
   useEffect(() => {
     const auth = getFirebaseAppAuth();
-    removeCookies('session');
 
     auth.authStateReady().then(() => {
       if (auth.currentUser === null) {
@@ -256,10 +196,10 @@ export default function Index() {
       } else if (!auth.currentUser.emailVerified) {
         setStep('verify');
       } else {
-        setStep('login');
+        router.push('/');
       }
     });
-  }, [removeCookies]);
+  }, [router]);
 
   return (
     <Box
@@ -290,7 +230,7 @@ export default function Index() {
           <Form
             onUserCredential={(userCredential) => {
               if (userCredential.user.emailVerified) {
-                setStep('login');
+                router.push('/');
               } else {
                 sendEmailVerification(userCredential.user);
                 setStep('verify');
@@ -301,16 +241,7 @@ export default function Index() {
         {step === 'verify' && (
           <Verify
             onEmailVerified={() => {
-              setStep('login');
-            }}
-          />
-        )}
-        {step === 'login' && (
-          <Login
-            onLogin={(sessionCookie, expiresIn) => {
-              setCookies('session', sessionCookie, {
-                maxAge: expiresIn,
-              });
+              router.push('/');
             }}
           />
         )}
@@ -318,21 +249,3 @@ export default function Index() {
     </Box>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const adminApp = getFirebaseAdminApp();
-  const user = await getUser(adminApp, prisma, req.cookies['session']);
-
-  if (user !== undefined) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  } else {
-    return {
-      props: {},
-    };
-  }
-};

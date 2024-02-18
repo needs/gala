@@ -1,6 +1,8 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 import type { AppRouter } from '../server/routers/_app';
+import { getIdToken } from 'firebase/auth';
+import { getFirebaseAppAuth } from '../lib/firebase';
 
 function getBaseUrl() {
   if (typeof window !== 'undefined')
@@ -19,6 +21,16 @@ function getBaseUrl() {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
+async function getAuthToken() {
+  const auth = getFirebaseAppAuth();
+
+  if (auth.currentUser === null) {
+    return undefined;
+  }
+
+  return getIdToken(auth.currentUser)
+}
+
 export const trpc = createTRPCNext<AppRouter>({
   config(opts) {
     return {
@@ -29,6 +41,11 @@ export const trpc = createTRPCNext<AppRouter>({
            * @link https://trpc.io/docs/ssr
            **/
           url: `${getBaseUrl()}/api/trpc`,
+          async headers() {
+            return {
+              authorization: await getAuthToken(),
+            };
+          },
         }),
       ],
     };

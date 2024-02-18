@@ -1,19 +1,17 @@
 import { inferAsyncReturnType } from '@trpc/server';
 import * as trpcNext from '@trpc/server/adapters/next';
-import { getUser } from '@tgym.fr/auth';
 import { prisma } from '../lib/prisma';
 import { getFirebaseAdminApp } from '../lib/firebase-admin';
+import { getUser } from '@tgym.fr/auth';
 
 export async function createContext({
   req,
 }: trpcNext.CreateNextContextOptions) {
-  const sessionCookie = req.cookies['session'];
+  const idToken = req.headers.authorization;
   const adminApp = getFirebaseAdminApp();
-  const user = await getUser(adminApp, prisma, sessionCookie);
 
   return {
-    user,
-    sessionCookie,
+    user: await getUser(adminApp, prisma, idToken),
   };
 }
 

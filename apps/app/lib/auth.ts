@@ -2,9 +2,11 @@ import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
 import { getRole, getUser } from '@tgym.fr/auth';
-import { serialize } from 'cookie';
 import { prisma } from './prisma';
 import { getFirebaseAdminApp } from './firebase-admin';
+import { getFirebaseAppAuth } from './firebase';
+import { getIdToken } from 'firebase/auth';
+import nookies from 'nookies';
 
 export type UserInfo = {
   foo: string;
@@ -24,22 +26,25 @@ const redirectToHome = {
   },
 };
 
+async function getAuthToken() {
+  const auth = getFirebaseAppAuth();
+
+  if (auth.currentUser === null) {
+    return undefined;
+  }
+
+  return getIdToken(auth.currentUser)
+}
+
 export const withAuth: (option: {
   checkMembership?: boolean;
   callback?: GetServerSideProps<PageProps>;
 }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
-    const adminApp = getFirebaseAdminApp();
-    const user = await getUser(
-      adminApp,
-      prisma,
-      context.req.cookies['session']
-    );
+    const idToken = nookies.get(context).token;
+    const user = await getUser(getFirebaseAdminApp(), prisma, idToken);
 
     if (user === undefined) {
-      context.res.setHeader('Set-Cookie', [
-        serialize('session', '', { maxAge: -1, path: '/' }),
-      ]);
       return redirectToLogin;
     }
 
