@@ -47,7 +47,7 @@ const StoreProvider = ({
     const provider = new HocuspocusProvider({
       url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
       name: competitionUuid,
-      token: cookies.token,
+      token: cookies.token || "notoken",
 
       onAwarenessUpdate(awareness) {
         setAwereness(awareness);
