@@ -151,7 +151,7 @@ export default function TimelineRotation({
       <Grid container>
         {rotationApparatuses.map((apparatuseKey) => {
           const apparatus = rotation.apparatuses[apparatuseKey];
-          const apparatusTeams = apparatus === undefined ? {} : apparatus.teams;
+          const apparatusTeams = apparatus === undefined || !('teams' in apparatus) ? {} : apparatus.teams;
 
           return (
             <Grid
@@ -209,6 +209,7 @@ export default function TimelineRotation({
 
                 <Stack flexGrow={1} direction="column" divider={<Divider />}>
                   {Object.keys(apparatusTeams).map((teamKey) => {
+                    console.log('teamKey', teamKey)
                     const team = teams[teamKey];
 
                     return (
