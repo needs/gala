@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user) {
         setUser(null);
         setIdToken(null);
-        nookies.set(undefined, 'token', '', { path: '/' });
+        nookies.destroy(undefined, 'token');
       } else {
         const idToken = await user.getIdToken();
         setUser(user);
