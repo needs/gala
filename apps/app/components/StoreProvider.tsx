@@ -7,7 +7,6 @@ import {
 } from 'react';
 import { Competition, Store } from '../lib/store';
 import { Box, CircularProgress } from '@mui/material';
-import { useCookies } from 'react-cookie';
 import { UndoManager } from 'yjs';
 import {
   HocuspocusProvider,
@@ -16,8 +15,7 @@ import {
 import { useSyncedStore } from '@syncedstore/react';
 import { trpc } from '../utils/trpc';
 import syncedStore from '@syncedstore/core';
-import { useAuth } from './AuthProvider';
-import nookies, { parseCookies } from 'nookies';
+import { parseCookies } from 'nookies';
 
 const context = createContext<
   | {

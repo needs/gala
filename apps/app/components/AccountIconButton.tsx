@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { trpc } from '../utils/trpc';
 import { avatarUrl, getUserName } from '../lib/avatar';
 import {

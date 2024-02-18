@@ -3,7 +3,6 @@ import Layout, { LayoutInfo } from '../components/Layout';
 import '../styles/global.css';
 import StoreProvider from '../components/StoreProvider';
 import { trpc } from '../utils/trpc';
-import { CookiesProvider } from 'react-cookie';
 import { UserInfo } from '../lib/auth';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -25,23 +24,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
   const competitionUuid = pageProps.competitionUuid;
 
   return (
-    <CookiesProvider>
-      <AuthProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
-          {competitionUuid !== undefined ? (
-            <StoreProvider competitionUuid={pageProps.competitionUuid}>
-              <Layout layoutInfo={pageProps.layoutInfo}>
-                <Component {...pageProps} />
-              </Layout>
-            </StoreProvider>
-          ) : (
+    <AuthProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+        {competitionUuid !== undefined ? (
+          <StoreProvider competitionUuid={pageProps.competitionUuid}>
             <Layout layoutInfo={pageProps.layoutInfo}>
               <Component {...pageProps} />
             </Layout>
-          )}
-        </LocalizationProvider>
-      </AuthProvider>
-    </CookiesProvider>
+          </StoreProvider>
+        ) : (
+          <Layout layoutInfo={pageProps.layoutInfo}>
+            <Component {...pageProps} />
+          </Layout>
+        )}
+      </LocalizationProvider>
+    </AuthProvider>
   );
 }
 
