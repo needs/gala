@@ -16,7 +16,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
 import { useState } from 'react';
 import SelectTeamDialog from './SelectTeamDialog';
-import { Add, Remove } from '@mui/icons-material';
+import { Add, Edit, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
 import { Stage, Team, TimelineRotation } from '@tgym.fr/core';
@@ -69,66 +69,67 @@ function TimelineEditTeamButton({
   return (
     <>
       <EditTeamDialog open={open} team={team} onClose={() => setOpen(false)} />
-      <ButtonBase
-        onClick={readOnly ? undefined : () => setOpen(true)}
-        component="div"
-      >
-        <Stack padding={2} gap={1} flexGrow={1}>
-          <Stack
-            direction="row"
-            gap={1}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Stack direction="row" gap={1} alignItems="center">
-              <Typography variant="body1" sx={getTeamNameSxProps(team)}>{getTeamName(team)}</Typography>
-              {team.label !== undefined && (
-                <Typography
-                  variant="caption"
-                  px={1}
-                  py={0.25}
-                  sx={{
-                    backgroundColor: '#eeeeee',
-                    borderRadius: 2,
-                  }}
-                >
-                  Équipe {team.label}
-                </Typography>
-              )}
-            </Stack>
-
-            {!readOnly && (
-              <IconButton
-                size="small"
-                onClick={onRemove}
-                sx={{ justifySelf: 'end' }}
+      <Stack padding={2} gap={1} flexGrow={1}>
+        <Stack direction="row" gap={1} alignItems="center">
+          <Stack direction="row" gap={1} alignItems="center" flexGrow={1}>
+            <Typography variant="body1" sx={getTeamNameSxProps(team)}>
+              {getTeamName(team)}
+            </Typography>
+            {team.label !== undefined && (
+              <Typography
+                variant="caption"
+                px={1}
+                py={0.25}
+                sx={{
+                  backgroundColor: '#eeeeee',
+                  borderRadius: 2,
+                }}
               >
-                <Remove />
-              </IconButton>
+                Équipe {team.label}
+              </Typography>
             )}
           </Stack>
-          {Object.keys(team.members).map((playerKey) => {
-            const player = players[playerKey];
 
-            return (
-              player !== undefined && (
-                <EditPlayerButton
-                  key={playerKey}
-                  player={player}
-                  onDelete={
-                    readOnly
-                      ? undefined
-                      : () => {
-                          delete team.members[playerKey];
-                          delete players[playerKey];
-                        }
-                  }
-                />
-              )
-            );
-          })}
+          {!readOnly && (
+            <IconButton
+              size="small"
+              onClick={() => setOpen(true)}
+              sx={{ justifySelf: 'end' }}
+            >
+              <Edit />
+            </IconButton>
+          )}
+          {!readOnly && (
+            <IconButton
+              size="small"
+              onClick={onRemove}
+              sx={{ justifySelf: 'end' }}
+            >
+              <Remove />
+            </IconButton>
+          )}
         </Stack>
-      </ButtonBase>
+        {Object.keys(team.members).map((playerKey) => {
+          const player = players[playerKey];
+
+          return (
+            player !== undefined && (
+              <EditPlayerButton
+                key={playerKey}
+                player={player}
+                onDelete={
+                  readOnly
+                    ? undefined
+                    : () => {
+                        delete team.members[playerKey];
+                        delete players[playerKey];
+                      }
+                }
+              />
+            )
+          );
+        })}
+      </Stack>
     </>
   );
 }
