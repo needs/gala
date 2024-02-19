@@ -57,7 +57,7 @@ const server = new Hocuspocus({
         const competition = await prisma.competition.update({
           where: {
             uuid: documentName,
-            deleted_at: null,
+            deletedAt: null,
           },
           data: {
             viewCount: {
@@ -96,7 +96,7 @@ const server = new Hocuspocus({
         await prisma.competition.update({
           where: {
             uuid: documentName,
-            deleted_at: null,
+            deletedAt: null,
           },
           data: {
             data: state,

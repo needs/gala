@@ -69,14 +69,14 @@ export const getRole = async (
     return undefined;
   }
 
-  if (user.is_admin === true) {
+  if (user.isAdmin === true) {
     return 'OWNER';
   }
 
   const competitionUser = await prisma.competitionUser.findFirst({
     where: {
-      user_id: user.id,
-      competition_uuid: uuid,
+      userId: user.id,
+      competitionUuid: uuid,
     },
     select: {
       role: true,

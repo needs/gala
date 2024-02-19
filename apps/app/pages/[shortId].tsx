@@ -6,7 +6,7 @@ export const getServerSideProps = (async (context) => {
 
   const screenShortId = await prisma.screenShortId.findUnique({
     where: {
-      short_id: shortId,
+      shortId: shortId,
     },
   });
 
@@ -18,7 +18,7 @@ export const getServerSideProps = (async (context) => {
 
   return {
     redirect: {
-      destination: `competition/${screenShortId.competition_uuid}/screen/${screenShortId.screen_uuid}`,
+      destination: `competition/${screenShortId.competitionUuid}/screen/${screenShortId.screenUuid}`,
       permanent: false,
     },
   };

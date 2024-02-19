@@ -32,9 +32,9 @@ const isMemberMiddleware = isAuthedMiddleware.unstable_pipe(async (opts) => {
 
   const member = await prisma.competitionUser.findUnique({
     where: {
-      user_id_competition_uuid: {
-        user_id: user.id,
-        competition_uuid: uuid,
+      userId_competitionUuid: {
+        userId: user.id,
+        competitionUuid: uuid,
       },
     },
   });
@@ -69,17 +69,17 @@ export const appRouter = router({
       z.object({
         email: z.string(),
         name: z.string().optional(),
-        created_at: z.date(),
-        is_admin: z.boolean(),
+        createdAt: z.date(),
+        isAdmin: z.boolean(),
       })
     )
     .query((opts) => {
-      const { email, name, created_at, is_admin } = opts.ctx.user;
+      const { email, name, createdAt, isAdmin } = opts.ctx.user;
       return {
         email,
         name: name ?? undefined,
-        created_at,
-        is_admin,
+        createdAt,
+        isAdmin,
       };
     }),
 
@@ -145,10 +145,10 @@ export const appRouter = router({
         where: {
           users: {
             some: {
-              user_id: opts.ctx.user.id,
+              userId: opts.ctx.user.id,
             },
           },
-          deleted_at: null,
+          deletedAt: null,
         },
       });
 
@@ -169,7 +169,7 @@ export const appRouter = router({
 
           users: {
             create: {
-              user_id: opts.ctx.user.id,
+              userId: opts.ctx.user.id,
               role: 'OWNER',
             },
           },
@@ -190,7 +190,7 @@ export const appRouter = router({
           uuid: opts.input.uuid,
         },
         data: {
-          deleted_at: new Date(),
+          deletedAt: new Date(),
         },
       });
 
@@ -206,9 +206,9 @@ export const appRouter = router({
 
       await prisma.screenShortId.create({
         data: {
-          short_id: shortId,
-          competition_uuid: opts.input.uuid,
-          screen_uuid: opts.input.screenUuid,
+          shortId: shortId,
+          competitionUuid: opts.input.uuid,
+          screenUuid: opts.input.screenUuid,
         },
       });
 
@@ -239,10 +239,10 @@ export const appRouter = router({
               },
             },
             role: true,
-            created_at: true,
+            createdAt: true,
           },
           where: {
-            competition_uuid: opts.input.uuid,
+            competitionUuid: opts.input.uuid,
           },
         });
 
@@ -250,7 +250,7 @@ export const appRouter = router({
           return {
             email: member.user.email,
             role: member.role,
-            joinedAt: member.created_at,
+            joinedAt: member.createdAt,
             name: member.user.name ?? undefined,
           };
         });
@@ -281,8 +281,8 @@ export const appRouter = router({
 
         await prisma.competitionUser.create({
           data: {
-            user_id: user.id,
-            competition_uuid: uuid,
+            userId: user.id,
+            competitionUuid: uuid,
             role: role,
           },
         });
@@ -309,8 +309,8 @@ export const appRouter = router({
         if (user !== null) {
           await prisma.competitionUser.deleteMany({
             where: {
-              competition_uuid: uuid,
-              user_id: user.id,
+              competitionUuid: uuid,
+              userId: user.id,
             },
           });
         }
@@ -333,7 +333,7 @@ export const appRouter = router({
 
         await prisma.competitionUser.updateMany({
           where: {
-            competition_uuid: uuid,
+            competitionUuid: uuid,
             user: {
               email: email,
             },

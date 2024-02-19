@@ -19,7 +19,7 @@ const getStats = cache(async () => {
       viewCount: true,
     },
     where: {
-      deleted_at: null,
+      deletedAt: null,
     }
   });
 
