@@ -4,8 +4,6 @@ import { merge } from 'lodash';
 import { getRole, getUser } from '@tgym.fr/auth';
 import { prisma } from './prisma';
 import { getFirebaseAdminApp } from './firebase-admin';
-import { getFirebaseAppAuth } from './firebase';
-import { getIdToken } from 'firebase/auth';
 import nookies from 'nookies';
 
 export type UserInfo = {
@@ -25,16 +23,6 @@ const redirectToHome = {
     permanent: false,
   },
 };
-
-async function getAuthToken() {
-  const auth = getFirebaseAppAuth();
-
-  if (auth.currentUser === null) {
-    return undefined;
-  }
-
-  return getIdToken(auth.currentUser)
-}
 
 export const withAuth: (option: {
   checkMembership?: boolean;
