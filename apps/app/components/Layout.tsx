@@ -37,6 +37,7 @@ import { useCompetition, useUndoManager } from './StoreProvider';
 import AccountIconButton from './AccountIconButton';
 import AwarenessAvatars from './AwarenessAvatars';
 import { trpc } from '../utils/trpc';
+import LoginButton from './LoginButton';
 
 const drawerWidth = 240;
 
@@ -230,16 +231,19 @@ function AppLayout({
                   </span>
                 </Tooltip>
               </Stack>
-              {user !== undefined && user.isAuthenticated && (
-                <Stack
-                  direction="row"
-                  bgcolor="#ffffffaa"
-                  borderRadius={999}
-                  p={0.5}
-                >
+
+              <Stack
+                direction="row"
+                bgcolor="#ffffffaa"
+                borderRadius={999}
+                p={0.5}
+              >
+                {user !== undefined && user.isAuthenticated ? (
                   <AccountIconButton />
-                </Stack>
-              )}
+                ) : (
+                  <LoginButton />
+                )}
+              </Stack>
             </Stack>
           )}
         </Toolbar>
@@ -302,6 +306,10 @@ export default function Layout({
   if (layoutInfo === undefined) {
     return <>{children}</>;
   } else {
-    return <AppLayout layoutInfo={layoutInfo} competitionUuid={competitionUuid}>{children}</AppLayout>;
+    return (
+      <AppLayout layoutInfo={layoutInfo} competitionUuid={competitionUuid}>
+        {children}
+      </AppLayout>
+    );
   }
 }
