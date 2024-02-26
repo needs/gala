@@ -1,66 +1,10 @@
-import * as trpc from '@trpc/server';
 import { z } from 'zod';
-import { middleware, procedure, router } from '../trpc';
+import { procedure, router } from '../trpc';
 import * as Y from 'yjs';
 import { prisma } from '../../lib/prisma';
 import { nanoid } from 'nanoid';
 import { getUserName } from '../../lib/avatar';
-
-const isAuthedMiddleware = middleware((opts) => {
-  const { ctx } = opts;
-
-  if (ctx.user === undefined) {
-    throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-  }
-
-  return opts.next({
-    ctx: {
-      user: ctx.user,
-    },
-  });
-});
-
-const authedProcedure = procedure.use(isAuthedMiddleware);
-
-const isMemberMiddleware = isAuthedMiddleware.unstable_pipe(async (opts) => {
-  const {
-    ctx: { user },
-    input,
-  } = opts;
-
-  const { uuid } = z.object({ uuid: z.string().uuid() }).parse(input);
-
-  const member = await prisma.competitionUser.findUnique({
-    where: {
-      userId_competitionUuid: {
-        userId: user.id,
-        competitionUuid: uuid,
-      },
-    },
-  });
-
-  if (member === null) {
-    throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-  }
-
-  return opts.next({
-    ctx: {
-      member,
-    },
-  });
-});
-
-const isOwnerMiddleware = isMemberMiddleware.unstable_pipe(async (opts) => {
-  const {
-    ctx: { member },
-  } = opts;
-
-  if (member.role !== 'OWNER') {
-    throw new trpc.TRPCError({ code: 'UNAUTHORIZED' });
-  }
-
-  return opts.next(opts);
-});
+import { authedProcedure, isMemberMiddleware, isOwnerMiddleware } from '../utils';
 
 export const appRouter = router({
   user: procedure
