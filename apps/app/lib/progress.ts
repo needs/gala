@@ -1,11 +1,10 @@
 import { addMinutes } from 'date-fns';
 import {
-  getRotationApparatuses,
-  stageRotations,
+  getRotationApparatuses, getScheduleEvents, rotateApparatusesOnce,
 } from './store';
-import { Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
+import { Schedule, ScheduleEventPause, ScheduleEventRotation, ScheduleEventRotationApparatus } from '@tgym.fr/core';
 
-export type ScheduledRotation =
+export type TimelineEvent =
   {
     type: 'start';
     startDate: Date;
@@ -18,99 +17,87 @@ export type ScheduledRotation =
     type: 'rotation';
     startDate: Date;
     endDate: Date;
-    rotation: TimelineRotation;
+    event: ScheduleEventRotation;
     timelineIndex: number;
     timelineLength: number;
     rotationIndex: number;
     rotationLength: number;
+    apparatuses: ScheduleEventRotationApparatus[];
   }
   | {
     type: 'pause';
     startDate: Date;
     endDate: Date;
-    durationInMinutes: TimelinePause["durationInMinutes"];
+    event: ScheduleEventPause;
     timelineIndex: number;
     timelineLength: number;
   };
 
-export function computeScheduledRotations(stage: Stage): ScheduledRotation[] {
-  const rotations = stageRotations(stage);
+export function computeTimeline(schedule: Schedule): TimelineEvent[] {
+  let startDate: Date, endDate = new Date(schedule.startDate);
 
-  let startDate: Date, endDate = new Date(stage.timelineStartDate);
-
-  const scheduledRotations: ScheduledRotation[] = [
+  const timeline: TimelineEvent[] = [
     {
       type: 'start',
       startDate: endDate,
     }
   ]
 
-  scheduledRotations.push(...rotations.flatMap((rotation, timelineIndex): (ScheduledRotation[]) => {
-    startDate = endDate;
-    endDate = addMinutes(startDate, rotation.durationInMinutes);
+  const scheduleEvents = getScheduleEvents(schedule);
 
-    if (rotation.type === 'pause') {
-      return [{
+  scheduleEvents.forEach((({ scheduleEvent }, timelineIndex) => {
+    startDate = endDate;
+    endDate = addMinutes(startDate, scheduleEvent.durationInMinutes);
+
+    if (scheduleEvent.type === 'pause') {
+      timeline.push({
         type: 'pause',
         startDate,
         endDate,
         timelineIndex,
-        timelineLength: rotations.length,
-        durationInMinutes: rotation.durationInMinutes,
-      }];
+        timelineLength: scheduleEvents.length,
+        event: scheduleEvent,
+      });
     } else {
-      const rotationApparatuses = getRotationApparatuses(stage, rotation);
+      let rotationApparatuses = getRotationApparatuses(scheduleEvent).map(({ apparatus }) => apparatus);
 
-      return rotationApparatuses.map((apparatusKey, rotationIndex) => {
-        const rotationStartDate = addMinutes(startDate, (rotation.durationInMinutes / rotationApparatuses.length) * rotationIndex);
-        const rotationEndDate = addMinutes(startDate, (rotation.durationInMinutes / rotationApparatuses.length) * (rotationIndex + 1));
+      for (let rotationIndex = 0; rotationIndex < rotationApparatuses.length; rotationIndex++) {
+        const rotationStartDate = addMinutes(startDate, (scheduleEvent.durationInMinutes / rotationApparatuses.length) * rotationIndex);
+        const rotationEndDate = addMinutes(startDate, (scheduleEvent.durationInMinutes / rotationApparatuses.length) * (rotationIndex + 1));
 
-        return {
+        timeline.push({
           type: 'rotation',
-          rotation: {
-            ...rotation,
-            apparatuses: Object.fromEntries(
-              rotationApparatuses.map((apparatusKey, apparatusIndex) => [
-                apparatusKey,
-                { ...rotation.apparatuses[
-                rotationApparatuses[mod(apparatusIndex - rotationIndex, rotationApparatuses.length)]
-                ]},
-              ])
-            ),
-            durationInMinutes: rotation.durationInMinutes / rotationApparatuses.length,
-          },
           startDate: rotationStartDate,
           endDate: rotationEndDate,
+          event: scheduleEvent,
           timelineIndex,
-          timelineLength: rotations.length,
+          timelineLength: scheduleEvents.length,
           rotationIndex,
           rotationLength: rotationApparatuses.length,
-        };
-      });
+          apparatuses: rotationApparatuses,
+        });
+
+        rotationApparatuses = rotateApparatusesOnce(rotationApparatuses);
+      }
     }
   }));
 
-  scheduledRotations.push({
+  timeline.push({
     type: 'end',
     endDate,
   });
 
-  return scheduledRotations;
+  return timeline;
 }
 
-function mod(n: number, m: number) {
-  'use strict';
-  return ((n % m) + m) % m;
-}
+export function getCurrentTimelineEvent(schedule: Schedule): TimelineEvent {
+  const timeline = computeTimeline(schedule);
 
-export function getCurrentScheduledRotation(stage: Stage): ScheduledRotation {
-  const scheduledRotations = computeScheduledRotations(stage);
-
-  if (stage.progress === undefined || stage.progress < 0) {
-    return scheduledRotations[0];
-  } else if (stage.progress >= scheduledRotations.length - 1) {
-    return scheduledRotations[scheduledRotations.length - 1];
+  if (schedule.progress === undefined || schedule.progress < 0) {
+    return timeline[0];
+  } else if (schedule.progress >= timeline.length - 1) {
+    return timeline[timeline.length - 1];
   } else {
-    return scheduledRotations[Math.floor(stage.progress)];
+    return timeline[Math.floor(schedule.progress)];
   }
 }

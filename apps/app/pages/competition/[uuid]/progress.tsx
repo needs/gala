@@ -1,14 +1,13 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { withCompetition } from '../../../lib/auth';
-import TimelineRotation_ from '../../../components/TimelineRotation';
-import TimelinePause_ from '../../../components/TimelinePause';
+import ScheduleEventRotationComponent from '../../../components/ScheduleEventRotation';
+import ScheduleEventPauseComponent from '../../../components/ScheduleEventPause';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { ReactNode } from 'react';
 import { format, formatDuration, intervalToDuration } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { isEmpty } from 'lodash';
-import { ScheduledRotation, getCurrentScheduledRotation } from '../../../lib/progress';
-import { Stage } from '@tgym.fr/core';
+import { TimelineEvent, getCurrentTimelineEvent } from '../../../lib/progress';
 import { useCompetition } from '../../../components/StoreProvider';
 
 export function formatRotationTime(startDate?: Date, endDate?: Date) {
@@ -40,7 +39,7 @@ export function formatRotationTime(startDate?: Date, endDate?: Date) {
 }
 
 function ProgressContainer({
-  stageName,
+  scheduleName,
   startDate,
   endDate,
   children,
@@ -51,7 +50,7 @@ function ProgressContainer({
   rotationIndex,
   rotationLength,
 }: {
-  stageName: string;
+  scheduleName: string;
   startDate?: Date;
   endDate?: Date;
   children?: ReactNode;
@@ -74,7 +73,7 @@ function ProgressContainer({
       >
         <Stack>
           <Stack direction="row" gap={2} alignItems="baseline">
-            <Typography variant="h5">{stageName}</Typography>
+            <Typography variant="h5">{scheduleName}</Typography>
           </Stack>
           <Stack direction="row" gap={2} alignItems="baseline">
             {timelineIndex !== undefined && timelineLength !== undefined && (
@@ -116,19 +115,19 @@ function ProgressContainer({
 }
 
 function ProgressStart({
-  stageName,
+  scheduleName,
   onForward,
   scheduledRotation: {
     startDate,
   },
 }: {
-  stageName: string;
+  scheduleName: string;
   onForward: () => void;
-  scheduledRotation: Extract<ScheduledRotation, {type: 'start'}>;
+  scheduledRotation: Extract<TimelineEvent, {type: 'start'}>;
 }) {
   return (
     <ProgressContainer
-      stageName={stageName}
+      scheduleName={scheduleName}
       onForward={onForward}
       startDate={startDate}
     />
@@ -136,49 +135,47 @@ function ProgressStart({
 }
 
 function ProgressEnd({
-  stageName,
+  scheduleName,
   onBackward,
   scheduledRotation: {
     endDate,
   },
 }: {
-  stageName: string;
+  scheduleName: string;
   onBackward: () => void;
-  scheduledRotation: Extract<ScheduledRotation, {type: 'end'}>;
+  scheduledRotation: Extract<TimelineEvent, {type: 'end'}>;
 }) {
   return (
     <ProgressContainer
       endDate={endDate}
-      stageName={stageName}
+      scheduleName={scheduleName}
       onBackward={onBackward}
     />
   );
 }
 
 function ProgressRotation({
-  stage,
-  stageName,
+  scheduleName,
   onForward,
   onBackward,
   scheduledRotation: {
     startDate,
     endDate,
-    rotation,
     timelineIndex,
     timelineLength,
     rotationIndex,
     rotationLength,
+    apparatuses
   },
 }: {
-  stage: Stage;
-  stageName: string;
+  scheduleName: string;
   onForward: () => void;
   onBackward: () => void;
-  scheduledRotation: Extract<ScheduledRotation, {type: 'rotation'}>;
+  scheduledRotation: Extract<TimelineEvent, {type: 'rotation'}>;
 }) {
   return (
     <ProgressContainer
-      stageName={stageName}
+      scheduleName={scheduleName}
       startDate={startDate}
       endDate={endDate}
       onForward={onForward}
@@ -188,9 +185,8 @@ function ProgressRotation({
       rotationIndex={rotationIndex}
       rotationLength={rotationLength}
     >
-      <TimelineRotation_
-        stage={stage}
-        rotation={rotation}
+      <ScheduleEventRotationComponent
+        apparatuses={apparatuses}
         readOnly={true}
       />
     </ProgressContainer>
@@ -198,7 +194,7 @@ function ProgressRotation({
 }
 
 function ProgressPause({
-  stageName,
+  scheduleName,
   onForward,
   onBackward,
   scheduledRotation: {
@@ -208,14 +204,14 @@ function ProgressPause({
     timelineLength,
   },
 }: {
-  stageName: string;
+  scheduleName: string;
   onForward: () => void;
   onBackward: () => void;
-  scheduledRotation: Extract<ScheduledRotation, {type: 'pause'}>;
+  scheduledRotation: Extract<TimelineEvent, {type: 'pause'}>;
 }) {
   return (
     <ProgressContainer
-      stageName={stageName}
+      scheduleName={scheduleName}
       startDate={startDate}
       endDate={endDate}
       onForward={onForward}
@@ -223,44 +219,40 @@ function ProgressPause({
       timelineIndex={timelineIndex}
       timelineLength={timelineLength}
     >
-      <TimelinePause_ />
+      <ScheduleEventPauseComponent />
     </ProgressContainer>
   );
 }
 
 export default function ProgressPage() {
-  const { stages } = useCompetition();
+  const { schedules } = useCompetition();
 
-  if (isEmpty(stages)) {
+  if (isEmpty(schedules)) {
     return (
       <Alert severity="info" sx={{ margin: 4 }}>
-        {`Aucun plateau n'a été créé pour cette compétition`}
+        {`Aucun échéancier n'a été créé pour cette compétition`}
       </Alert>
     );
   }
 
   return (
     <Stack direction="column" padding={4} gap={4}>
-      {Object.entries(stages).map(([stageKey, stage]) => {
-        if (stage === undefined) {
-          return null;
-        }
-
-        const currentScheduledRotation = getCurrentScheduledRotation(stage);
+      {Object.entries(schedules).map(([scheduleUuid, schedule]) => {
+        const currentScheduledRotation = getCurrentTimelineEvent(schedule);
 
         const onForward = () => {
-          if (stage.progress === undefined) {
-            stage.progress = 0;
+          if (schedule.progress === undefined) {
+            schedule.progress = 0;
           } else {
-            stage.progress += 1;
+            schedule.progress += 1;
           }
         };
 
         const onBackward = () => {
-          if (stage.progress === 0) {
-            stage.progress = undefined;
-          } else if (stage.progress !== undefined) {
-            stage.progress -= 1;
+          if (schedule.progress === 0) {
+            schedule.progress = undefined;
+          } else if (schedule.progress !== undefined) {
+            schedule.progress -= 1;
           }
         };
 
@@ -268,27 +260,26 @@ export default function ProgressPage() {
           case 'start':
             return (
               <ProgressStart
-                key={stageKey}
+                key={scheduleUuid}
                 scheduledRotation={currentScheduledRotation}
-                stageName={stage.name}
+                scheduleName={schedule.name}
                 onForward={onForward}
               />
             );
           case 'end':
             return (
               <ProgressEnd
-                key={stageKey}
+                key={scheduleUuid}
                 scheduledRotation={currentScheduledRotation}
-                stageName={stage.name}
+                scheduleName={schedule.name}
                 onBackward={onBackward}
               />
             );
           case 'rotation':
             return (
               <ProgressRotation
-                stage={stage}
-                key={stageKey}
-                stageName={stage.name}
+                key={scheduleUuid}
+                scheduleName={schedule.name}
                 scheduledRotation={currentScheduledRotation}
                 onForward={onForward}
                 onBackward={onBackward}
@@ -297,8 +288,8 @@ export default function ProgressPage() {
           case 'pause':
             return (
               <ProgressPause
-                key={stageKey}
-                stageName={stage.name}
+                key={scheduleUuid}
+                scheduleName={schedule.name}
                 onForward={onForward}
                 onBackward={onBackward}
                 scheduledRotation={currentScheduledRotation}

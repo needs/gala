@@ -54,10 +54,6 @@ export const categorySchema = z.object({
 
 export type Category = z.infer<typeof categorySchema>;
 
-export const progressSchema = z.record(z.string());
-
-export type Progress = z.infer<typeof progressSchema>;
-
 export const barItemSchema = z.object({
   name: z.string(),
   price: z.number(),
@@ -75,43 +71,6 @@ export const barCategorySchema = z.object({
 
 export type BarCategory = z.infer<typeof barCategorySchema>;
 
-export const timelineRotationApparatusSchema = z.object({
-  teams: z.record(z.boolean()),
-});
-
-export type TimelineRotationApparatus = z.infer<typeof timelineRotationApparatusSchema>;
-
-export const timelineRotationSchema = z.object({
-  type: z.literal('rotation'),
-  order: z.number(),
-  apparatuses: z.record(timelineRotationApparatusSchema),
-  durationInMinutes: z.number(),
-});
-
-export type TimelineRotation = z.infer<typeof timelineRotationSchema>;
-
-export const timelinePauseSchema = z.object({
-  type: z.literal('pause'),
-  order: z.number(),
-  durationInMinutes: z.number(),
-});
-
-export type TimelinePause = z.infer<typeof timelinePauseSchema>;
-
-export const timelineSchema = z.union([timelineRotationSchema, timelinePauseSchema]);
-
-export type Timeline = z.infer<typeof timelineSchema>;
-
-export const stageSchema = z.object({
-  name: z.string(),
-  timeline: z.record(timelineSchema),
-  timelineStartDate: z.string(),
-  progress: z.number().optional(),
-  apparatuses: z.record(z.number()),
-});
-
-export type Stage = z.infer<typeof stageSchema>;
-
 export const baseScreenSchema = z.object({
   name: z.string(),
   shortUrlId: z.string().optional(),
@@ -128,7 +87,7 @@ export type ScreenBar = z.infer<typeof screenBarSchema>;
 
 export const screenProgressSchema = z.object({
   type: z.literal('progress'),
-  stageKey: z.string(),
+  scheduleUuid: z.string().optional(),
   ...baseScreenSchema.shape,
 });
 
@@ -139,12 +98,49 @@ export const screenTypes: Screen['type'][] = ['bar', 'progress'];
 
 export type Screen = z.infer<typeof screenSchema>;
 
+export const scheduleEventRotationApparatusSchema = z.object({
+  type: apparatusKeySchema,
+  teams: z.record(z.boolean()),
+  order: z.number(),
+});
+
+export type ScheduleEventRotationApparatus = z.infer<typeof scheduleEventRotationApparatusSchema>;
+
+export const scheduleEventRotationSchema = z.object({
+  type: z.literal('rotation'),
+  durationInMinutes: z.number(),
+  order: z.number(),
+  apparatuses: z.record(scheduleEventRotationApparatusSchema).default({}),
+});
+
+export type ScheduleEventRotation = z.infer<typeof scheduleEventRotationSchema>;
+
+export const scheduleEventPauseSchema = z.object({
+  type: z.literal('pause'),
+  durationInMinutes: z.number(),
+  order: z.number(),
+});
+
+export type ScheduleEventPause = z.infer<typeof scheduleEventPauseSchema>;
+
+export const scheduleEventSchema = z.union([scheduleEventRotationSchema, scheduleEventPauseSchema]);
+
+export type ScheduleEvent = z.infer<typeof scheduleEventSchema>;
+
+export const scheduleSchema = z.object({
+  name: z.string(),
+  startDate: z.string(),
+  events: z.record(scheduleEventSchema).default({}),
+  progress: z.number().optional(),
+});
+
+export type Schedule = z.infer<typeof scheduleSchema>;
+
 export const competitionSchema = z.object({
   players: z.record(playerSchema).default({}),
   teams: z.record(teamSchema).default({}),
   categories: z.record(categorySchema).default({}),
-  stages: z.record(stageSchema).default({}),
-  progresses: z.record(progressSchema).default({}),
+  schedules: z.record(scheduleSchema).default({}),
   bar: z.record(barCategorySchema).default({}),
   screens: z.record(screenSchema).default({}),
   info: z.object({

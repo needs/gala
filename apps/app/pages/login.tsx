@@ -1,6 +1,5 @@
 import {
   Alert,
-  Box,
   Button,
   CircularProgress,
   CssBaseline,

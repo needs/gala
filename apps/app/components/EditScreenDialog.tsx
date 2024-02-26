@@ -43,24 +43,24 @@ function EditScreenProgress({
   screen: ScreenProgress;
   setScreen: (screen: ScreenProgress) => void;
 }) {
-  const { stages } = useCompetition();
+  const { schedules } = useCompetition();
 
   return (
     <FormControl sx={{ width: 300 }} variant="standard">
-      <InputLabel>Plateau</InputLabel>
+      <InputLabel>Échéancier</InputLabel>
       <Select
-        value={screen.stageKey}
-        label="Plateau"
+        value={screen.scheduleUuid}
+        label="Échéancier"
         onChange={(event) => {
-          setScreen({ ...screen, stageKey: event.target.value as string });
+          setScreen({ ...screen, scheduleUuid: event.target.value as string });
         }}
-        placeholder="Selectionner un plateau"
+        placeholder="Selectionner un échéancier"
       >
-        {Object.entries(stages).map(
-          ([stageKey, stage]) =>
-            stage !== undefined && (
-              <MenuItem key={stageKey} value={stageKey}>
-                {stage.name}
+        {Object.entries(schedules).map(
+          ([scheduleUuid, schedule]) =>
+            schedule !== undefined && (
+              <MenuItem key={scheduleUuid} value={scheduleUuid}>
+                {schedule.name}
               </MenuItem>
             )
         )}

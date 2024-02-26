@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 
-export default function TimelinePauseComponent() {
+export default function ScheduleEventPause() {
   return (
     <Box
       paddingY={2}

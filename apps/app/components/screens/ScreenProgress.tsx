@@ -2,20 +2,19 @@ import { Alert, Box, CssBaseline, Stack, Typography } from '@mui/material';
 import {
   getApparatusIconPath,
   getApparatusName,
-  getRotationApparatuses,
 } from '../../lib/store';
-import { ScheduledRotation, getCurrentScheduledRotation } from '../../lib/progress';
+import { TimelineEvent, getCurrentTimelineEvent } from '../../lib/progress';
 import Image from 'next/image';
 import GenderAvatar from '../GenderAvatar';
 import { useEffect, useRef, useState } from 'react';
-import { ScreenProgress, Stage } from '@tgym.fr/core';
+import { ScreenProgress } from '@tgym.fr/core';
 import { useCompetition } from '../StoreProvider';
 
 function Start() {
   return (
     <Box flexGrow="1" display="flex">
       <Typography variant="h1" textAlign="center" marginY="auto" flexGrow="1">
-        {'Le plateau va bientôt commencer'}
+        {"L'échéancier va bientôt commencer"}
       </Typography>
     </Box>
   );
@@ -25,29 +24,25 @@ function End() {
   return (
     <Box flexGrow="1" display="flex">
       <Typography variant="h1" textAlign="center" marginY="auto" flexGrow="1">
-        {'Le plateau est terminé'}
+        {"L'échéancier est terminé"}
       </Typography>
     </Box>
   );
 }
 
 function Rotation({
-  stage,
   rotation,
 }: {
-  stage: Stage;
-  rotation: Extract<ScheduledRotation, { type: 'rotation' }>;
+  rotation: Extract<TimelineEvent, { type: 'rotation' }>;
 }) {
   const { teams, players, categories } = useCompetition();
-
-  const rotationApparatuses = getRotationApparatuses(stage, rotation.rotation);
 
   const [scrollIndex, setScrollIndex] = useState(0);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    refs.current = refs.current.slice(0, rotationApparatuses.length);
-  }, [rotationApparatuses.length]);
+    refs.current = refs.current.slice(0, rotation.apparatuses.length);
+  }, [rotation.apparatuses.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -74,12 +69,10 @@ function Rotation({
       alignItems="start"
       overflow="hidden"
     >
-      {rotationApparatuses.map((apparatusKey, index) => {
-        const rotationApparatus = rotation.rotation.apparatuses[apparatusKey];
-
+      {rotation.apparatuses.map((apparatus, index) => {
         return (
           <Stack
-            key={apparatusKey}
+            key={index}
             flexGrow="1"
             bgcolor="#ffffff87"
             borderRadius={8}
@@ -88,20 +81,19 @@ function Rotation({
           >
             <Stack direction="row" gap={4} alignItems="center" padding={4}>
               <Image
-                src={getApparatusIconPath(apparatusKey)}
+                src={getApparatusIconPath(apparatus.type)}
                 alt="Vault"
                 width={96}
                 height={96}
               />
 
               <Typography variant="h2" fontWeight="bold">
-                {getApparatusName(apparatusKey)}
+                {getApparatusName(apparatus.type)}
               </Typography>
             </Stack>
 
             <Stack gap={4}>
-              {rotationApparatus !== undefined &&
-                Object.keys(rotationApparatus.teams).map((teamKey) => {
+              {Object.keys(apparatus.teams).map((teamKey) => {
                   const team = teams[teamKey];
                   const category = categories[team.categoryKey ?? ''];
 
@@ -173,22 +165,27 @@ function Pause() {
 }
 
 export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
-  const { stages } = useCompetition();
+  const { schedules } = useCompetition();
 
-  const stage =
-    stages[screen.stageKey] !== undefined
-      ? stages[screen.stageKey]
-      : Object.values(stages)[0];
-
-  if (stage === undefined) {
+  if (screen.scheduleUuid === undefined) {
     return (
-      <Alert severity="info">
-        {"Aucun plateau n'a été ajouté à la compétition"}
+      <Alert severity="warning">
+        {"Cet écran n'a aucun échéancier d'associé."}
       </Alert>
     );
   }
 
-  const currentScheduledRotation = getCurrentScheduledRotation(stage);
+  const schedule = schedules[screen.scheduleUuid];
+
+  if (schedule === undefined) {
+    return (
+      <Alert severity="warning">
+        {"L'échéancier que cet écran doit afficher n'éxiste plus."}
+      </Alert>
+    );
+  }
+
+  const currentScheduledRotation = getCurrentTimelineEvent(schedule);
 
   const rotationComponent = () => {
     switch (currentScheduledRotation.type) {
@@ -199,7 +196,6 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
       case 'rotation':
         return (
           <Rotation
-            stage={stage}
             rotation={currentScheduledRotation}
           />
         );
@@ -230,7 +226,7 @@ export default function ScreenProgress({ screen }: { screen: ScreenProgress }) {
           padding={4}
         >
           <Typography textAlign="center" variant="h1" color="white">
-            {stage.name}
+            {schedule.name}
           </Typography>
         </Box>
 

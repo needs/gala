@@ -23,7 +23,6 @@ import {
   SportsBar,
   Tv,
   Undo,
-  Villa,
 } from '@mui/icons-material';
 import {
   Alert,
@@ -67,13 +66,8 @@ export const menuAdmin = (uuid: string): Menu => [
       label: 'Inscriptions',
       icon: <Group />,
     },
-    stages: {
-      href: `/competition/${uuid}/stages`,
-      label: 'Plateaux',
-      icon: <Villa />,
-    },
-    timeline: {
-      href: `/competition/${uuid}/timeline`,
+    schedules: {
+      href: `/competition/${uuid}/schedules`,
       label: 'Échéancier',
       icon: <EventNote />,
     },

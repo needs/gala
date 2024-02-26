@@ -5,14 +5,14 @@ import { useCompetition } from '../../../components/StoreProvider';
 import { useState } from 'react';
 import GenderAvatar from '../../../components/GenderAvatar';
 import { getTeamName, getTeamNameSxProps } from '../../../lib/team';
-import { computeScheduledRotations } from '../../../lib/progress';
+import { computeTimeline } from '../../../lib/progress';
 import { compact } from 'lodash';
 import { formatRotationTime } from '../../competition/[uuid]/progress';
 import { getApparatusName } from '../../../lib/store';
 import { ApparatusKey } from '@tgym.fr/core';
 
 export default function Index() {
-  const { players, teams, stages } = useCompetition();
+  const { players, teams, schedules } = useCompetition();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredPlayers = Object.entries(players)
@@ -40,33 +40,40 @@ export default function Index() {
 
       const [teamKey, team] = playerTeam;
 
-      const rotationsPerStage = Object.entries(stages)
-        .map(([stageKey, stage]) => {
+      const rotationsPerSchedule = Object.entries(schedules)
+        .map(([scheduleUuid, schedule]) => {
           return {
-            stage,
-            stageKey,
-            apparatuses: compact(computeScheduledRotations(stage).flatMap((scheduledRotation) => {
-              if (scheduledRotation.type !== 'rotation') {
-                return [];
-              }
+            schedule,
+            scheduleUuid,
+            apparatuses: compact(
+              computeTimeline(schedule).flatMap((scheduledRotation) => {
+                if (scheduledRotation.type !== 'rotation') {
+                  return [];
+                }
 
-              return Object.entries(scheduledRotation.rotation.apparatuses).map(([apparatusKey, apparatus]) => {
-                if (apparatus.teams !== undefined && Object.keys(apparatus.teams).includes(teamKey)) {
-                  return {
-                    apparatusKey,
-                    startDate: scheduledRotation.startDate,
-                    endDate: scheduledRotation.endDate,
+                return Object.entries(scheduledRotation.event.apparatuses).map(
+                  ([apparatusKey, apparatus]) => {
+                    if (
+                      apparatus.teams !== undefined &&
+                      Object.keys(apparatus.teams).includes(teamKey)
+                    ) {
+                      return {
+                        apparatusKey,
+                        startDate: scheduledRotation.startDate,
+                        endDate: scheduledRotation.endDate,
+                      };
+                    } else {
+                      return undefined;
+                    }
                   }
-                } else {
-                  return undefined;
-                };
-              });
-            }))
+                );
+              })
+            ),
           };
         })
-        .filter(({ apparatuses }) => apparatuses.length > 0)
+        .filter(({ apparatuses }) => apparatuses.length > 0);
 
-      return { playerKey, player, team, rotationsPerStage };
+      return { playerKey, player, team, rotationsPerSchedule };
     });
 
   return (
@@ -83,7 +90,7 @@ export default function Index() {
           onChange={(event) => setSearchQuery(event.target.value)}
         />
         {filteredPlayers.map(
-          ({ playerKey, player, team, rotationsPerStage }) => (
+          ({ playerKey, player, team, rotationsPerSchedule }) => (
             <Paper key={playerKey}>
               <Stack direction="column" divider={<Divider />}>
                 <Stack
@@ -125,20 +132,38 @@ export default function Index() {
                     )}
                   </Stack>
                 </Stack>
-                {rotationsPerStage !== undefined &&
-                  rotationsPerStage.map(({ stage, stageKey, apparatuses }) => (
-                    <Stack key={stageKey} direction="column" gap={1} px={2} py={1}>
-                      <Typography sx={{ fontWeight: "bold" }}>{stage.name}</Typography>
-                      {apparatuses.map(({ apparatusKey, startDate, endDate }, index) => {
-                        return (
-                          <Stack key={index} direction="row" gap={1} pl={2}>
-                            <Typography>{getApparatusName(apparatusKey as ApparatusKey)}</Typography>
-                            <Typography>{formatRotationTime(startDate, endDate)}</Typography>
-                          </Stack>
-                        );
-                      })}
-                    </Stack>
-                  ))}
+                {rotationsPerSchedule !== undefined &&
+                  rotationsPerSchedule.map(
+                    ({ schedule, scheduleUuid, apparatuses }) => (
+                      <Stack
+                        key={scheduleUuid}
+                        direction="column"
+                        gap={1}
+                        px={2}
+                        py={1}
+                      >
+                        <Typography sx={{ fontWeight: 'bold' }}>
+                          {schedule.name}
+                        </Typography>
+                        {apparatuses.map(
+                          ({ apparatusKey, startDate, endDate }, index) => {
+                            return (
+                              <Stack key={index} direction="row" gap={1} pl={2}>
+                                <Typography>
+                                  {getApparatusName(
+                                    apparatusKey as ApparatusKey
+                                  )}
+                                </Typography>
+                                <Typography>
+                                  {formatRotationTime(startDate, endDate)}
+                                </Typography>
+                              </Stack>
+                            );
+                          }
+                        )}
+                      </Stack>
+                    )
+                  )}
               </Stack>
             </Paper>
           )

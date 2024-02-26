@@ -9,7 +9,6 @@ import {
 import {
   getApparatusIconPath,
   getApparatusName,
-  getRotationApparatuses,
 } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
@@ -18,11 +17,11 @@ import SelectTeamDialog from './SelectTeamDialog';
 import { Add, Edit, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
-import { Stage, Team, TimelineRotation } from '@tgym.fr/core';
+import { ScheduleEventRotation, ScheduleEventRotationApparatus, Team } from '@tgym.fr/core';
 import { useCompetition } from './StoreProvider';
 import { getTeamName, getTeamNameSxProps } from '../lib/team';
 
-function TimelineAddTeamButton({
+function AddTeamButton({
   onAdd,
 }: {
   onAdd: (teamKey: string) => void;
@@ -53,7 +52,7 @@ function TimelineAddTeamButton({
   );
 }
 
-function TimelineEditTeamButton({
+function EditTeamButton({
   team,
   onRemove,
   readOnly,
@@ -133,28 +132,22 @@ function TimelineEditTeamButton({
   );
 }
 
-export default function TimelineRotation({
-  stage,
-  rotation,
+export default function ScheduleEventRotation({
+  apparatuses,
   readOnly,
 }: {
-  stage: Stage;
-  rotation: TimelineRotation;
+  apparatuses: ScheduleEventRotationApparatus[];
   readOnly?: boolean;
 }) {
   const { teams } = useCompetition();
-  const rotationApparatuses = getRotationApparatuses(stage, rotation);
 
   return (
     <Paper elevation={1}>
       <Grid container>
-        {rotationApparatuses.map((apparatuseKey) => {
-          const apparatus = rotation.apparatuses[apparatuseKey];
-          const apparatusTeams = apparatus === undefined || !('teams' in apparatus) ? {} : apparatus.teams;
-
+        {apparatuses.map((apparatus, index) => {
           return (
             <Grid
-              key={apparatuseKey}
+              key={index}
               xs
               sx={{
                 '&:nth-of-type(odd)': {
@@ -179,44 +172,36 @@ export default function TimelineRotation({
                     justifyContent="center"
                   >
                     <Image
-                      src={getApparatusIconPath(apparatuseKey)}
-                      alt={getApparatusName(apparatuseKey)}
+                      src={getApparatusIconPath(apparatus.type)}
+                      alt={getApparatusName(apparatus.type)}
                       width={24}
                       height={24}
                     />
                     <Typography variant="h6">
-                      {getApparatusName(apparatuseKey)}
+                      {getApparatusName(apparatus.type)}
                     </Typography>
                   </Stack>
 
                   {!readOnly && (
-                    <TimelineAddTeamButton
+                    <AddTeamButton
                       onAdd={(teamKey) => {
-                        const apparatus = rotation.apparatuses[apparatuseKey];
-
-                        if (apparatus === undefined) {
-                          rotation.apparatuses[apparatuseKey] = {
-                            teams: { [teamKey]: true },
-                          };
-                        } else {
-                          apparatus.teams[teamKey] = true;
-                        }
+                        apparatus.teams[teamKey] = true;
                       }}
                     />
                   )}
                 </Stack>
 
                 <Stack flexGrow={1} direction="column" divider={<Divider />}>
-                  {Object.keys(apparatusTeams).map((teamKey) => {
-                    const team = teams[teamKey];
+                  {Object.keys(apparatus.teams).map((teamUuid) => {
+                    const team = teams[teamUuid];
 
                     return (
                       team !== undefined && (
-                        <TimelineEditTeamButton
-                          key={teamKey}
+                        <EditTeamButton
+                          key={teamUuid}
                           team={team}
                           onRemove={() => {
-                            delete apparatusTeams[teamKey];
+                            delete apparatus.teams[teamUuid];
                           }}
                           readOnly={readOnly}
                         />

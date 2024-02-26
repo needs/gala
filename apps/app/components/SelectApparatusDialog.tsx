@@ -15,15 +15,13 @@ import {
   getApparatusName,
 } from '../lib/store';
 import Image from 'next/image';
-import { ApparatusKey } from '@tgym.fr/core';
+import { ApparatusKey, allApparatusKeys } from '@tgym.fr/core';
 
 export default function SelectApparatusDialog({
-  apparatuses,
   open,
   onSelect,
   onClose,
 }: {
-  apparatuses: ApparatusKey[];
   open: boolean;
   onSelect: (apparatus: ApparatusKey) => void;
   onClose: () => void;
@@ -43,7 +41,7 @@ export default function SelectApparatusDialog({
             dense
             disablePadding
           >
-            {apparatuses.map((apparatuseKey) => {
+            {allApparatusKeys.map((apparatuseKey) => {
               return (
                 <ListItemButton
                   key={apparatuseKey}

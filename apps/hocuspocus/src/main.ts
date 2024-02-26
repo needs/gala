@@ -82,10 +82,10 @@ const server = new Hocuspocus({
 
         const teamCount = Object.values(competition.teams).length;
         const playerCount = Object.values(competition.players).length;
-        const cumulativeDuration = Object.values(competition.stages)
-          .map((stage) =>
-            Object.values(stage.timeline).map(
-              (timeline) => timeline.durationInMinutes
+        const cumulativeDuration = Object.values(competition.schedules)
+          .map((schedule) =>
+            Object.values(schedule.events).map(
+              (event) => event.durationInMinutes
             )
           )
           .flat()

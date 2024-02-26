@@ -1,6 +1,6 @@
 import { Box } from '@syncedstore/core';
 import { sortBy } from 'lodash';
-import { ApparatusKey, BarCategory, Competition as OriginalCompetition, Screen, ScreenBar, ScreenProgress, Stage, TimelinePause, TimelineRotation } from '@tgym.fr/core';
+import { ApparatusKey, BarCategory, Competition as OriginalCompetition, Schedule, ScheduleEventRotation, ScheduleEventRotationApparatus, Screen, ScreenBar, ScreenProgress } from '@tgym.fr/core';
 import { MappedTypeDescription } from '@syncedstore/core/types/doc';
 
 export type Competition = Omit<OriginalCompetition, 'screens'> & {
@@ -69,28 +69,38 @@ export function isApparatusOptional(apparatusKey: ApparatusKey): boolean {
   }
 }
 
-export function getStageApparatuses(stage: Stage): ApparatusKey[] {
-  return sortBy(Object.entries(stage.apparatuses), [
-    ([apparatusKey, apparatusOrder]) => apparatusOrder,
-  ])
-    .map(([apparatusKey, apparatusOrder]) => apparatusKey as ApparatusKey)
-    .filter((apparatusKey) => !isApparatusOptional(apparatusKey));
+export function getScheduleEvents(schedule: Schedule) {
+  return sortBy(Object.entries(schedule.events), [
+    ([_, scheduleEvent]) => scheduleEvent.order,
+  ]).map(([scheduleEventUuid, scheduleEvent]) => ({
+    scheduleEventUuid,
+    scheduleEvent,
+  }));
 }
 
-export function getRotationApparatuses(stage: Stage, rotation: TimelineRotation): ApparatusKey[] {
-  const rotationApparatuses = getStageApparatuses(stage);
-
-  if ('rest' in rotation.apparatuses) {
-    rotationApparatuses.push('rest');
-  }
-
-  return rotationApparatuses;
+export function getRotationApparatuses(scheduleEventRotation: ScheduleEventRotation) {
+  return sortBy(Object.entries(scheduleEventRotation.apparatuses), [
+    ([apparatusUuid, apparatus]) => apparatus.order,
+  ]).map(([apparatusUuid, apparatus]) => ({
+    apparatusUuid,
+    apparatus,
+  }));
 }
 
-export function stageRotations(
-  stage: Stage
-): (TimelineRotation | TimelinePause)[] {
-  return sortBy(Object.values(stage.timeline), (rotation) => rotation.order);
+function mod(n: number, m: number) {
+  'use strict';
+  return ((n % m) + m) % m;
+}
+
+export function rotateApparatusesOnce(apparatuses: ScheduleEventRotationApparatus[]) {
+  return apparatuses.map((apparatus, index) => {
+    const newIndex = mod(index - 1, apparatuses.length);
+
+    return {
+      ...apparatus,
+      teams: apparatuses[newIndex].teams,
+    };
+  });
 }
 
 export function getScreenName(screenType: Screen['type']): string {
@@ -117,7 +127,7 @@ export function getDefaultScreen(
         name: '',
         shortUrlId: undefined,
         type: 'progress',
-        stageKey: '',
+        scheduleUuid: undefined
       };
   }
 }
