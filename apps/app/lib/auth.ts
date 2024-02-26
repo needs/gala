@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsResult } from 'next';
 import { PageProps } from '../pages/_app';
 import { merge } from 'lodash';
-import { getRole, getUser } from '@tgym.fr/auth';
+import { getRole, getUser, isPublicCompetition } from '@tgym.fr/auth';
 import { prisma } from './prisma';
 import { getFirebaseAdminApp } from './firebase-admin';
 import nookies from 'nookies';
@@ -30,6 +30,22 @@ export const withAuth: (option: {
 }) => GetServerSideProps<PageProps> = ({ checkMembership, callback }) => {
   return async (context) => {
     const idToken = nookies.get(context).token;
+    const competitionUuid = context.query.uuid as string | undefined;
+
+    let extraProps: GetServerSidePropsResult<PageProps> = { props: {} };
+
+    if (competitionUuid !== undefined && await isPublicCompetition(prisma, competitionUuid)) {
+      if (callback !== undefined) {
+        extraProps = await callback(context);
+      }
+
+      return merge(extraProps, {
+        props: {
+          isPublicCompetition: true
+        }
+      });
+    }
+
     const user = await getUser(getFirebaseAdminApp(), prisma, idToken);
 
     if (user === undefined) {
@@ -37,15 +53,16 @@ export const withAuth: (option: {
     }
 
     if (checkMembership === true) {
-      const competitionUuid = context.query.uuid as string;
+      if (competitionUuid === undefined) {
+        return redirectToHome;
+      }
+
       const role = await getRole(prisma, competitionUuid, user);
 
       if (role === undefined) {
         return redirectToHome;
       }
     }
-
-    let extraProps: GetServerSidePropsResult<PageProps> = { props: {} };
 
     if (callback !== undefined) {
       extraProps = await callback(context);
@@ -54,6 +71,7 @@ export const withAuth: (option: {
     return merge(extraProps, {
       props: {
         userInfo: user.email,
+        isPublicCompetition: false
       },
     });
   };

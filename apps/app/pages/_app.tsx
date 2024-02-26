@@ -14,6 +14,7 @@ export type PageProps = {
   competitionUuid?: string;
   layoutInfo?: LayoutInfo;
   userInfo?: UserInfo;
+  isPublicCompetition?: boolean;
 };
 
 type AppPropsWithProoperties = AppProps & {
@@ -28,7 +29,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
         {competitionUuid !== undefined ? (
           <StoreProvider competitionUuid={pageProps.competitionUuid}>
-            <Layout layoutInfo={pageProps.layoutInfo}>
+            <Layout layoutInfo={pageProps.layoutInfo} isPublicCompetition={pageProps.isPublicCompetition}>
               <Component {...pageProps} />
             </Layout>
           </StoreProvider>

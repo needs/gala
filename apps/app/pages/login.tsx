@@ -18,6 +18,7 @@ import { getFirebaseAppAuth } from '../lib/firebase';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import PublicCompetitionList from '../components/PublicCompetitionList';
 
 function Verify({ onEmailVerified }: { onEmailVerified: () => void }) {
   const [disabled, setDisabled] = useState(true);
@@ -202,7 +203,10 @@ export default function Index() {
   }, [router]);
 
   return (
-    <Box
+    <Stack
+    direction="column"
+    gap={4}
+    p={4}
       minWidth="100vw"
       minHeight="100vh"
       display="flex"
@@ -214,9 +218,13 @@ export default function Index() {
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        overflowY: 'auto',
       }}
     >
       <CssBaseline />
+
+      <PublicCompetitionList />
 
       <Stack
         gap={2}
@@ -246,6 +254,6 @@ export default function Index() {
           />
         )}
       </Stack>
-    </Box>
+    </Stack>
   );
 }

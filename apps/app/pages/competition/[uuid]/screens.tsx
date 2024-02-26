@@ -1,8 +1,5 @@
 import { withAuthCompetition } from '../../../lib/auth';
-import {
-  getScreenName,
-  getDefaultScreen,
-} from '../../../lib/store';
+import { getScreenName, getDefaultScreen } from '../../../lib/store';
 import {
   Chip,
   IconButton,
@@ -23,17 +20,39 @@ import { trpc } from '../../../utils/trpc';
 import { Screen } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
 
+function getScreenUrl(
+  competitionUuid: string,
+  screenUuid: string,
+  shortUrlId: string | undefined
+) {
+  if (shortUrlId !== undefined) {
+    return `${location.origin}/${shortUrlId}`;
+  } else {
+    return `${location.origin}/competition/${competitionUuid}/screen/${screenUuid}`;
+  }
+}
+
 function EditScreenButton({
   screen,
+  competitionUuid,
+  screenUuid,
   onChange,
   onDelete,
 }: {
   screen: Screen;
+  competitionUuid: string;
+  screenUuid: string;
   onChange: (screen: Screen) => void;
   onDelete: () => void;
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const screenUrl = getScreenUrl(
+    competitionUuid,
+    screenUuid,
+    screen.shortUrlId
+  );
 
   return (
     <>
@@ -111,7 +130,7 @@ function EditScreenButton({
             </Stack>
           </Stack>
           <Chip
-            label={`${location.host}/${screen.shortUrlId}`}
+            label={screen.shortUrlId === undefined ? "Copier l'URL" : screenUrl}
             size="small"
             sx={{
               '& .MuiChip-label': {
@@ -120,9 +139,7 @@ function EditScreenButton({
               width: '100%',
             }}
             onClick={() => {
-              navigator.clipboard.writeText(
-                `${location.origin}/${screen.shortUrlId}`
-              );
+              navigator.clipboard.writeText(screenUrl);
               setOpenSnackbar(true);
             }}
           />
@@ -187,8 +204,10 @@ function CreateScreenButton({
 
 export default function ScreensPage({
   competitionUuid,
+  isPublicCompetition,
 }: {
   competitionUuid: string;
+  isPublicCompetition: boolean;
 }) {
   const { screens } = useCompetition();
   const toShortId = trpc.toShortId.useMutation();
@@ -201,21 +220,26 @@ export default function ScreensPage({
       flexWrap="wrap"
       justifyContent="space-evenly"
     >
-      {Object.entries(screens).map(([screenKey, screen]) => (
+      {Object.entries(screens).map(([screenUuid, screen]) => (
         <EditScreenButton
-          key={screenKey}
+          key={screenUuid}
           screen={screen.value}
-          onChange={(screen) => (screens[screenKey] = boxed(screen))}
-          onDelete={() => delete screens[screenKey]}
+          competitionUuid={competitionUuid}
+          screenUuid={screenUuid}
+          onChange={(screen) => (screens[screenUuid] = boxed(screen))}
+          onDelete={() => delete screens[screenUuid]}
         />
       ))}
       <CreateScreenButton
         onCreate={async (screen) => {
           const screenUuid = uuidv4();
-          const shortId = await toShortId.mutateAsync({
-            uuid: competitionUuid,
-            screenUuid,
-          });
+
+          const shortId = isPublicCompetition
+            ? undefined
+            : await toShortId.mutateAsync({
+                uuid: competitionUuid,
+                screenUuid,
+              });
 
           screens[screenUuid] = boxed({
             ...screen,

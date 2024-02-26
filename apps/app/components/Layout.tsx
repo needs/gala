@@ -131,9 +131,11 @@ function getMenu(layoutInfo: LayoutInfo): Menu {
 function AppLayout({
   children,
   layoutInfo,
+  isPublicCompetition,
 }: {
   children: React.ReactNode;
   layoutInfo: LayoutInfo;
+  isPublicCompetition?: boolean;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { info } = useCompetition();
@@ -226,14 +228,16 @@ function AppLayout({
                   </span>
                 </Tooltip>
               </Stack>
-              <Stack
-                direction="row"
-                bgcolor="#ffffffaa"
-                borderRadius={999}
-                p={0.5}
-              >
-                <AccountIconButton />
-              </Stack>
+              {!isPublicCompetition && (
+                <Stack
+                  direction="row"
+                  bgcolor="#ffffffaa"
+                  borderRadius={999}
+                  p={0.5}
+                >
+                  <AccountIconButton />
+                </Stack>
+              )}
             </Stack>
           )}
         </Toolbar>
@@ -287,13 +291,15 @@ function AppLayout({
 export default function Layout({
   children,
   layoutInfo,
+  isPublicCompetition
 }: {
   children: React.ReactNode;
   layoutInfo?: LayoutInfo;
+  isPublicCompetition?: boolean;
 }) {
   if (layoutInfo === undefined) {
     return <>{children}</>;
   } else {
-    return <AppLayout layoutInfo={layoutInfo}>{children}</AppLayout>;
+    return <AppLayout layoutInfo={layoutInfo} isPublicCompetition={isPublicCompetition}>{children}</AppLayout>;
   }
 }

@@ -143,13 +143,7 @@ const InviteMemberDialog = ({
   );
 };
 
-export default function Index({
-  competitionUuid,
-}: {
-  competitionUuid: string;
-}) {
-  const { info } = useCompetition();
-
+function MembersListSection({ competitionUuid }: { competitionUuid: string }) {
   const {
     data: members,
     isLoading: isMembersLoading,
@@ -163,24 +157,147 @@ export default function Index({
   const { mutateAsync: updateMemberRole } =
     trpc.members.updateRole.useMutation();
   const [inviteMemberDialogOpen, setInviteMemberDialogOpen] = useState(false);
+
+  return (
+    <Stack gap={4}>
+      <Stack direction="row" gap={2} justifyContent="space-between">
+        <InviteMemberDialog
+          competitionUuid={competitionUuid}
+          open={inviteMemberDialogOpen}
+          onClose={() => {
+            setInviteMemberDialogOpen(false);
+          }}
+          onInvited={() => {
+            setInviteMemberDialogOpen(false);
+            refetchMembers();
+          }}
+        />
+
+        <Typography variant="h6" component="h1">
+          Membres
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<Email />}
+          onClick={() => setInviteMemberDialogOpen(true)}
+        >
+          Inviter
+        </Button>
+      </Stack>
+
+      {isMembersLoading && <CircularProgress />}
+
+      {isMembersError && (
+        <Alert severity="error">
+          Échec lors du chargement de la liste des membres.
+        </Alert>
+      )}
+
+      {members !== undefined && (
+        <List sx={{ width: '100%' }} disablePadding>
+          {Object.entries(members ?? {}).map(([memberKey, member]) => {
+            const name = getUserName(member.email, member.name);
+            const joinedAt = new Date(member.joinedAt);
+
+            return (
+              <ListItem key={member.email}>
+                <ListItemAvatar>
+                  <Avatar src={avatarUrl(name)} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={name}
+                  secondary={`${
+                    member.email
+                  } - Ajouté le ${joinedAt.toLocaleDateString(
+                    'fr-FR'
+                  )} à ${joinedAt.toLocaleTimeString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`}
+                />
+                <Stack direction="row" gap={2} alignItems="center">
+                  <RoleSelector
+                    value={member.role}
+                    onChange={(role) => {
+                      updateMemberRole({
+                        uuid: competitionUuid,
+                        email: member.email,
+                        role,
+                      }).then(() => {
+                        refetchMembers();
+                      });
+                    }}
+                  />
+                  <Tooltip title="Double cliquez pour supprimer">
+                    <IconButton
+                      edge="end"
+                      onDoubleClick={() => {
+                        removeMember({
+                          uuid: competitionUuid,
+                          email: member.email,
+                        }).then(() => {
+                          refetchMembers();
+                        });
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
+    </Stack>
+  );
+}
+
+function DeleteCompetitionSection({ competitionUuid }: { competitionUuid: string }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  return (
+    <Stack gap={4}>
+      <Typography variant="h6" component="h1">
+        Supprimer la compétition
+      </Typography>
+      <Stack direction="column" gap={2}>
+        <Typography variant="body1">
+          Attention, une fois supprimée, il est impossible de récupérer la
+          compétition.
+        </Typography>
+        <Box>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setOpenDeleteDialog(true)}
+          >
+            Supprimer
+          </Button>
+          <DeleteCompetitionDialog
+            isOpen={openDeleteDialog}
+            onClose={() => setOpenDeleteDialog(false)}
+            competitionUuid={competitionUuid}
+          />
+        </Box>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default function Index({
+  competitionUuid,
+  isPublicCompetition,
+}: {
+  competitionUuid: string;
+  isPublicCompetition: boolean;
+}) {
+  const { info } = useCompetition();
   return (
     <>
       <Head>
         <title>Général</title>
       </Head>
-      <InviteMemberDialog
-        competitionUuid={competitionUuid}
-        open={inviteMemberDialogOpen}
-        onClose={() => {
-          setInviteMemberDialogOpen(false);
-        }}
-        onInvited={() => {
-          setInviteMemberDialogOpen(false);
-          refetchMembers();
-        }}
-      />
       <Stack padding={4} gap={4}>
         <Typography variant="h6" component="h1">
           Information générales
@@ -192,106 +309,14 @@ export default function Index({
             info.name = e.target.value;
           }}
         />
-        <Stack direction="row" gap={2} justifyContent="space-between">
-          <Typography variant="h6" component="h1">
-            Membres
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<Email />}
-            onClick={() => setInviteMemberDialogOpen(true)}
-          >
-            Inviter
-          </Button>
-        </Stack>
 
-        {isMembersLoading && <CircularProgress />}
-
-        {isMembersError && (
-          <Alert severity="error">
-            Échec lors du chargement de la liste des membres.
-          </Alert>
+        {!isPublicCompetition && (
+          <MembersListSection competitionUuid={competitionUuid} />
         )}
 
-        {members !== undefined && (
-          <List sx={{ width: '100%' }} disablePadding>
-            {Object.entries(members ?? {}).map(([memberKey, member]) => {
-              const name = getUserName(member.email, member.name);
-              const joinedAt = new Date(member.joinedAt);
-
-              return (
-                <ListItem key={member.email}>
-                  <ListItemAvatar>
-                    <Avatar src={avatarUrl(name)} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={name}
-                    secondary={`${
-                      member.email
-                    } - Ajouté le ${joinedAt.toLocaleDateString(
-                      'fr-FR'
-                    )} à ${joinedAt.toLocaleTimeString('fr-FR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}`}
-                  />
-                  <Stack direction="row" gap={2} alignItems="center">
-                    <RoleSelector
-                      value={member.role}
-                      onChange={(role) => {
-                        updateMemberRole({
-                          uuid: competitionUuid,
-                          email: member.email,
-                          role,
-                        }).then(() => {
-                          refetchMembers();
-                        });
-                      }}
-                    />
-                    <Tooltip title="Double cliquez pour supprimer">
-                      <IconButton
-                        edge="end"
-                        onDoubleClick={() => {
-                          removeMember({
-                            uuid: competitionUuid,
-                            email: member.email,
-                          }).then(() => {
-                            refetchMembers();
-                          });
-                        }}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </ListItem>
-              );
-            })}
-          </List>
+        {!isPublicCompetition && (
+          <DeleteCompetitionSection competitionUuid={competitionUuid} />
         )}
-        <Typography variant="h6" component="h1">
-          Supprimer la compétition
-        </Typography>
-        <Stack direction="column" gap={2}>
-          <Typography variant="body1">
-            Attention, une fois supprimée, il est impossible de récupérer la
-            compétition.
-          </Typography>
-          <Box>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => setOpenDeleteDialog(true)}
-            >
-              Supprimer
-            </Button>
-            <DeleteCompetitionDialog
-              isOpen={openDeleteDialog}
-              onClose={() => setOpenDeleteDialog(false)}
-              competitionUuid={competitionUuid}
-            />
-          </Box>
-        </Stack>
       </Stack>
     </>
   );

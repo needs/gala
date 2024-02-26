@@ -45,6 +45,7 @@ model Competition {
   playerCount        Int               @default(0)
   cumulativeDuration Int               @default(0)
   viewCount          Int               @default(0)
+  isPublicShowcase   Boolean           @default(false)
   data               Bytes
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
