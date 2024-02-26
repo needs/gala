@@ -230,18 +230,15 @@ export default function ScreensPage({
           onDelete={() => delete screens[screenUuid]}
         />
       ))}
-      {user !== undefined && (
+      {user !== undefined && user.role !== Role.READER && (
         <CreateScreenButton
           onCreate={async (screen) => {
             const screenUuid = uuidv4();
 
-            const shortId =
-              user.role === Role.READER
-                ? undefined
-                : await toShortId.mutateAsync({
-                    uuid: competitionUuid,
-                    screenUuid,
-                  });
+            const shortId = await toShortId.mutateAsync({
+              uuid: competitionUuid,
+              screenUuid,
+            });
 
             screens[screenUuid] = boxed({
               ...screen,
