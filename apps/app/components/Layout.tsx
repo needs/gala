@@ -11,6 +11,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {
+  Close,
   EmojiEvents,
   EventNote,
   FoodBank,
@@ -25,6 +26,9 @@ import {
   Villa,
 } from '@mui/icons-material';
 import {
+  Alert,
+  AlertTitle,
+  Collapse,
   Divider,
   IconButton,
   Menu as MenuList,
@@ -38,6 +42,7 @@ import AccountIconButton from './AccountIconButton';
 import AwarenessAvatars from './AwarenessAvatars';
 import { trpc } from '../utils/trpc';
 import LoginButton from './LoginButton';
+import { Role } from '@prisma/client';
 
 const drawerWidth = 240;
 
@@ -140,6 +145,7 @@ function AppLayout({
   competitionUuid?: string;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isReadOnlyBannerOpen, setIsReadOnlyBannerOpen] = React.useState(true);
   const { info } = useCompetition();
   const undoManager = useUndoManager();
   const { data: user } = trpc.user.useQuery({ competitionUuid });
@@ -288,6 +294,37 @@ function AppLayout({
       </Box>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
+
+        {user !== undefined && user.role === Role.READER && layoutInfo.menu === "admin" && (
+          <Collapse in={isReadOnlyBannerOpen}>
+            <Box padding={4}>
+              <Alert
+                variant="outlined"
+                severity="info"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setIsReadOnlyBannerOpen(false);
+                    }}
+                  >
+                    <Close fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                <AlertTitle>Lecture seule</AlertTitle>
+                {user.isAuthenticated
+                  ? "Vous n'avez pas les droits pour modifier cette compétition."
+                  : "Vous n'êtes pas connecté."}
+                {
+                  'Vous pouvez consulter les informations, mais vous ne pouvez pas les modifier.'
+                }
+              </Alert>
+            </Box>
+          </Collapse>
+        )}
         {children}
       </Box>
     </Box>
