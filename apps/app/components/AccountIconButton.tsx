@@ -16,6 +16,8 @@ import Link from 'next/link';
 import { EmojiEvents, Logout } from '@mui/icons-material';
 import { getFirebaseAppAuth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
+import { useQueryClient } from '@tanstack/react-query';
+import { getQueryKey } from '@trpc/react-query';
 
 export default function AccountIconButton() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -29,13 +31,15 @@ export default function AccountIconButton() {
 
   const router = useRouter();
 
-  const { data: user } = trpc.user.useQuery(null);
+  const { data: user } = trpc.user.useQuery({});
+  const queryClient = useQueryClient();
+  const userKey = getQueryKey(trpc.user);
 
   if (user === undefined) {
     return null;
   }
 
-  const name = getUserName(user.email, user.name);
+  const name = getUserName(user.email, user.name ?? undefined);
 
   return (
     <>
@@ -107,6 +111,7 @@ export default function AccountIconButton() {
           onClick={() => {
             const auth = getFirebaseAppAuth();
             signOut(auth).then(() => {
+              queryClient.removeQueries(userKey);
               router.push('/login');
             });
           }}

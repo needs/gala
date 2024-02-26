@@ -85,14 +85,3 @@ export const getRole = async (
 
   return competitionUser?.role;
 };
-
-export const isPublicCompetition = async (prisma: PrismaClient, competitionUuid: string) => {
-  const competition = await prisma.competition.findFirst({
-    where: {
-      uuid: competitionUuid,
-      isPublicShowcase: true,
-    },
-  });
-
-  return competition !== null;
-}

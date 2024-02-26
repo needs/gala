@@ -26,7 +26,7 @@ import CategorySelector, {
 } from '../../../components/CategorySelector';
 import EditPlayerButton from '../../../components/EditPlayerButton';
 import AddPlayerButton from '../../../components/AddPlayerButton';
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import EditCategoryDialog from '../../../components/EditCategoryDialog';
 import { Category, Team } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
@@ -421,4 +421,4 @@ export default function TeamsPage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('teams');
+export const getServerSideProps = withCompetition('teams');

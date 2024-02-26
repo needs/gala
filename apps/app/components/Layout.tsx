@@ -36,6 +36,7 @@ import Link from 'next/link';
 import { useCompetition, useUndoManager } from './StoreProvider';
 import AccountIconButton from './AccountIconButton';
 import AwarenessAvatars from './AwarenessAvatars';
+import { trpc } from '../utils/trpc';
 
 const drawerWidth = 240;
 
@@ -131,15 +132,16 @@ function getMenu(layoutInfo: LayoutInfo): Menu {
 function AppLayout({
   children,
   layoutInfo,
-  isPublicCompetition,
+  competitionUuid,
 }: {
   children: React.ReactNode;
   layoutInfo: LayoutInfo;
-  isPublicCompetition?: boolean;
+  competitionUuid?: string;
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { info } = useCompetition();
   const undoManager = useUndoManager();
+  const { data: user } = trpc.user.useQuery({ competitionUuid });
 
   const menu = getMenu(layoutInfo);
 
@@ -228,7 +230,7 @@ function AppLayout({
                   </span>
                 </Tooltip>
               </Stack>
-              {!isPublicCompetition && (
+              {user !== undefined && user.isAuthenticated && (
                 <Stack
                   direction="row"
                   bgcolor="#ffffffaa"
@@ -291,15 +293,15 @@ function AppLayout({
 export default function Layout({
   children,
   layoutInfo,
-  isPublicCompetition
+  competitionUuid,
 }: {
   children: React.ReactNode;
   layoutInfo?: LayoutInfo;
-  isPublicCompetition?: boolean;
+  competitionUuid?: string;
 }) {
   if (layoutInfo === undefined) {
     return <>{children}</>;
   } else {
-    return <AppLayout layoutInfo={layoutInfo} isPublicCompetition={isPublicCompetition}>{children}</AppLayout>;
+    return <AppLayout layoutInfo={layoutInfo} competitionUuid={competitionUuid}>{children}</AppLayout>;
   }
 }

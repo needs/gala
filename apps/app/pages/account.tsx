@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 
 export default function AccountPage() {
   const updateUser = trpc.updateUser.useMutation();
-  const { data: user, refetch: refetchUser } = trpc.user.useQuery(null);
+  const { data: user, refetch: refetchUser } = trpc.user.useQuery({});
   const [userName, setUserName] = useState('');
 
   useEffect(() => {

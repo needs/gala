@@ -63,24 +63,50 @@ const isOwnerMiddleware = isMemberMiddleware.unstable_pipe(async (opts) => {
 });
 
 export const appRouter = router({
-  user: authedProcedure
-    .input(z.null())
+  user: procedure
+    .input(z.object({
+      competitionUuid: z.string().uuid().optional(),
+    }))
     .output(
       z.object({
-        email: z.string(),
-        name: z.string().optional(),
+        email: z.string().optional(),
+        name: z.string().nullable(),
         createdAt: z.date(),
         isAdmin: z.boolean(),
+        isAuthenticated: z.boolean(),
+        role: z.enum(['OWNER', 'EDITOR', 'READER']),
       })
     )
-    .query((opts) => {
-      const { email, name, createdAt, isAdmin } = opts.ctx.user;
-      return {
-        email,
-        name: name ?? undefined,
-        createdAt,
-        isAdmin,
-      };
+    .query(async (opts) => {
+      if (opts.ctx.user === undefined) {
+        return {
+          email: undefined,
+          name: 'Anonymous',
+          createdAt: new Date(),
+          isAdmin: false,
+          isAuthenticated: false,
+          role: 'READER',
+        };
+      } else {
+        const competitionUuid = opts.input.competitionUuid;
+
+        const member = competitionUuid === undefined ? null : await prisma.competitionUser.findUnique({
+          select: {
+            role: true,
+          },
+
+          where: {
+            userId_competitionUuid: {
+              userId: opts.ctx.user.id,
+              competitionUuid,
+            },
+          },
+        });
+
+        const role = member === null ? 'READER' : member.role;
+
+        return { ...opts.ctx.user, isAuthenticated: true, role };
+      }
     }),
 
   userName: procedure

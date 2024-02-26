@@ -15,7 +15,7 @@ import {
 import { uuidv4 } from 'lib0/random';
 import Image from 'next/image';
 import SelectApparatusDialog from '../../../components/SelectApparatusDialog';
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import {
   getApparatusIconPath,
   getApparatusName,
@@ -281,4 +281,4 @@ export default function StagesPage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('stages');
+export const getServerSideProps = withCompetition('stages');

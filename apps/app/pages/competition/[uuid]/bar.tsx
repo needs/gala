@@ -1,4 +1,4 @@
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import { barDefault } from '../../../lib/store';
 import {
   Button,
@@ -304,4 +304,4 @@ export default function BarPage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('bar');
+export const getServerSideProps = withCompetition('bar');

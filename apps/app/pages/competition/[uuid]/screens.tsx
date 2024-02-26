@@ -1,4 +1,4 @@
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import { getScreenName, getDefaultScreen } from '../../../lib/store';
 import {
   Chip,
@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { trpc } from '../../../utils/trpc';
 import { Screen } from '@tgym.fr/core';
 import { useCompetition } from '../../../components/StoreProvider';
+import { Role } from '@prisma/client';
 
 function getScreenUrl(
   competitionUuid: string,
@@ -204,12 +205,11 @@ function CreateScreenButton({
 
 export default function ScreensPage({
   competitionUuid,
-  isPublicCompetition,
 }: {
   competitionUuid: string;
-  isPublicCompetition: boolean;
 }) {
   const { screens } = useCompetition();
+  const { data: user } = trpc.user.useQuery({ competitionUuid });
   const toShortId = trpc.toShortId.useMutation();
 
   return (
@@ -230,25 +230,28 @@ export default function ScreensPage({
           onDelete={() => delete screens[screenUuid]}
         />
       ))}
-      <CreateScreenButton
-        onCreate={async (screen) => {
-          const screenUuid = uuidv4();
+      {user !== undefined && (
+        <CreateScreenButton
+          onCreate={async (screen) => {
+            const screenUuid = uuidv4();
 
-          const shortId = isPublicCompetition
-            ? undefined
-            : await toShortId.mutateAsync({
-                uuid: competitionUuid,
-                screenUuid,
-              });
+            const shortId =
+              user.role === Role.READER
+                ? undefined
+                : await toShortId.mutateAsync({
+                    uuid: competitionUuid,
+                    screenUuid,
+                  });
 
-          screens[screenUuid] = boxed({
-            ...screen,
-            shortUrlId: shortId,
-          });
-        }}
-      />
+            screens[screenUuid] = boxed({
+              ...screen,
+              shortUrlId: shortId,
+            });
+          }}
+        />
+      )}
     </Stack>
   );
 }
 
-export const getServerSideProps = withAuthCompetition('screens');
+export const getServerSideProps = withCompetition('screens');

@@ -11,12 +11,16 @@ function extractNameFromEmail(email: string) {
     .join(' ');
 }
 
-export function getUserName(email: string, name?: string) {
+export function getUserName(email?: string, name?: string) {
   if (name !== undefined) {
     return name;
   }
 
-  return extractNameFromEmail(email);
+  if (email !== undefined) {
+    return extractNameFromEmail(email);
+  }
+
+  return 'Anonymous';
 }
 
 export function avatarUrl(name: string) {

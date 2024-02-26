@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import {
   Add,
   ArrowDownward,
@@ -436,4 +436,4 @@ export default function TimelinePage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('timeline');
+export const getServerSideProps = withCompetition('timeline');

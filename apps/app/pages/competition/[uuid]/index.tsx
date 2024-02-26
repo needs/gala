@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import Head from 'next/head';
 
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import { trpc } from '../../../utils/trpc';
 import { Role } from '@prisma/client';
 import { Delete, Email } from '@mui/icons-material';
@@ -287,12 +287,12 @@ function DeleteCompetitionSection({ competitionUuid }: { competitionUuid: string
 
 export default function Index({
   competitionUuid,
-  isPublicCompetition,
 }: {
   competitionUuid: string;
-  isPublicCompetition: boolean;
 }) {
   const { info } = useCompetition();
+  const { data: user } = trpc.user.useQuery({ competitionUuid });
+
   return (
     <>
       <Head>
@@ -310,11 +310,11 @@ export default function Index({
           }}
         />
 
-        {!isPublicCompetition && (
+        {user !== undefined && user.role !== Role.READER && (
           <MembersListSection competitionUuid={competitionUuid} />
         )}
 
-        {!isPublicCompetition && (
+        {user !== undefined && user.role === Role.OWNER && (
           <DeleteCompetitionSection competitionUuid={competitionUuid} />
         )}
       </Stack>
@@ -322,4 +322,4 @@ export default function Index({
   );
 }
 
-export const getServerSideProps = withAuthCompetition('info');
+export const getServerSideProps = withCompetition('info');

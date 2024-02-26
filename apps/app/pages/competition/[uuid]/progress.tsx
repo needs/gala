@@ -1,5 +1,5 @@
 import { Alert, Button, Stack, Typography } from '@mui/material';
-import { withAuthCompetition } from '../../../lib/auth';
+import { withCompetition } from '../../../lib/auth';
 import TimelineRotation_ from '../../../components/TimelineRotation';
 import TimelinePause_ from '../../../components/TimelinePause';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
@@ -310,4 +310,4 @@ export default function ProgressPage() {
   );
 }
 
-export const getServerSideProps = withAuthCompetition('progress');
+export const getServerSideProps = withCompetition('progress');
