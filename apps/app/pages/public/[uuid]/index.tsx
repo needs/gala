@@ -9,7 +9,6 @@ import { computeTimeline } from '../../../lib/progress';
 import { compact } from 'lodash';
 import { formatRotationTime } from '../../competition/[uuid]/progress';
 import { getApparatusName } from '../../../lib/store';
-import { ApparatusKey } from '@tgym.fr/core';
 
 export default function Index() {
   const { players, teams, schedules } = useCompetition();
@@ -46,21 +45,18 @@ export default function Index() {
             schedule,
             scheduleUuid,
             apparatuses: compact(
-              computeTimeline(schedule).flatMap((scheduledRotation) => {
-                if (scheduledRotation.type !== 'rotation') {
+              computeTimeline(schedule).flatMap((timelineEvent) => {
+                if (timelineEvent.type !== 'rotation') {
                   return [];
                 }
 
-                return Object.entries(scheduledRotation.event.apparatuses).map(
-                  ([apparatusKey, apparatus]) => {
-                    if (
-                      apparatus.teams !== undefined &&
-                      Object.keys(apparatus.teams).includes(teamKey)
-                    ) {
+                return Object.entries(timelineEvent.apparatuses).map(
+                  ([apparatusUuid, apparatus]) => {
+                    if (Object.keys(apparatus.teams).includes(teamKey)) {
                       return {
-                        apparatusKey,
-                        startDate: scheduledRotation.startDate,
-                        endDate: scheduledRotation.endDate,
+                        apparatusType: apparatus.type,
+                        startDate: timelineEvent.startDate,
+                        endDate: timelineEvent.endDate,
                       };
                     } else {
                       return undefined;
@@ -146,13 +142,11 @@ export default function Index() {
                           {schedule.name}
                         </Typography>
                         {apparatuses.map(
-                          ({ apparatusKey, startDate, endDate }, index) => {
+                          ({ apparatusType, startDate, endDate }, index) => {
                             return (
                               <Stack key={index} direction="row" gap={1} pl={2}>
                                 <Typography>
-                                  {getApparatusName(
-                                    apparatusKey as ApparatusKey
-                                  )}
+                                  {getApparatusName(apparatusType)}
                                 </Typography>
                                 <Typography>
                                   {formatRotationTime(startDate, endDate)}
