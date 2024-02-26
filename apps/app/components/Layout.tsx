@@ -297,7 +297,7 @@ function AppLayout({
 
         {user !== undefined && user.role === Role.READER && layoutInfo.menu === "admin" && (
           <Collapse in={isReadOnlyBannerOpen}>
-            <Box padding={4}>
+            <Box paddingX={4} paddingTop={4}>
               <Alert
                 variant="outlined"
                 severity="info"
