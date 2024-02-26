@@ -47,8 +47,6 @@ export default function ListPage() {
     >
       <CssBaseline />
       <Stack gap={4} direction="column">
-        <PublicCompetitionList />
-
         <Stack
           gap={2}
           width="600px"
@@ -153,6 +151,7 @@ export default function ListPage() {
             </Button>
           </Box>
         </Stack>
+        <PublicCompetitionList />
       </Stack>
     </Stack>
   );
