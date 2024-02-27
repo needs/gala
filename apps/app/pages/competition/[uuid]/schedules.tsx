@@ -4,6 +4,8 @@ import {
   Divider,
   IconButton,
   InputAdornment,
+  SpeedDial,
+  SpeedDialIcon,
   Stack,
   Tab,
   Tabs,
@@ -27,6 +29,7 @@ import ScheduleEventRotationComponent from '../../../components/ScheduleEventRot
 import ScheduleEventPauseComponent from '../../../components/ScheduleEventPause';
 import fr from 'date-fns/locale/fr';
 import {
+  Schedule,
   ScheduleEvent,
   ScheduleEventPause,
   ScheduleEventRotation,
@@ -227,6 +230,22 @@ function ScheduleEventPauseContainer({
   );
 }
 
+function newScheduleName(schedules: Record<string, Schedule>) {
+  const scheduleNames = Object.values(schedules).map(
+    (schedule) => schedule.name
+  );
+
+  for (let i = 1; i < 100; i++) {
+    const name = `Plateau ${i}`;
+
+    if (!scheduleNames.includes(name)) {
+      return name;
+    }
+  }
+
+  return 'Nouveau plateau';
+}
+
 export default function SchedulesPage() {
   const { schedules } = useCompetition();
 
@@ -258,7 +277,7 @@ export default function SchedulesPage() {
           onClick={() => {
             const uuid = uuidv4();
             schedules[uuid] = {
-              name: 'Plateau 1',
+              name: newScheduleName(schedules),
               startDate: new Date().toString(),
               events: {},
             };
@@ -303,7 +322,7 @@ export default function SchedulesPage() {
   let nextEventDate = new Date(selectedSchedule.startDate);
 
   return (
-    <Stack direction="column" padding={4} gap={4}>
+    <Stack direction="column">
       <Stack direction="column">
         <Stack
           direction="row"
@@ -314,7 +333,17 @@ export default function SchedulesPage() {
           <Tabs
             value={selectedScheduleUuid}
             onChange={(event, newValue) => {
-              setSelectedScheduleUuid(newValue);
+              if (newValue === 'new') {
+                const uuid = uuidv4();
+                schedules[uuid] = {
+                  name: newScheduleName(schedules),
+                  startDate: new Date().toString(),
+                  events: {},
+                };
+                setSelectedScheduleUuid(uuid);
+              } else {
+                setSelectedScheduleUuid(newValue);
+              }
             }}
             variant="scrollable"
             scrollButtons
@@ -330,8 +359,14 @@ export default function SchedulesPage() {
                   />
                 )
             )}
+            <Tab
+              label="Nouvel échéancier"
+              value="new"
+              icon={<Add />}
+              iconPosition="start"
+            />
           </Tabs>
-          <Stack direction="row" gap={2} py={2}>
+          <Stack direction="row" gap={2} pr={4}>
             <Button
               variant="outlined"
               startIcon={<Add />}
@@ -372,102 +407,106 @@ export default function SchedulesPage() {
         <Divider />
       </Stack>
 
-      <Stack direction="column" gap={2}>
-        <Typography variant="h6" component="h1">
-          Ouverture du gymnase
-        </Typography>
-        <DateTimePicker
-          label="Date"
-          sx={{
-            minWidth: '400px',
-          }}
-          value={new Date(selectedSchedule.startDate)}
-          onChange={(date) => {
-            if (date !== null) {
-              selectedSchedule.startDate = date.toString();
-            }
-          }}
-          format="EEEE d MMMM yyyy HH:mm"
-        />
-      </Stack>
-
-      {scheduleEvents.map(([scheduleEventUuid, scheduleEvent], order) => {
-        const eventDate = nextEventDate;
-
-        nextEventDate = addMinutes(
-          nextEventDate,
-          scheduleEvent.durationInMinutes || 0
-        );
-
-        const onMoveUp = () => {
-          scheduleEvents[order][1].order -= 1;
-          scheduleEvents[order - 1][1].order += 1;
-        };
-
-        const onMoveDown = () => {
-          scheduleEvents[order][1].order += 1;
-          scheduleEvents[order + 1][1].order -= 1;
-        };
-
-        const onDelete = () => {
-          delete selectedSchedule.events[scheduleEventUuid];
-        };
-
-        if (scheduleEvent.type === 'rotation') {
-          const rotationApparatuses = getRotationApparatuses(scheduleEvent);
-
-          const isEmpty = rotationApparatuses.every(
-            ({ apparatus }) => Object.keys(apparatus.teams).length === 0
-          );
-
-          return (
-            <ScheduleEventRotationContainer
-              key={scheduleEventUuid}
-              scheduleEventRotation={scheduleEvent}
-              date={eventDate}
-              onMoveUp={order === 0 ? undefined : onMoveUp}
-              onMoveDown={
-                order === Object.keys(selectedSchedule.events).length - 1
-                  ? undefined
-                  : onMoveDown
+      <Stack gap={4} padding={4}>
+        <Stack direction="column" gap={2}>
+          <Stack direction="row" gap={4} justifyContent="space-between">
+            <Typography variant="h6" component="h1">
+              {"Début de l'échéancier"}
+            </Typography>
+          </Stack>
+          <DateTimePicker
+            label="Date"
+            sx={{
+              minWidth: '400px',
+            }}
+            value={new Date(selectedSchedule.startDate)}
+            onChange={(date) => {
+              if (date !== null) {
+                selectedSchedule.startDate = date.toString();
               }
-              onDelete={!isEmpty ? undefined : onDelete}
-            />
-          );
-        } else if (scheduleEvent.type === 'pause') {
-          return (
-            <ScheduleEventPauseContainer
-              key={scheduleEventUuid}
-              scheduleEventPause={scheduleEvent}
-              date={eventDate}
-              onMoveUp={order === 0 ? undefined : onMoveUp}
-              onMoveDown={
-                order === Object.keys(selectedSchedule.events).length - 1
-                  ? undefined
-                  : onMoveDown
-              }
-              onDelete={onDelete}
-            />
-          );
-        }
-      })}
+            }}
+            format="EEEE d MMMM yyyy HH:mm"
+          />
+        </Stack>
 
-      <Stack gap={2}>
-        <Typography variant="h6" component="h1">
-          {format(nextEventDate, 'HH:mm')} - Fin de la compétition
-        </Typography>
-        <Typography variant="body1">
-          Durée totale de la compétition :{' '}
-          {formatDuration(
-            intervalToDuration({
-              start: new Date(selectedSchedule.startDate),
-              end: nextEventDate,
-            }),
-            {
-              locale: fr,
-            }
-          )}
-        </Typography>
+        {scheduleEvents.map(([scheduleEventUuid, scheduleEvent], order) => {
+          const eventDate = nextEventDate;
+
+          nextEventDate = addMinutes(
+            nextEventDate,
+            scheduleEvent.durationInMinutes || 0
+          );
+
+          const onMoveUp = () => {
+            scheduleEvents[order][1].order -= 1;
+            scheduleEvents[order - 1][1].order += 1;
+          };
+
+          const onMoveDown = () => {
+            scheduleEvents[order][1].order += 1;
+            scheduleEvents[order + 1][1].order -= 1;
+          };
+
+          const onDelete = () => {
+            delete selectedSchedule.events[scheduleEventUuid];
+          };
+
+          if (scheduleEvent.type === 'rotation') {
+            const rotationApparatuses = getRotationApparatuses(scheduleEvent);
+
+            const isEmpty = rotationApparatuses.every(
+              ({ apparatus }) => Object.keys(apparatus.teams).length === 0
+            );
+
+            return (
+              <ScheduleEventRotationContainer
+                key={scheduleEventUuid}
+                scheduleEventRotation={scheduleEvent}
+                date={eventDate}
+                onMoveUp={order === 0 ? undefined : onMoveUp}
+                onMoveDown={
+                  order === Object.keys(selectedSchedule.events).length - 1
+                    ? undefined
+                    : onMoveDown
+                }
+                onDelete={!isEmpty ? undefined : onDelete}
+              />
+            );
+          } else if (scheduleEvent.type === 'pause') {
+            return (
+              <ScheduleEventPauseContainer
+                key={scheduleEventUuid}
+                scheduleEventPause={scheduleEvent}
+                date={eventDate}
+                onMoveUp={order === 0 ? undefined : onMoveUp}
+                onMoveDown={
+                  order === Object.keys(selectedSchedule.events).length - 1
+                    ? undefined
+                    : onMoveDown
+                }
+                onDelete={onDelete}
+              />
+            );
+          }
+        })}
+
+        <Stack gap={2}>
+          <Typography variant="h6" component="h1">
+            {`${format(nextEventDate, 'HH:mm')} - Fin de l'échéancier`}
+          </Typography>
+          <Typography variant="body1">
+            Durée totale de la compétition :{' '}
+            {formatDuration(
+              intervalToDuration({
+                start: new Date(selectedSchedule.startDate),
+                end: nextEventDate,
+              }),
+              {
+                locale: fr,
+              }
+            )}
+          </Typography>
+        </Stack>
       </Stack>
     </Stack>
   );
