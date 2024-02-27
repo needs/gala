@@ -145,19 +145,19 @@ function ScheduleEventRotationContainer({
   onMoveUp,
   onMoveDown,
   onDelete,
+  onRemoveApparatus,
 }: {
   scheduleEventRotation: ScheduleEventRotation;
   date: Date;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onDelete?: () => void;
+  onRemoveApparatus: (apparatusUuid: string) => void;
 }) {
   const [isSelectApparatusDialogOpen, setIsSelectApparatusDialogOpen] =
     useState(false);
 
-  const apparatuses = getRotationApparatuses(scheduleEventRotation).map(
-    ({ apparatus }) => apparatus
-  );
+  const apparatuses = getRotationApparatuses(scheduleEventRotation);
 
   return (
     <>
@@ -197,7 +197,10 @@ function ScheduleEventRotationContainer({
         onMoveDown={onMoveDown}
         onDelete={onDelete}
       >
-        <ScheduleEventRotationComponent apparatuses={apparatuses} />
+        <ScheduleEventRotationComponent
+          apparatuses={apparatuses}
+          onRemove={onRemoveApparatus}
+        />
       </ScheduleEventContainer>
     </>
   );
@@ -488,6 +491,9 @@ export default function SchedulesPage() {
                     : onMoveDown
                 }
                 onDelete={!isEmpty ? undefined : onDelete}
+                onRemoveApparatus={(apparatusUuid) => {
+                  delete scheduleEvent.apparatuses[apparatusUuid];
+                }}
               />
             );
           } else if (scheduleEvent.type === 'pause') {

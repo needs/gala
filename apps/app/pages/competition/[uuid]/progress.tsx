@@ -186,7 +186,10 @@ function ProgressRotation({
       rotationLength={rotationLength}
     >
       <ScheduleEventRotationComponent
-        apparatuses={apparatuses}
+        apparatuses={apparatuses.map((apparatus, index) => ({
+          apparatus: apparatus,
+          apparatusUuid: "apparatus-" + index.toString(),
+        }))}
         readOnly={true}
       />
     </ProgressContainer>

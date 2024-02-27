@@ -6,10 +6,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import {
-  getApparatusIconPath,
-  getApparatusName,
-} from '../lib/store';
+import { getApparatusIconPath, getApparatusName } from '../lib/store';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
 import { useState } from 'react';
@@ -17,15 +14,15 @@ import SelectTeamDialog from './SelectTeamDialog';
 import { Add, Edit, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
-import { ScheduleEventRotation, ScheduleEventRotationApparatus, Team } from '@tgym.fr/core';
+import {
+  ScheduleEventRotation,
+  ScheduleEventRotationApparatus,
+  Team,
+} from '@tgym.fr/core';
 import { useCompetition } from './StoreProvider';
 import { getTeamName, getTeamNameSxProps } from '../lib/team';
 
-function AddTeamButton({
-  onAdd,
-}: {
-  onAdd: (teamKey: string) => void;
-}) {
+function AddTeamButton({ onAdd }: { onAdd: (teamKey: string) => void }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -134,9 +131,14 @@ function EditTeamButton({
 
 export default function ScheduleEventRotation({
   apparatuses,
+  onRemove,
   readOnly,
 }: {
-  apparatuses: ScheduleEventRotationApparatus[];
+  apparatuses: {
+    apparatus: ScheduleEventRotationApparatus;
+    apparatusUuid: string;
+  }[];
+  onRemove?: (apparatusUuid: string) => void;
   readOnly?: boolean;
 }) {
   const { teams } = useCompetition();
@@ -144,10 +146,10 @@ export default function ScheduleEventRotation({
   return (
     <Paper elevation={1}>
       <Grid container>
-        {apparatuses.map((apparatus, index) => {
+        {apparatuses.map(({ apparatus, apparatusUuid }) => {
           return (
             <Grid
-              key={index}
+              key={apparatusUuid}
               xs
               sx={{
                 '&:nth-of-type(odd)': {
@@ -181,13 +183,15 @@ export default function ScheduleEventRotation({
                       {getApparatusName(apparatus.type)}
                     </Typography>
                   </Stack>
-
-                  {!readOnly && (
-                    <AddTeamButton
-                      onAdd={(teamKey) => {
-                        apparatus.teams[teamKey] = true;
+                  {!readOnly && onRemove !== undefined && (
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        onRemove(apparatusUuid);
                       }}
-                    />
+                    >
+                      <Remove />
+                    </IconButton>
                   )}
                 </Stack>
 
@@ -208,6 +212,15 @@ export default function ScheduleEventRotation({
                       )
                     );
                   })}
+                  {!readOnly && (
+                    <Stack alignItems="end" p={2}>
+                      <AddTeamButton
+                        onAdd={(teamKey) => {
+                          apparatus.teams[teamKey] = true;
+                        }}
+                      />
+                    </Stack>
+                  )}
                 </Stack>
               </Stack>
             </Grid>
