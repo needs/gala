@@ -4,8 +4,6 @@ import {
   Divider,
   IconButton,
   InputAdornment,
-  SpeedDial,
-  SpeedDialIcon,
   Stack,
   Tab,
   Tabs,
@@ -22,6 +20,7 @@ import {
   format,
   formatDuration,
   intervalToDuration,
+  isEqual,
 } from 'date-fns';
 import { ReactNode, useState } from 'react';
 import { max, sortBy } from 'lodash';
@@ -409,11 +408,9 @@ export default function SchedulesPage() {
 
       <Stack gap={4} padding={4}>
         <Stack direction="column" gap={2}>
-          <Stack direction="row" gap={4} justifyContent="space-between">
-            <Typography variant="h6" component="h1">
-              {"Début de l'échéancier"}
-            </Typography>
-          </Stack>
+          <Typography variant="h6" component="h1">
+            {"Début de l'échéancier"}
+          </Typography>
           <DateTimePicker
             label="Date"
             sx={{
@@ -491,20 +488,39 @@ export default function SchedulesPage() {
         })}
 
         <Stack gap={2}>
-          <Typography variant="h6" component="h1">
-            {`${format(nextEventDate, 'HH:mm')} - Fin de l'échéancier`}
-          </Typography>
+          <Stack direction="row" gap={4} justifyContent="space-between">
+            <Typography variant="h6" component="h1">
+              {`${format(nextEventDate, 'HH:mm')} - Fin de l'échéancier`}
+            </Typography>
+            <Tooltip title={'Doubler cliquez pour supprimer'}>
+              <span>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onDoubleClick={() => {
+                    delete schedules[selectedScheduleUuid];
+                    setSelectedScheduleUuid(Object.keys(schedules).at(0));
+                  }}
+                  startIcon={<Delete />}
+                >
+                  Supprimer
+                </Button>
+              </span>
+            </Tooltip>
+          </Stack>
           <Typography variant="body1">
             Durée totale de la compétition :{' '}
-            {formatDuration(
-              intervalToDuration({
-                start: new Date(selectedSchedule.startDate),
-                end: nextEventDate,
-              }),
-              {
-                locale: fr,
-              }
-            )}
+            {isEqual(nextEventDate, new Date(selectedSchedule.startDate))
+              ? '0 minute'
+              : formatDuration(
+                  intervalToDuration({
+                    start: new Date(selectedSchedule.startDate),
+                    end: nextEventDate,
+                  }),
+                  {
+                    locale: fr,
+                  }
+                )}
           </Typography>
         </Stack>
       </Stack>
