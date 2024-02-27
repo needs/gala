@@ -150,7 +150,10 @@ export default function ScheduleEventRotation({
           return (
             <Grid
               key={apparatusUuid}
-              xs
+              xs={12}
+              md={6}
+              lg={4}
+              xl={3}
               sx={{
                 '&:nth-of-type(odd)': {
                   backgroundColor: (theme) => theme.palette.grey[50],
