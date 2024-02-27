@@ -392,7 +392,28 @@ export default function SchedulesPage() {
 
                 selectedSchedule.events[uuidv4()] = {
                   type: 'rotation',
-                  apparatuses: {},
+                  apparatuses: {
+                    [uuidv4()]: {
+                      type: 'vault',
+                      order: 0,
+                      teams: {},
+                    },
+                    [uuidv4()]: {
+                      type: 'unevenBars',
+                      order: 1,
+                      teams: {},
+                    },
+                    [uuidv4()]: {
+                      type: 'beam',
+                      order: 2,
+                      teams: {},
+                    },
+                    [uuidv4()]: {
+                      type: 'floor',
+                      order: 3,
+                      teams: {},
+                    },
+                  },
                   order,
                   durationInMinutes: 60,
                 };
