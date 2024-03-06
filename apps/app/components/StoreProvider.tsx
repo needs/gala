@@ -16,6 +16,7 @@ import { useSyncedStore } from '@syncedstore/react';
 import { trpc } from '../utils/trpc';
 import syncedStore from '@syncedstore/core';
 import { parseCookies } from 'nookies';
+import { getUserName } from '../lib/avatar';
 
 const context = createContext<
   | {
@@ -38,7 +39,7 @@ const StoreProvider = ({
   const [awareness, setAwereness] = useState<
     onAwarenessUpdateParameters | undefined
   >(undefined);
-  const { data: userName } = trpc.userName.useQuery(null);
+  const { data: user } = trpc.user.useQuery({ competitionUuid });
 
   const [values] = useState(() => {
     const cookies = parseCookies();
@@ -77,12 +78,12 @@ const StoreProvider = ({
   });
 
   useEffect(() => {
-    if (userName !== undefined) {
+    if (user !== undefined) {
       values.provider.setAwarenessField('user', {
-        name: userName,
+        name: getUserName(user.email, user.name ?? undefined),
       });
     }
-  }, [userName, values.provider]);
+  }, [user, values.provider]);
 
   if (competitionUuid !== undefined && !storeLoaded) {
     return (
