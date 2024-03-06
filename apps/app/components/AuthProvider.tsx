@@ -1,15 +1,15 @@
 import { User } from 'firebase/auth';
 import nookies from 'nookies';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, use, useContext, useEffect, useState } from 'react';
 import { getFirebaseAppAuth } from '../lib/firebase';
 
-const AuthContext = createContext<{ user: User | null, idToken: string | null }>({
+const authContext = createContext<{ user: User | null, idToken: string | null }>({
   user: null,
   idToken: null,
 });
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  return useContext(authContext);
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -48,6 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, idToken }}>{children}</AuthContext.Provider>
+    <authContext.Provider value={{ user, idToken }}>{children}</authContext.Provider>
   );
 }

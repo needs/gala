@@ -36,22 +36,22 @@ const StoreProvider = ({
   competitionUuid: string;
 }) => {
   const [storeLoaded, setStoreLoaded] = useState(false);
-  const [awareness, setAwereness] = useState<
+  const [awareness, setAwareness] = useState<
     onAwarenessUpdateParameters | undefined
   >(undefined);
   const { data: user } = trpc.user.useQuery({ competitionUuid });
 
-  const [values] = useState(() => {
+  const [{ provider, store, undoManager }] = useState(() => {
     const cookies = parseCookies();
     setStoreLoaded(false);
 
     const provider = new HocuspocusProvider({
       url: process.env.NEXT_PUBLIC_HOCUSPOCUS_URL ?? 'ws://127.0.0.1:1234',
       name: competitionUuid,
-      token: cookies.token || "notoken",
+      token: cookies.token || 'notoken',
 
       onAwarenessUpdate(awareness) {
-        setAwereness(awareness);
+        setAwareness(awareness);
       },
     });
 
@@ -79,11 +79,17 @@ const StoreProvider = ({
 
   useEffect(() => {
     if (user !== undefined) {
-      values.provider.setAwarenessField('user', {
-        name: getUserName(user.email, user.name ?? undefined),
-      });
+      const name = getUserName(user.email, user.name ?? undefined);
+      provider.setAwarenessField('user', { name });
     }
-  }, [user, values.provider]);
+  }, [user, provider]);
+
+  useEffect(() => {
+    return () => {
+      provider.destroy();
+      undoManager.destroy();
+    };
+  }, [provider, undoManager]);
 
   if (competitionUuid !== undefined && !storeLoaded) {
     return (
@@ -100,7 +106,7 @@ const StoreProvider = ({
     );
   } else {
     return (
-      <context.Provider value={{ ...values, awareness }}>
+      <context.Provider value={{ provider, store, undoManager, awareness }}>
         {children}
       </context.Provider>
     );

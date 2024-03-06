@@ -304,7 +304,7 @@ export default function Index({
         </Typography>
         <TextField
           label="Nom de la compétition"
-          value={info.name}
+          value={info.name ?? ''}
           onChange={(e) => {
             info.name = e.target.value;
           }}

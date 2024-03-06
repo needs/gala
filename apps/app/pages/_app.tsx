@@ -31,7 +31,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithProoperties) {
       <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
         {gaId !== undefined && <GoogleAnalytics gaId={gaId} />}
         {competitionUuid !== undefined ? (
-          <StoreProvider competitionUuid={pageProps.competitionUuid}>
+          <StoreProvider competitionUuid={competitionUuid}>
             <Layout
               layoutInfo={pageProps.layoutInfo}
               competitionUuid={competitionUuid}
