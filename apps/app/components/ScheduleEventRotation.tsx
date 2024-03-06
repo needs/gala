@@ -2,6 +2,10 @@ import {
   Button,
   Divider,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   Paper,
   Stack,
   Typography,
@@ -11,7 +15,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Image from 'next/image';
 import { useState } from 'react';
 import SelectTeamDialog from './SelectTeamDialog';
-import { Add, Edit, Remove } from '@mui/icons-material';
+import { Add, Edit, MoreVert, Remove } from '@mui/icons-material';
 import EditTeamDialog from './EditTeamDialog';
 import EditPlayerButton from './EditPlayerButton';
 import {
@@ -129,6 +133,114 @@ function EditTeamButton({
   );
 }
 
+function Apparatus({
+  apparatus,
+  apparatusUuid,
+  teams,
+  onRemove,
+  readOnly,
+}: {
+  apparatus: ScheduleEventRotationApparatus;
+  apparatusUuid: string;
+  teams: Record<string, Team>;
+  onRemove?: (apparatusUuid: string) => void;
+  readOnly?: boolean;
+}) {
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+
+  const closeMenu = () => {
+    setMenuAnchorEl(null);
+  };
+
+  return (
+    <Stack alignItems="stretch" flexGrow={1}>
+      <Stack
+        direction="row"
+        gap={2}
+        justifyContent="space-between"
+        padding={2}
+        sx={{
+          backgroundColor: '#a5a5a511',
+        }}
+      >
+        <Stack
+          direction="row"
+          gap={2}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Image
+            src={getApparatusIconPath(apparatus.type)}
+            alt={getApparatusName(apparatus.type)}
+            width={24}
+            height={24}
+          />
+          <Typography variant="h6">
+            {getApparatusName(apparatus.type)}
+          </Typography>
+        </Stack>
+        {!readOnly && onRemove !== undefined && (
+          <>
+            <Menu
+              anchorEl={menuAnchorEl}
+              open={Boolean(menuAnchorEl)}
+              onClose={closeMenu}
+            >
+              <MenuItem
+                onClick={() => {
+                  onRemove(apparatusUuid);
+                  closeMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <Remove />
+                </ListItemIcon>
+                <ListItemText>Supprimer</ListItemText>
+              </MenuItem>
+            </Menu>
+            <IconButton
+              size="small"
+              onClick={(event) => {
+                setMenuAnchorEl(event.currentTarget);
+              }}
+            >
+              <MoreVert />
+            </IconButton>
+          </>
+        )}
+      </Stack>
+
+      <Stack flexGrow={1} direction="column" divider={<Divider />}>
+        {Object.keys(apparatus.teams).map((teamUuid) => {
+          const team = teams[teamUuid];
+
+          return (
+            team !== undefined && (
+              <EditTeamButton
+                key={teamUuid}
+                team={team}
+                onRemove={() => {
+                  delete apparatus.teams[teamUuid];
+                }}
+                readOnly={readOnly}
+              />
+            )
+          );
+        })}
+        {!readOnly && (
+          <Stack alignItems="end" p={2}>
+            <AddTeamButton
+              onAdd={(teamKey) => {
+                apparatus.teams[teamKey] = true;
+              }}
+            />
+          </Stack>
+        )}
+      </Stack>
+    </Stack>
+  );
+}
+
 export default function ScheduleEventRotation({
   apparatuses,
   onRemove,
@@ -160,72 +272,13 @@ export default function ScheduleEventRotation({
                 },
               }}
             >
-              <Stack alignItems="stretch" flexGrow={1}>
-                <Stack
-                  direction="row"
-                  gap={2}
-                  justifyContent="space-between"
-                  padding={2}
-                  sx={{
-                    backgroundColor: '#a5a5a511',
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    gap={2}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Image
-                      src={getApparatusIconPath(apparatus.type)}
-                      alt={getApparatusName(apparatus.type)}
-                      width={24}
-                      height={24}
-                    />
-                    <Typography variant="h6">
-                      {getApparatusName(apparatus.type)}
-                    </Typography>
-                  </Stack>
-                  {!readOnly && onRemove !== undefined && (
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        onRemove(apparatusUuid);
-                      }}
-                    >
-                      <Remove />
-                    </IconButton>
-                  )}
-                </Stack>
-
-                <Stack flexGrow={1} direction="column" divider={<Divider />}>
-                  {Object.keys(apparatus.teams).map((teamUuid) => {
-                    const team = teams[teamUuid];
-
-                    return (
-                      team !== undefined && (
-                        <EditTeamButton
-                          key={teamUuid}
-                          team={team}
-                          onRemove={() => {
-                            delete apparatus.teams[teamUuid];
-                          }}
-                          readOnly={readOnly}
-                        />
-                      )
-                    );
-                  })}
-                  {!readOnly && (
-                    <Stack alignItems="end" p={2}>
-                      <AddTeamButton
-                        onAdd={(teamKey) => {
-                          apparatus.teams[teamKey] = true;
-                        }}
-                      />
-                    </Stack>
-                  )}
-                </Stack>
-              </Stack>
+              <Apparatus
+                apparatus={apparatus}
+                apparatusUuid={apparatusUuid}
+                teams={teams}
+                onRemove={onRemove}
+                readOnly={readOnly}
+              />
             </Grid>
           );
         })}
