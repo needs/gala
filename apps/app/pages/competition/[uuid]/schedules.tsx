@@ -431,6 +431,13 @@ export default function SchedulesPage() {
       </Stack>
 
       <Stack gap={4} padding={4}>
+      <TextField
+            label="Nom de l'échéancier"
+            value={selectedSchedule.name ?? ''}
+            onChange={(e) => {
+              selectedSchedule.name = e.target.value;
+            }}
+          />
         <Stack direction="column" gap={2}>
           <Typography variant="h6" component="h1">
             {"Début de l'échéancier"}
