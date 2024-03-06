@@ -4,6 +4,11 @@ import {
   Divider,
   IconButton,
   InputAdornment,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuList,
   Stack,
   Tab,
   Tabs,
@@ -12,7 +17,16 @@ import {
   Typography,
 } from '@mui/material';
 import { withCompetition } from '../../../lib/auth';
-import { Add, ArrowDownward, ArrowUpward, Delete } from '@mui/icons-material';
+import {
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  CalendarViewWeek,
+  Delete,
+  EventNote,
+  KeyboardArrowDown,
+  Pause,
+} from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { uuidv4 } from 'lib0/random';
 import {
@@ -250,6 +264,9 @@ function newScheduleName(schedules: Record<string, Schedule>) {
 
 export default function SchedulesPage() {
   const { schedules } = useCompetition();
+  const [addMenuAnchorEl, setAddMenuAnchorEl] = useState<null | HTMLElement>(
+    null
+  );
 
   const [selectedScheduleUuid, setSelectedScheduleUuid] = useState<
     string | undefined
@@ -323,6 +340,62 @@ export default function SchedulesPage() {
 
   let nextEventDate = new Date(selectedSchedule.startDate);
 
+  const closeAddMenu = () => {
+    setAddMenuAnchorEl(null);
+  };
+
+  const addRotation = () => {
+    const order = eventNextOrder(Object.values(selectedSchedule.events));
+
+    selectedSchedule.events[uuidv4()] = {
+      type: 'rotation',
+      apparatuses: {
+        [uuidv4()]: {
+          type: 'vault',
+          order: 0,
+          teams: {},
+        },
+        [uuidv4()]: {
+          type: 'unevenBars',
+          order: 1,
+          teams: {},
+        },
+        [uuidv4()]: {
+          type: 'beam',
+          order: 2,
+          teams: {},
+        },
+        [uuidv4()]: {
+          type: 'floor',
+          order: 3,
+          teams: {},
+        },
+      },
+      order,
+      durationInMinutes: 60,
+    };
+  };
+
+  const addPause = () => {
+    const order = eventNextOrder(Object.values(selectedSchedule.events));
+
+    selectedSchedule.events[uuidv4()] = {
+      type: 'pause',
+      order,
+      durationInMinutes: 30,
+    };
+  };
+
+  const addSchedule = () => {
+    const uuid = uuidv4();
+    schedules[uuid] = {
+      name: newScheduleName(schedules),
+      startDate: new Date().toString(),
+      events: {},
+    };
+    setSelectedScheduleUuid(uuid);
+  };
+
   return (
     <Stack direction="column">
       <Stack direction="column">
@@ -334,18 +407,8 @@ export default function SchedulesPage() {
         >
           <Tabs
             value={selectedScheduleUuid}
-            onChange={(event, newValue) => {
-              if (newValue === 'new') {
-                const uuid = uuidv4();
-                schedules[uuid] = {
-                  name: newScheduleName(schedules),
-                  startDate: new Date().toString(),
-                  events: {},
-                };
-                setSelectedScheduleUuid(uuid);
-              } else {
-                setSelectedScheduleUuid(newValue);
-              }
+            onChange={(_, newValue) => {
+              setSelectedScheduleUuid(newValue);
             }}
             variant="scrollable"
             scrollButtons
@@ -358,86 +421,104 @@ export default function SchedulesPage() {
                     key={scheduleUuid}
                     label={schedule.name}
                     value={scheduleUuid}
+                    sx={{ minHeight: 60 }}
                   />
                 )
             )}
-            <Tab
-              label="Nouvel échéancier"
-              value="new"
-              icon={<Add />}
-              iconPosition="start"
-            />
           </Tabs>
-          <Stack direction="row" gap={2} pr={4}>
+          <>
             <Button
-              variant="outlined"
-              startIcon={<Add />}
-              onClick={() => {
-                const order = eventNextOrder(
-                  Object.values(selectedSchedule.events)
-                );
-
-                selectedSchedule.events[uuidv4()] = {
-                  type: 'pause',
-                  order,
-                  durationInMinutes: 30,
-                };
-              }}
-            >
-              Pause
-            </Button>
-            <Button
+              endIcon={<KeyboardArrowDown />}
               variant="contained"
-              onClick={() => {
-                const order = eventNextOrder(
-                  Object.values(selectedSchedule.events)
-                );
-
-                selectedSchedule.events[uuidv4()] = {
-                  type: 'rotation',
-                  apparatuses: {
-                    [uuidv4()]: {
-                      type: 'vault',
-                      order: 0,
-                      teams: {},
-                    },
-                    [uuidv4()]: {
-                      type: 'unevenBars',
-                      order: 1,
-                      teams: {},
-                    },
-                    [uuidv4()]: {
-                      type: 'beam',
-                      order: 2,
-                      teams: {},
-                    },
-                    [uuidv4()]: {
-                      type: 'floor',
-                      order: 3,
-                      teams: {},
-                    },
-                  },
-                  order,
-                  durationInMinutes: 60,
-                };
+              onClick={(event) => {
+                setAddMenuAnchorEl(event.currentTarget);
               }}
-              startIcon={<Add />}
+              sx={{ mr: 4 }}
             >
-              Rotation
+              Ajouter
             </Button>
-          </Stack>
+            <Menu
+              anchorEl={addMenuAnchorEl}
+              open={Boolean(addMenuAnchorEl)}
+              onClose={closeAddMenu}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: 'visible',
+                  filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                  mt: 1.5,
+                  minWidth: 200,
+                  '& .MuiAvatar-root': {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  '&::before': {
+                    content: '""',
+                    display: 'block',
+                    position: 'absolute',
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: 'background.paper',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    zIndex: 0,
+                  },
+                },
+              }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem
+                onClick={() => {
+                  addSchedule();
+                  closeAddMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <EventNote />
+                </ListItemIcon>
+                <ListItemText>Échéancier</ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  addRotation();
+                  closeAddMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <CalendarViewWeek />
+                </ListItemIcon>
+                <ListItemText>Rotation</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  addPause();
+                  closeAddMenu();
+                }}
+              >
+                <ListItemIcon>
+                  <Pause />
+                </ListItemIcon>
+                <ListItemText>Pause</ListItemText>
+              </MenuItem>
+            </Menu>
+          </>
         </Stack>
         <Divider />
       </Stack>
 
       <Stack gap={4} padding={4}>
-      <TextField
-            label="Nom de l'échéancier"
-            value={selectedSchedule.name ?? ''}
-            onChange={(e) => {
-              selectedSchedule.name = e.target.value;
-            }}
-          />
+        <TextField
+          label="Nom de l'échéancier"
+          value={selectedSchedule.name ?? ''}
+          onChange={(e) => {
+            selectedSchedule.name = e.target.value;
+          }}
+        />
         <Stack direction="column" gap={2}>
           <Typography variant="h6" component="h1">
             {"Début de l'échéancier"}
