@@ -1,10 +1,12 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:latest
+  postgres:
+    image: postgres:latest
     environment:
-      MYSQL_ROOT_PASSWORD: tgymfr
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tgym
     ports:
-      - "3306:3306"
+      - "5437:5432"
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c max_connections=200
     restart: always
