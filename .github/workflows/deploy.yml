@@ -25,6 +25,8 @@ jobs:
       - name: Proxy database
         run: |
           flyctl proxy 5434:5432 --app tgymfr-postgres &
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_POSTGRES }}
 
       # Migrate database before building because the building process expects the
       # database to be up-to-date.
@@ -33,7 +35,6 @@ jobs:
           npx nx run-many -t prisma-deploy --parallel=3
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_POSTGRES }}
 
       - name: Prisma Generate
         run: npx nx run-many -t prisma-generate --parallel=3
