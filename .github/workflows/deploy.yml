@@ -26,7 +26,6 @@ jobs:
         run: |
           flyctl proxy 5434:5432 --app tgymfr-postgres &
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_POSTGRES }}
 
       # Migrate database before building because the building process expects the
